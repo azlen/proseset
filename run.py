@@ -222,6 +222,14 @@ def build_wordfreq_twl_dictionary(
         sort_output=False,
     )
 
+    if allow_single_letters:
+        single_letters = allowed_single_letters or DEFAULT_SINGLE_LETTERS
+        for letter in single_letters:
+            if len(letter) == 1 and letter not in processed:
+                processed.append(letter)
+
+    processed.sort()
+
     return processed
 
 
@@ -457,6 +465,50 @@ def interactive_loop(
             debug_extension_process(lookup, word_set, trie)
 
 
+def calculate_combinations_for_word(
+    word: str,
+    word_set: Set[str],
+    forward_index_sets: Dict[str, Set[str]],
+    backward_index_sets: Dict[str, Set[str]],
+    *,
+    require_valid_start: bool = False,
+    require_valid_end: bool = False,
+) -> Tuple[int, int, int, int]:
+    """Return (total_combos, total_left, total_right, contributing_segmentations)."""
+
+    segmentations = segment_word(
+        word,
+        word_set,
+        require_valid_start=require_valid_start,
+        require_valid_end=require_valid_end,
+    )
+
+    total_combos = 0
+    total_left = 0
+    total_right = 0
+    contributing_segmentations = 0
+
+    for segmentation in segmentations:
+        if len(segmentation) < 2:
+            continue
+        first_segment = segmentation[0]
+        last_segment = segmentation[-1]
+        left_candidates = forward_index_sets.get(first_segment)
+        right_candidates = backward_index_sets.get(last_segment)
+        if not left_candidates or not right_candidates:
+            continue
+        left_count = len(left_candidates)
+        right_count = len(right_candidates)
+        if not left_count or not right_count:
+            continue
+        contributing_segmentations += 1
+        total_left += left_count
+        total_right += right_count
+        total_combos += left_count * right_count
+
+    return total_combos, total_left, total_right, contributing_segmentations
+
+
 def build_extension_index(
     words: List[str],
     forward_trie: TrieNode,
@@ -635,6 +687,17 @@ def parse_args() -> argparse.Namespace:
         default=Path("third_party/twl.py"),
         help="Path to a TWL word list (twl.py or text) for Scrabble validation",
     )
+    parser.add_argument(
+        "--rank-combinations",
+        action="store_true",
+        help="Compute combination totals for every word and print the top scorers",
+    )
+    parser.add_argument(
+        "--combination-top",
+        type=int,
+        default=500,
+        help="How many of the highest-scoring words to display when ranking combinations",
+    )
     return parser.parse_args()
 
 
@@ -693,35 +756,107 @@ def main() -> None:
         serialize_trie(reverse, output_dir / "reverse_trie.json")
         print(f"Serialized tries to {output_dir.resolve()}")
 
+    word_set: Set[str] = set(words)
+
     forward_extension_lists: Dict[str, List[str]] = {}
     backward_extension_lists: Dict[str, List[str]] = {}
+    forward_extension_sets: Dict[str, Set[str]] = {}
+    backward_extension_sets: Dict[str, Set[str]] = {}
 
-    if not args.skip_extension_index:
+    need_extension_index = (
+        args.rank_combinations
+        or not args.skip_extension_index
+        or not args.no_interactive
+    )
+
+    if need_extension_index:
+        extension_limit = args.extension_limit
+        if args.rank_combinations and extension_limit < len(words):
+            extension_limit = len(words)
+            print(
+                "Expanding extension index limit to cover entire dictionary:",
+                f"{extension_limit:,}",
+            )
+
         extension_index = build_extension_index(
             words,
             forward,
             reverse,
-            limit=args.extension_limit,
+            limit=extension_limit,
         )
-        serialize_extension_index(extension_index, args.extension_output)
-        print(
-            "Extension index entries:",
-            f"forward={len(extension_index['forward']):,} | backward={len(extension_index['backward']):,}",
-            "| Saved to",
-            args.extension_output.resolve(),
-        )
+
         forward_extension_lists = extension_index["forward"]
         backward_extension_lists = extension_index["backward"]
-
-    if not args.no_interactive:
         forward_extension_sets = {
-            remainder: set(word_list) for remainder, word_list in forward_extension_lists.items()
+            remainder: set(word_list)
+            for remainder, word_list in forward_extension_lists.items()
         }
         backward_extension_sets = {
-            remainder: set(word_list) for remainder, word_list in backward_extension_lists.items()
+            remainder: set(word_list)
+            for remainder, word_list in backward_extension_lists.items()
         }
+
+        print(
+            "Extension index entries:",
+            f"forward={len(forward_extension_lists):,} | backward={len(backward_extension_lists):,}",
+        )
+
+        if not args.skip_extension_index:
+            serialize_extension_index(extension_index, args.extension_output)
+            print("Saved extension index to", args.extension_output.resolve())
+
+    if args.rank_combinations:
+        if not forward_extension_sets or not backward_extension_sets:
+            print("Combination ranking requires the extension index; none available.")
+        else:
+            print("Calculating combination totals for all words…")
+            combo_results: List[Tuple[int, int, int, int, str]] = []
+            for word in words:
+                combos, total_left, total_right, contributing = calculate_combinations_for_word(
+                    word,
+                    word_set,
+                    forward_extension_sets,
+                    backward_extension_sets,
+                    require_valid_start=args.require_valid_start,
+                    require_valid_end=args.require_valid_end,
+                )
+                if combos:
+                    combo_results.append(
+                        (combos, total_left, total_right, contributing, word)
+                    )
+
+            if combo_results:
+                combo_results.sort(
+                    key=lambda item: (
+                        -item[0],
+                        -item[1],
+                        -item[2],
+                        -item[3],
+                        item[4],
+                    )
+                )
+                top_n = min(args.combination_top, len(combo_results))
+                print(
+                    f"Top {top_n} words by combination count (out of {len(combo_results):,} scoring words):"
+                )
+                for rank, (combos, total_left, total_right, contributing, word) in enumerate(
+                    combo_results[:top_n],
+                    start=1,
+                ):
+                    print(
+                        f"{rank:4d}. {word:<15} combinations={combos:<8} left_total={total_left:<6} "
+                        f"right_total={total_right:<6} segs={contributing}"
+                    )
+                if len(combo_results) > top_n:
+                    print(
+                        f"… {len(combo_results) - top_n:,} additional words have non-zero combinations."
+                    )
+            else:
+                print("No words produced any combinations with the current settings.")
+
+    if not args.no_interactive:
         interactive_loop(
-            set(words),
+            word_set,
             forward,
             reverse,
             forward_extension_sets,

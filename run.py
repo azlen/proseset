@@ -233,6 +233,46 @@ def build_wordfreq_twl_dictionary(
     return processed
 
 
+def get_zipf_frequency(word: str, wordlist: str = "best") -> float:
+    """Return the wordfreq Zipf frequency for the given word."""
+
+    if not hasattr(get_zipf_frequency, "_cache"):
+        get_zipf_frequency._cache = {}  # type: ignore[attr-defined]
+
+    cache: Dict[Tuple[str, str], float] = get_zipf_frequency._cache  # type: ignore[attr-defined]
+    key = (word, wordlist)
+    if key in cache:
+        return cache[key]
+
+    try:
+        from wordfreq import zipf_frequency
+    except ImportError as exc:  # pragma: no cover - environment-specific
+        raise RuntimeError("wordfreq package is required to fetch word frequencies") from exc
+
+    value = zipf_frequency(word, "en", wordlist=wordlist)
+    cache[key] = value
+    return value
+
+def get_word_frequency(word: str, wordlist: str = "best") -> float:
+    """Return the wordfreq Zipf frequency for the given word."""
+
+    if not hasattr(get_word_frequency, "_cache"):
+        get_word_frequency._cache = {}  # type: ignore[attr-defined]
+
+    cache: Dict[Tuple[str, str], float] = get_word_frequency._cache  # type: ignore[attr-defined]
+    key = (word, wordlist)
+    if key in cache:
+        return cache[key]
+
+    try:
+        from wordfreq import word_frequency
+    except ImportError as exc:  # pragma: no cover - environment-specific
+        raise RuntimeError("wordfreq package is required to fetch word frequencies") from exc
+
+    value = word_frequency(word, "en", wordlist=wordlist)
+    cache[key] = value
+    return value
+
 def find_trie_node(trie: TrieNode, prefix: str) -> TrieNode | None:
     node = trie
     for ch in prefix:
@@ -473,8 +513,17 @@ def calculate_combinations_for_word(
     *,
     require_valid_start: bool = False,
     require_valid_end: bool = False,
-) -> Tuple[int, int, int, int]:
-    """Return (total_combos, total_left, total_right, contributing_segmentations)."""
+) -> Tuple[int, int, int, int, float, Dict[str, float]]:
+    """Calculate combination metrics and edge weights for a single word.
+
+    Returns:
+        total_combos: Count of left-right combinations across segmentations.
+        total_left: Total number of left candidates considered.
+        total_right: Total number of right candidates considered.
+        contributing_segmentations: Segmentations contributing combos.
+        score: Heuristic score for the word (higher is better).
+        edges: Mapping of neighbor word -> accumulated edge weight.
+    """
 
     segmentations = segment_word(
         word,
@@ -488,15 +537,36 @@ def calculate_combinations_for_word(
     total_right = 0
     contributing_segmentations = 0
 
+    score = 0.0
+    word_length = len(word)
+    edges: Dict[str, float] = {}
+
     for segmentation in segmentations:
         if len(segmentation) < 2:
             continue
         first_segment = segmentation[0]
+        middle_segments = segmentation[1:-1]
         last_segment = segmentation[-1]
         left_candidates = forward_index_sets.get(first_segment)
         right_candidates = backward_index_sets.get(last_segment)
         if not left_candidates or not right_candidates:
             continue
+        left_score = sum(get_zipf_frequency(candidate) * len(candidate) / (len(candidate) + word_length) for candidate in left_candidates)
+        right_score = sum(get_zipf_frequency(candidate) * len(candidate) / (len(candidate) + word_length) for candidate in right_candidates)
+        middle_score = sum(get_zipf_frequency(segment) * len(segment) / (len(segment) + word_length) for segment in middle_segments) if len(middle_segments) > 0 else 10
+
+        for candidate in left_candidates:
+            edges.setdefault(candidate, 0)
+            edges[candidate] += get_zipf_frequency(candidate) * len(candidate) / (len(candidate) + word_length) * right_score
+            if candidate[0] == 's':
+                edges[candidate] = 0
+        for candidate in right_candidates:
+            edges.setdefault(candidate, 0)
+            edges[candidate] += get_zipf_frequency(candidate) * len(candidate) / (len(candidate) + word_length) * left_score
+            if candidate[0] == 's':
+                edges[candidate] = 0
+
+        score += left_score * middle_score * right_score
         left_count = len(left_candidates)
         right_count = len(right_candidates)
         if not left_count or not right_count:
@@ -506,8 +576,92 @@ def calculate_combinations_for_word(
         total_right += right_count
         total_combos += left_count * right_count
 
-    return total_combos, total_left, total_right, contributing_segmentations
+    score *= pow(word_length, 3) * get_zipf_frequency(word)
 
+    if word[0] == 's':
+        score = 0
+
+    return total_combos, total_left, total_right, contributing_segmentations, score, edges
+
+
+def walk_graph(
+    start_word: str,
+    word_set: Set[str],
+    forward_index_sets: Dict[str, Set[str]],
+    backward_index_sets: Dict[str, Set[str]],
+    *,
+    steps: int,
+    require_valid_start: bool = False,
+    require_valid_end: bool = False,
+    combo_results: Dict[str, Tuple[float, int, int, int, int, int]] = {},
+) -> Dict[str, object]:
+    """Greedy walk across the graph using combination edges."""
+
+    if steps < 1:
+        raise ValueError("steps must be at least 1")
+    if start_word not in word_set:
+        raise ValueError(f"start word '{start_word}' is not in the current dictionary")
+    if not forward_index_sets or not backward_index_sets:
+        raise ValueError("walk_graph requires populated extension indexes")
+
+    visited: List[Dict[str, object]] = []
+    visited_words: Set[str] = set()
+    edge_totals: Dict[str, float] = {}
+
+    current = start_word
+
+    for _ in range(steps):
+        combos, total_left, total_right, contributing, score, edges = calculate_combinations_for_word(
+            current,
+            word_set,
+            forward_index_sets,
+            backward_index_sets,
+            require_valid_start=require_valid_start,
+            require_valid_end=require_valid_end,
+        )
+
+        visited.append(
+            {
+                "word": current,
+                "combinations": combos,
+                "left_total": total_left,
+                "right_total": total_right,
+                "segmentations": contributing,
+                "score": score,
+            }
+        )
+        visited_words.add(current)
+
+        for neighbor, weight in edges.items():
+            if neighbor in visited_words:
+                continue
+            edge_totals[neighbor] = edge_totals.get(neighbor, 0.0) + weight
+
+        edge_totals.pop(current, None)
+
+        edge_totals_score_augmented = {
+            neighbor: weight + combo_results.get(neighbor, (0.0, 0, 0, 0, 0, 0))[0]
+            for neighbor, weight in edge_totals.items()
+        }
+
+        if len(visited) >= steps or not edge_totals:
+            break
+
+        import random
+
+        next_word, _ = max(edge_totals.items(), key=lambda item: item[1])
+        # sorted_edge_totals = sorted(edge_totals.items(), key=lambda item: item[1], reverse=True)
+        # next_word = random.choice(sorted_edge_totals[:10])[0]
+        edge_totals.pop(next_word, None)
+        current = next_word
+
+    for entry in visited_words:
+        edge_totals.pop(entry, None)
+
+    return {
+        "path": visited,
+        "edges": edge_totals,
+    }
 
 def build_extension_index(
     words: List[str],
@@ -698,6 +852,23 @@ def parse_args() -> argparse.Namespace:
         default=500,
         help="How many of the highest-scoring words to display when ranking combinations",
     )
+    parser.add_argument(
+        "--walk-start",
+        type=str,
+        help="Starting word for greedy graph walk",
+    )
+    parser.add_argument(
+        "--walk-length",
+        type=int,
+        default=5,
+        help="Number of words to visit during the graph walk (including the start)",
+    )
+    parser.add_argument(
+        "--walk-top-edges",
+        type=int,
+        default=10,
+        help="How many of the remaining edges to display after the walk",
+    )
     return parser.parse_args()
 
 
@@ -765,6 +936,7 @@ def main() -> None:
 
     need_extension_index = (
         args.rank_combinations
+        or args.walk_start is not None
         or not args.skip_extension_index
         or not args.no_interactive
     )
@@ -804,55 +976,109 @@ def main() -> None:
         if not args.skip_extension_index:
             serialize_extension_index(extension_index, args.extension_output)
             print("Saved extension index to", args.extension_output.resolve())
+    
+    combo_results: List[Tuple[float, int, int, int, int, int, str]] = []
+    combo_results_dict: Dict[str, Tuple[float, int, int, int, int, int]] = {}
+    # if args.rank_combinations:
+    if not forward_extension_sets or not backward_extension_sets:
+        print("Combination ranking requires the extension index; none available.")
+    else:
+        print("Calculating combination totals for all words…")
+        
+        i = 0
+        for word in words:
+            i += 1
+            if i % 100 == 0:
+                print(f"Processed {i:,} words")
+            combos, total_left, total_right, contributing, score, _edges = calculate_combinations_for_word(
+                word,
+                word_set,
+                forward_extension_sets,
+                backward_extension_sets,
+                require_valid_start=args.require_valid_start,
+                require_valid_end=args.require_valid_end,
+            )
+            if combos:
+                combo_results.append(
+                    (score, combos, total_left, total_right, contributing, word)
+                )
+                combo_results_dict[word] = (score, combos, total_left, total_right, contributing)
 
-    if args.rank_combinations:
-        if not forward_extension_sets or not backward_extension_sets:
-            print("Combination ranking requires the extension index; none available.")
+        if combo_results:
+            combo_results.sort(
+                key=lambda item: (
+                    -item[0],
+                    -item[1],
+                    -item[2],
+                    -item[3],
+                    -item[4],
+                    item[5],
+                )
+            )
+            top_n = min(args.combination_top, len(combo_results))
+            print(
+                f"Top {top_n} words by combination count (out of {len(combo_results):,} scoring words):"
+            )
+            for rank, (score, combos, total_left, total_right, contributing, word) in enumerate(
+                combo_results[:top_n],
+                start=1,
+            ):
+                print(
+                    f"{rank:4d}. {word:<15} combinations={combos:<8} left_total={total_left:<6} "
+                    f"right_total={total_right:<6} segs={contributing} score={score:<8}"
+                )
+            if len(combo_results) > top_n:
+                print(
+                    f"… {len(combo_results) - top_n:,} additional words have non-zero combinations."
+                )
         else:
-            print("Calculating combination totals for all words…")
-            combo_results: List[Tuple[int, int, int, int, str]] = []
-            for word in words:
-                combos, total_left, total_right, contributing = calculate_combinations_for_word(
-                    word,
+            print("No words produced any combinations with the current settings.")
+
+    if args.walk_start:
+        if args.walk_start not in word_set:
+            print(f"Walk start word '{args.walk_start}' is not in the dictionary; skipping walk.")
+        elif not forward_extension_sets or not backward_extension_sets:
+            print("Graph walk requires the extension index; none available.")
+        else:
+            walk_steps = max(1, args.walk_length)
+            try:
+                walk_result = walk_graph(
+                    args.walk_start,
                     word_set,
                     forward_extension_sets,
                     backward_extension_sets,
+                    steps=walk_steps,
                     require_valid_start=args.require_valid_start,
                     require_valid_end=args.require_valid_end,
+                    combo_results=combo_results_dict,
                 )
-                if combos:
-                    combo_results.append(
-                        (combos, total_left, total_right, contributing, word)
-                    )
-
-            if combo_results:
-                combo_results.sort(
-                    key=lambda item: (
-                        -item[0],
-                        -item[1],
-                        -item[2],
-                        -item[3],
-                        item[4],
-                    )
-                )
-                top_n = min(args.combination_top, len(combo_results))
-                print(
-                    f"Top {top_n} words by combination count (out of {len(combo_results):,} scoring words):"
-                )
-                for rank, (combos, total_left, total_right, contributing, word) in enumerate(
-                    combo_results[:top_n],
-                    start=1,
-                ):
-                    print(
-                        f"{rank:4d}. {word:<15} combinations={combos:<8} left_total={total_left:<6} "
-                        f"right_total={total_right:<6} segs={contributing}"
-                    )
-                if len(combo_results) > top_n:
-                    print(
-                        f"… {len(combo_results) - top_n:,} additional words have non-zero combinations."
-                    )
+            except ValueError as exc:
+                print(f"Graph walk failed: {exc}")
             else:
-                print("No words produced any combinations with the current settings.")
+                print(
+                    f"Graph walk starting at '{args.walk_start}' for up to {walk_steps} words:" 
+                )
+                for idx, entry in enumerate(walk_result["path"], start=1):
+                    print(
+                        f"  {idx:2d}. {entry['word']:<15} combos={entry['combinations']:<6} "
+                        f"left={entry['left_total']:<5} right={entry['right_total']:<5} "
+                        f"segs={entry['segmentations']:<4} score={entry['score']:.3f}"
+                    )
+                remaining_edges = walk_result["edges"]
+                if remaining_edges:
+                    top_edges = sorted(
+                        remaining_edges.items(), key=lambda item: item[1], reverse=True
+                    )[: args.walk_top_edges]
+                    print(
+                        f"  Top {len(top_edges)} remaining edges after walk (word, weight):"
+                    )
+                    for neighbor, weight in top_edges:
+                        print(f"    {neighbor:<15} {weight:.3f}")
+                    leftover = len(remaining_edges) - len(top_edges)
+                    if leftover > 0:
+                        print(f"    … {leftover} more edges not shown")
+                else:
+                    print("  No remaining edges after walk.")
 
     if not args.no_interactive:
         interactive_loop(

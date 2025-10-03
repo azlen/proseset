@@ -11,8 +11,12 @@ Steps:
 
 from wordfreq import top_n_list
 import third_party.twl as twl
+from tqdm import tqdm
 
-top_words = set(top_n_list('en', 100000, wordlist='best'))
+def progress(iterable, desc=""):
+    return tqdm(iterable, desc=desc, ascii=" ▖▘▝▗▚▞█", bar_format='{desc}: |{bar:20}|')
+
+top_words = set(top_n_list('en', 20000, wordlist='best'))
 valid_words_all = set(['a', 'i'] + [word for word in top_words if twl.check(word) and word.isalpha() and len(word) > 1])
 valid_words = set([word for word in valid_words_all if len(word) <= 7])
 
@@ -44,21 +48,27 @@ def segment_word(word: str, *, start: bool = False, end: bool = False):
 forward_lookup = {}
 backward_lookup = {}
 
-for word in valid_words:
-    for segmentation in segment_word(word, start=True, end=False): # forward
-        if segmentation:
-            last_segment = segmentation[-1]
-            candidates = affix_lookup['forward'].get(last_segment, set())
-            for candidate in candidates:
-                remainder = candidate[len(last_segment):]
-                forward_lookup.setdefault(remainder, set()).add(word)
-    for segmentation in segment_word(word, start=False, end=True): # backward
+for word in progress(valid_words, "Building forward lookups"):
+    for segmentation in segment_word(word, start=False, end=True): # forward
         if segmentation:
             first_segment = segmentation[0]
             candidates = affix_lookup['backward'].get(first_segment, set())
             for candidate in candidates:
                 remainder = candidate[:-len(first_segment)]
-                backward_lookup.setdefault(remainder, set()).add(word)
+                forward_lookup.setdefault(remainder, set()).add(word)
 
 print(f"Built forward lookup containing {len(forward_lookup)} entries")
+
+for word in progress(valid_words, "Building backward lookups"):
+    for segmentation in segment_word(word, start=True, end=False): # backward
+        if segmentation:
+            last_segment = segmentation[-1]
+            candidates = affix_lookup['forward'].get(last_segment, set())
+            for candidate in candidates:
+                remainder = candidate[len(last_segment):]
+                backward_lookup.setdefault(remainder, set()).add(word)
+
+
 print(f"Built backward lookup containing {len(backward_lookup)} entries")
+
+print(forward_lookup['sp'])

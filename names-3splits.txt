@@ -1,0 +1,287 @@
+# Name candidates — 283 results
+# * = real dictionary word
+# Filters: len 6-12, zipf>=3.0, no-boring 
+#
+   1. FINESTATE    (4splits)  fin+estate / fine+state / fines+tate / finest+ate
+   2. MODESTATE    (4splits)  mod+estate / mode+state / modes+tate / modest+ate
+   3. PROFITSELF    (3splits)  prof+itself / profit+self / profits+elf  also: pro | fit | self ; pro | fits | elf
+   4. METALONE    (3splits)  met+alone / meta+lone / metal+one  also: met | a | lone
+   5. MARCHEAT    (3splits)  mar+cheat / marc+heat / march+eat  also: marc | he | at
+   6. MARSHALLOW    (3splits)  mar+shallow / marsh+allow / marshal+low  also: mar | shall | ow ; mars | hall | ow
+   7. BEGINSTALL    (3splits)  beg+install / begin+stall / begins+tall  also: be | gin | stall ; beg | in | stall
+   8. METRESTORE    (3splits)  met+restore / metre+store / metres+tore  also: me | tres | tore ; met | res | tore
+   9. MARCHAIR    (3splits)  mar+chair / marc+hair / march+air
+  10. FATHERSELF    (3splits)  fat+herself / father+self / fathers+elf  also: fat | her | self ; fat | hers | elf
+  11. MARCHART    (3splits)  mar+chart / marc+hart / march+art
+  12. MARCHILL    (3splits)  mar+chill / marc+hill / march+ill
+  13. MARCHARM    (3splits)  mar+charm / marc+harm / march+arm
+  14. DIGITSELF    (3splits)  dig+itself / digit+self / digits+elf  also: dig | it | self ; dig | its | elf
+  15. BRAINSTALL    (3splits)  bra+install / brain+stall / brains+tall  also: bra | in | stall ; bra | ins | tall
+  16. GENRESTORE    (3splits)  gen+restore / genre+store / genres+tore  also: gen | res | tore ; gen | rest | ore
+  17. CENTRESTORE    (3splits)  cent+restore / centre+store / centres+tore  also: cent | res | tore ; cent | rest | ore
+  18. CARESTATE    (3splits)  car+estate / care+state / cares+tate
+  19. STATESTATE    (3splits)  stat+estate / state+state / states+tate
+  20. MARSHALE    (3splits)  mar+shale / mars+hale / marsh+ale
+  21. CLOSESTONE    (3splits)  close+stone / closes+tone / closest+one
+  22. SITESTATE    (3splits)  sit+estate / site+state / sites+tate
+  23. CLOSESTILL    (3splits)  close+still / closes+till / closest+ill
+  24. FINESTONE    (3splits)  fine+stone / fines+tone / finest+one
+  25. FINESTILL    (3splits)  fine+still / fines+till / finest+ill
+  26. HOPESTATE    (3splits)  hop+estate / hope+state / hopes+tate
+  27. RATESTATE    (3splits)  rat+estate / rate+state / rates+tate
+  28. PLANESTATE    (3splits)  plan+estate / plane+state / planes+tate
+  29. MODESTONE    (3splits)  mode+stone / modes+tone / modest+one
+  30. WINESTATE    (3splits)  win+estate / wine+state / wines+tate
+  31. LOWESTATE    (3splits)  low+estate / lowe+state / lowest+ate
+  32. FINESTABLE    (3splits)  fine+stable / fines+table / finest+able
+  33. HATESTATE    (3splits)  hat+estate / hate+state / hates+tate
+  34. MODESTILL    (3splits)  mode+still / modes+till / modest+ill
+  35. BITESTATE    (3splits)  bit+estate / bite+state / bites+tate
+  36. RIDESTATE    (3splits)  rid+estate / ride+state / rides+tate
+  37. MODESTABLE    (3splits)  mode+stable / modes+table / modest+able
+  38. CODESTATE    (3splits)  cod+estate / code+state / codes+tate
+  39. CLOSESTATE    (3splits)  close+state / closes+tate / closest+ate
+  40. FARESTATE    (3splits)  far+estate / fare+state / fares+tate
+  41. RANGESTATE    (3splits)  rang+estate / range+state / ranges+tate
+  42. GENESTATE    (3splits)  gen+estate / gene+state / genes+tate
+  43. CLOSESTRIP    (3splits)  close+strip / closes+trip / closest+rip
+  44. GRADESTATE    (3splits)  grad+estate / grade+state / grades+tate
+  45. FINESTRAIN    (3splits)  fine+strain / fines+train / finest+rain
+  46. TAPESTATE    (3splits)  tap+estate / tape+state / tapes+tate
+  47. TONESTATE    (3splits)  ton+estate / tone+state / tones+tate
+  48. MATESTATE    (3splits)  mat+estate / mate+state / mates+tate
+  49. FINESTRIP    (3splits)  fine+strip / fines+trip / finest+rip
+  50. TUBESTATE    (3splits)  tub+estate / tube+state / tubes+tate
+  51. MODESTRAIN    (3splits)  mode+strain / modes+train / modest+rain
+  52. CLOSESTORE    (3splits)  close+store / closes+tore / closest+ore
+  53. HIDESTATE    (3splits)  hid+estate / hide+state / hides+tate
+  54. FINESTONES    (3splits)  fine+stones / fines+tones / finest+ones
+  55. MODESTRIP    (3splits)  mode+strip / modes+trip / modest+rip
+  56. FINESTORE    (3splits)  fine+store / fines+tore / finest+ore
+  57. SLIDESTATE    (3splits)  slid+estate / slide+state / slides+tate
+  58. SCARESTATE    (3splits)  scar+estate / scare+state / scares+tate
+  59. SHINESTATE    (3splits)  shin+estate / shine+state / shines+tate
+  60. TILESTATE    (3splits)  til+estate / tile+state / tiles+tate
+  61. CLOSESTRAP    (3splits)  close+strap / closes+trap / closest+rap
+  62. MODESTONES    (3splits)  mode+stones / modes+tones / modest+ones
+  63. NODESTATE    (3splits)  nod+estate / node+state / nodes+tate
+  64. CHANGESTATE    (3splits)  chang+estate / change+state / changes+tate
+  65. CLOSESTRAY    (3splits)  close+stray / closes+tray / closest+ray
+  66. CLOSESTABLE    (3splits)  close+stable / closes+table / closest+able
+  67. MODESTORE    (3splits)  mode+store / modes+tore / modest+ore
+  68. FINESTRAP    (3splits)  fine+strap / fines+trap / finest+rap
+  69. FINESTRAY    (3splits)  fine+stray / fines+tray / finest+ray
+  70. FINESTROLL    (3splits)  fine+stroll / fines+troll / finest+roll
+  71. RICHESTATE    (3splits)  rich+estate / riches+tate / richest+ate
+  72. MODESTRAP    (3splits)  mode+strap / modes+trap / modest+rap
+  73. MODESTRAY    (3splits)  mode+stray / modes+tray / modest+ray
+  74. MARCHAIRS    (3splits)  mar+chairs / marc+hairs / march+airs
+  75. MODESTROLL    (3splits)  mode+stroll / modes+troll / modest+roll
+  76. ORBITSELF    (3splits)  orb+itself / orbit+self / orbits+elf  also: or | bit | self ; or | bits | elf
+  77. CLOSESTRAIN    (3splits)  close+strain / closes+train / closest+rain
+  78. BEGINSTILL    (3splits)  beg+instill / begin+still / begins+till  also: be | gin | still ; beg | in | still
+  79. LATERALLIES    (3splits)  late+rallies / later+allies / lateral+lies
+  80. CLOSESTONES    (3splits)  close+stones / closes+tones / closest+ones
+  81. MENUSAGE    (3splits)  men+usage / menu+sage / menus+age  also: men | us | age
+  82. STRIPESTATE    (3splits)  strip+estate / stripe+state / stripes+tate
+  83. CORPSESTATE    (3splits)  corps+estate / corpse+state / corpses+tate
+  84. METRESTART    (3splits)  met+restart / metre+start / metres+tart  also: me | tres | tart ; met | res | tart
+  85. CLOSESTROLL    (3splits)  close+stroll / closes+troll / closest+roll
+  86. CLOSESTRAINS    (3splits)  close+strains / closes+trains / closest+rains
+  87. MINERALLIES    (3splits)  mine+rallies / miner+allies / mineral+lies
+  88. FINESTRAINS    (3splits)  fine+strains / fines+trains / finest+rains
+  89. MAXIMAGE    (3splits)  max+image / maxi+mage / maxim+age  also: max | i | mage
+  90. MODESTRAINS    (3splits)  mode+strains / modes+trains / modest+rains
+  91. BOOSTONE    (3splits)  boo+stone / boos+tone / boost+one
+  92. BOOSTILL    (3splits)  boo+still / boos+till / boost+ill
+  93. VISITSELF    (3splits)  vis+itself / visit+self / visits+elf  also: vis | it | self ; vis | its | elf
+  94. VISASCOT    (3splits)  vis+ascot / visa+scot / visas+cot  also: vis | a | scot ; vis | as | cot
+  95. BRAINSTILL    (3splits)  bra+instill / brain+still / brains+till  also: bra | in | still ; bra | ins | till
+  96. METALOFT    (3splits)  met+aloft / meta+loft / metal+oft  also: met | a | loft
+  97. BANDITSELF    (3splits)  band+itself / bandit+self / bandits+elf  also: band | it | self ; band | its | elf
+  98. BOOSTART    (3splits)  boo+start / boos+tart / boost+art
+  99. BANDARES    (3splits)  ban+dares / band+ares / banda+res  also: band | a | res
+ 100. ROBINSTILL    (3splits)  rob+instill / robin+still / robins+till  also: rob | in | still ; rob | ins | till
+ 101. MARSHEAR    (3splits)  mar+shear / mars+hear / marsh+ear
+ 102. PERMITSELF    (3splits)  perm+itself / permit+self / permits+elf  also: perm | it | self ; perm | its | elf
+ 103. BOOSTATE    (3splits)  boo+state / boos+tate / boost+ate
+ 104. MARSHONE    (3splits)  mar+shone / mars+hone / marsh+one
+ 105. CABINSTILL    (3splits)  cab+instill / cabin+still / cabins+till  also: cab | in | still ; cab | ins | till
+ 106. ARCHERSELF    (3splits)  arc+herself / archer+self / archers+elf  also: arc | her | self ; arc | hers | elf
+ 107. METRESALE    (3splits)  met+resale / metre+sale / metres+ale  also: me | tres | ale ; met | res | ale
+ 108. BOOSTRIP    (3splits)  boo+strip / boos+trip / boost+rip
+ 109. GENRESTART    (3splits)  gen+restart / genre+start / genres+tart  also: gen | res | tart ; gen | rest | art
+ 110. SPARESTATE    (3splits)  spar+estate / spare+state / spares+tate  also: spa | res | tate ; spa | rest | ate
+ 111. PIPERODE    (3splits)  pip+erode / pipe+rode / piper+ode  also: pi | per | ode
+ 112. CONDOMAIN    (3splits)  con+domain / condo+main / condom+ain  also: con | do | main ; condom | a | in
+ 113. MARCHAIRED    (3splits)  mar+chaired / marc+haired / march+aired  also: mar | chai | red ; march | a | i | red
+ 114. BOOSTOUT    (3splits)  boo+stout / boos+tout / boost+out
+ 115. LOWERODE    (3splits)  low+erode / lowe+rode / lower+ode
+ 116. ROBINSTALL    (3splits)  rob+install / robin+stall / robins+tall  also: rob | in | stall ; rob | ins | tall
+ 117. BOOSTORE    (3splits)  boo+store / boos+tore / boost+ore
+ 118. SPARESTORE    (3splits)  spa+restore / spare+store / spares+tore  also: spa | res | tore ; spa | rest | ore
+ 119. METRESTING    (3splits)  met+resting / metre+sting / metres+ting  also: me | tres | ting ; met | res | ting
+ 120. CABINSTALL    (3splits)  cab+install / cabin+stall / cabins+tall  also: cab | in | stall ; cab | ins | tall
+ 121. FELLASCENT    (3splits)  fell+ascent / fella+scent / fellas+cent  also: fell | a | scent ; fell | as | cent
+ 122. SPARESTART    (3splits)  spa+restart / spare+start / spares+tart  also: spa | res | tart ; spa | rest | art
+ 123. LITRESTORE    (3splits)  lit+restore / litre+store / litres+tore  also: lit | res | tore ; lit | rest | ore
+ 124. BRAVESTONE    (3splits)  brave+stone / braves+tone / bravest+one  also: bra | vest | one
+ 125. RIDERODE    (3splits)  rid+erode / ride+rode / rider+ode
+ 126. BOOSTRAP    (3splits)  boo+strap / boos+trap / boost+rap
+ 127. BOOSTRAY    (3splits)  boo+stray / boos+tray / boost+ray
+ 128. LITRESTART    (3splits)  lit+restart / litre+start / litres+tart  also: lit | res | tart ; lit | rest | art
+ 129. CENTRESTART    (3splits)  cent+restart / centre+start / centres+tart  also: cent | res | tart ; cent | rest | art
+ 130. MARSHIRE    (3splits)  mar+shire / mars+hire / marsh+ire
+ 131. MARSHALT    (3splits)  mar+shalt / mars+halt / marsh+alt
+ 132. CHINASCENT    (3splits)  chi+nascent / chin+ascent / china+scent  also: chin | a | scent ; chin | as | cent
+ 133. BRAVESTILL    (3splits)  brave+still / braves+till / bravest+ill  also: bra | vest | ill
+ 134. PADRESTORE    (3splits)  pad+restore / padre+store / padres+tore  also: pad | res | tore ; pad | rest | ore
+ 135. BACKUPSTATE    (3splits)  back+upstate / backup+state / backups+tate  also: back | up | state ; back | ups | tate
+ 136. AIDESTATE    (3splits)  aid+estate / aide+state / aides+tate  also: a | ides | tate
+ 137. PINESTATE    (3splits)  pin+estate / pine+state / pines+tate  also: pi | nest | ate
+ 138. VISASCENT    (3splits)  vis+ascent / visa+scent / visas+cent  also: vis | a | scent ; vis | as | cent
+ 139. HATERODE    (3splits)  hat+erode / hate+rode / hater+ode
+ 140. PADRESTART    (3splits)  pad+restart / padre+start / padres+tart  also: pad | res | tart ; pad | rest | art
+ 141. PIPESTATE    (3splits)  pip+estate / pipe+state / pipes+tate  also: pi | pest | ate
+ 142. CENTRESALE    (3splits)  cent+resale / centre+sale / centres+ale  also: cent | res | ale
+ 143. MORALESTATE    (3splits)  moral+estate / morale+state / morales+tate  also: mora | les | tate ; mora | lest | ate
+ 144. BOOSTALE    (3splits)  boo+stale / boos+tale / boost+ale
+ 145. FINERODE    (3splits)  fin+erode / fine+rode / finer+ode
+ 146. FELLASTRAY    (3splits)  fell+astray / fella+stray / fellas+tray  also: fell | a | stray ; fell | as | tray
+ 147. TAPERODE    (3splits)  tap+erode / tape+rode / taper+ode
+ 148. CUTESTATE    (3splits)  cut+estate / cute+state / cutest+ate
+ 149. MATERODE    (3splits)  mat+erode / mate+rode / mater+ode
+ 150. BRAVESTART    (3splits)  brave+start / braves+tart / bravest+art  also: bra | vest | art
+ 151. TONERODE    (3splits)  ton+erode / tone+rode / toner+ode
+ 152. PINTOWED    (3splits)  pin+towed / pint+owed / pinto+wed
+ 153. PICKUPSTATE    (3splits)  pick+upstate / pickup+state / pickups+tate  also: pick | up | state ; pick | ups | tate
+ 154. MARCHARMED    (3splits)  mar+charmed / marc+harmed / march+armed  also: mar | char | med
+ 155. CLOSESTART    (3splits)  close+start / closes+tart / closest+art
+ 156. BRAVESTATE    (3splits)  brave+state / braves+tate / bravest+ate  also: bra | vest | ate
+ 157. CATERODE    (3splits)  cat+erode / cate+rode / cater+ode
+ 158. VISASTRAY    (3splits)  vis+astray / visa+stray / visas+tray  also: vis | a | stray ; vis | as | tray
+ 159. LITERODE    (3splits)  lit+erode / lite+rode / liter+ode
+ 160. BRAVESTRIP    (3splits)  brave+strip / braves+trip / bravest+rip  also: bra | vest | rip
+ 161. FELLASCOT    (3splits)  fell+ascot / fella+scot / fellas+cot  also: fell | a | scot ; fell | as | cot
+ 162. FINESTART    (3splits)  fine+start / fines+tart / finest+art
+ 163. FIRESTATE    (3splits)  fir+estate / fire+state / fires+tate
+ 164. MAYORALLIES    (3splits)  mayo+rallies / mayor+allies / mayoral+lies  also: may | or | allies ; may | oral | lies
+ 165. GENRESALE    (3splits)  gen+resale / genre+sale / genres+ale  also: gen | res | ale
+ 166. WAGERODE    (3splits)  wag+erode / wage+rode / wager+ode
+ 167. STAGESTATE    (3splits)  stag+estate / stage+state / stages+tate
+ 168. WHITESTATE    (3splits)  whit+estate / white+state / whites+tate
+ 169. WRITESTATE    (3splits)  writ+estate / write+state / writes+tate
+ 170. BRAVESTOUT    (3splits)  brave+stout / braves+tout / bravest+out  also: bra | vest | out
+ 171. FILESTATE    (3splits)  fil+estate / file+state / files+tate
+ 172. MODESTART    (3splits)  mode+start / modes+tart / modest+art
+ 173. DINERODE    (3splits)  din+erode / dine+rode / diner+ode
+ 174. PROBESPOKE    (3splits)  pro+bespoke / probe+spoke / probes+poke  also: pro | be | spoke
+ 175. STARESTATE    (3splits)  star+estate / stare+state / stares+tate
+ 176. HONESTATE    (3splits)  hon+estate / hone+state / honest+ate
+ 177. BRAVESTORE    (3splits)  brave+store / braves+tore / bravest+ore  also: bra | vest | ore
+ 178. FATESTATE    (3splits)  fat+estate / fate+state / fates+tate
+ 179. CONDOSAGE    (3splits)  con+dosage / condo+sage / condos+age  also: con | do | sage
+ 180. SUITESTATE    (3splits)  suit+estate / suite+state / suites+tate
+ 181. POPESTATE    (3splits)  pop+estate / pope+state / popes+tate
+ 182. PROMORALLY    (3splits)  pro+morally / prom+orally / promo+rally  also: prom | or | ally
+ 183. CLOSESTOUT    (3splits)  close+stout / closes+tout / closest+out
+ 184. WARESTATE    (3splits)  war+estate / ware+state / wares+tate
+ 185. BOOSTABLE    (3splits)  boo+stable / boos+table / boost+able
+ 186. UNITESTATE    (3splits)  unit+estate / unite+state / unites+tate
+ 187. GENRESTING    (3splits)  gen+resting / genre+sting / genres+ting  also: gen | res | ting
+ 188. MASSESTATE    (3splits)  mass+estate / masse+state / masses+tate
+ 189. RAPESTATE    (3splits)  rap+estate / rape+state / rapes+tate
+ 190. ROUTESTATE    (3splits)  rout+estate / route+state / routes+tate
+ 191. SPARESALE    (3splits)  spa+resale / spare+sale / spares+ale  also: spa | res | ale
+ 192. LESSENTRY    (3splits)  les+sentry / less+entry / lessen+try
+ 193. PLATESTATE    (3splits)  plat+estate / plate+state / plates+tate
+ 194. FINESTOUT    (3splits)  fine+stout / fines+tout / finest+out
+ 195. MAYORALLIED    (3splits)  mayo+rallied / mayor+allied / mayoral+lied  also: may | or | allied ; may | oral | lied
+ 196. BRAVESTRAP    (3splits)  brave+strap / braves+trap / bravest+rap  also: bra | vest | rap
+ 197. CAPESTATE    (3splits)  cap+estate / cape+state / capes+tate
+ 198. BARRELATE    (3splits)  bar+relate / barre+late / barrel+ate
+ 199. BRAVESTRAY    (3splits)  brave+stray / braves+tray / bravest+ray  also: bra | vest | ray
+ 200. WAGESTATE    (3splits)  wag+estate / wage+state / wages+tate
+ 201. LESSENDING    (3splits)  les+sending / less+ending / lessen+ding
+ 202. SPINESTATE    (3splits)  spin+estate / spine+state / spines+tate
+ 203. LITRESALE    (3splits)  lit+resale / litre+sale / litres+ale  also: lit | res | ale
+ 204. POLESTATE    (3splits)  pol+estate / pole+state / poles+tate
+ 205. BRAVESTABLE    (3splits)  brave+stable / braves+table / bravest+able  also: bra | vest | able
+ 206. CONESTATE    (3splits)  con+estate / cone+state / cones+tate
+ 207. BARRELEASE    (3splits)  bar+release / barre+lease / barrel+ease
+ 208. CASTESTATE    (3splits)  cast+estate / caste+state / castes+tate
+ 209. MODESTOUT    (3splits)  mode+stout / modes+tout / modest+out
+ 210. ROBESTATE    (3splits)  rob+estate / robe+state / robes+tate
+ 211. PARADESIRE    (3splits)  para+desire / parade+sire / parades+ire  also: par | a | desire
+ 212. NAPKINSHIP    (3splits)  nap+kinship / napkin+ship / napkins+hip  also: nap | kin | ship
+ 213. SOLESTATE    (3splits)  sol+estate / sole+state / soles+tate
+ 214. SPARESTING    (3splits)  spa+resting / spare+sting / spares+ting  also: spa | res | ting
+ 215. BRAVESTALE    (3splits)  brave+stale / braves+tale / bravest+ale  also: bra | vest | ale
+ 216. PADRESALE    (3splits)  pad+resale / padre+sale / padres+ale  also: pad | res | ale
+ 217. BOOSTRAIN    (3splits)  boo+strain / boos+train / boost+rain
+ 218. MARCHARMS    (3splits)  mar+charms / marc+harms / march+arms
+ 219. CUBESTATE    (3splits)  cub+estate / cube+state / cubes+tate
+ 220. RAGESTATE    (3splits)  rag+estate / rage+state / rages+tate
+ 221. LITRESTING    (3splits)  lit+resting / litre+sting / litres+ting  also: lit | res | ting
+ 222. HEARTHEATER    (3splits)  hear+theater / heart+heater / hearth+eater  also: he | art | heater
+ 223. CENTRESTING    (3splits)  cent+resting / centre+sting / centres+ting  also: cent | res | ting
+ 224. CLOSESTALE    (3splits)  close+stale / closes+tale / closest+ale
+ 225. FADESTATE    (3splits)  fad+estate / fade+state / fades+tate
+ 226. BRAVESTRAIN    (3splits)  brave+strain / braves+train / bravest+rain  also: bra | vest | rain
+ 227. MARCHANGER    (3splits)  mar+changer / marc+hanger / march+anger
+ 228. FINESTALE    (3splits)  fine+stale / fines+tale / finest+ale
+ 229. FINESTRIPS    (3splits)  fine+strips / fines+trips / finest+rips
+ 230. BOOSTONES    (3splits)  boo+stones / boos+tones / boost+ones
+ 231. GRIMESTATE    (3splits)  grim+estate / grime+state / grimes+tate
+ 232. PADRESTING    (3splits)  pad+resting / padre+sting / padres+ting  also: pad | res | ting
+ 233. MARCHILLS    (3splits)  mar+chills / marc+hills / march+ills
+ 234. TENTHEATER    (3splits)  ten+theater / tent+heater / tenth+eater
+ 235. DUNESTATE    (3splits)  dun+estate / dune+state / dunes+tate
+ 236. MARCHEATS    (3splits)  mar+cheats / marc+heats / march+eats
+ 237. MOLESTATE    (3splits)  mol+estate / mole+state / moles+tate
+ 238. BRAVESTONES    (3splits)  brave+stones / braves+tones / bravest+ones  also: bra | vest | ones
+ 239. MODESTALE    (3splits)  mode+stale / modes+tale / modest+ale
+ 240. MODESTRIPS    (3splits)  mode+strips / modes+trips / modest+rips
+ 241. FLAKESTATE    (3splits)  flak+estate / flake+state / flakes+tate
+ 242. PROMOWING    (3splits)  pro+mowing / prom+owing / promo+wing
+ 243. PARADESCENT    (3splits)  para+descent / parade+scent / parades+cent  also: par | a | descent
+ 244. PLEASESTATE    (3splits)  pleas+estate / please+state / pleases+tate
+ 245. MATTERODE    (3splits)  matt+erode / matte+rode / matter+ode
+ 246. MARCHEATER    (3splits)  mar+cheater / marc+heater / march+eater
+ 247. BOOTHEATER    (3splits)  boo+theater / boot+heater / booth+eater
+ 248. FINESTRAPS    (3splits)  fine+straps / fines+traps / finest+raps
+ 249. POLLENDING    (3splits)  pol+lending / poll+ending / pollen+ding
+ 250. BOOSTROLL    (3splits)  boo+stroll / boos+troll / boost+roll
+ 251. WRITERODE    (3splits)  writ+erode / write+rode / writer+ode
+ 252. BOOSTRAINS    (3splits)  boo+strains / boos+trains / boost+rains
+ 253. LATERALLIED    (3splits)  late+rallied / later+allied / lateral+lied
+ 254. SPADESCENT    (3splits)  spa+descent / spade+scent / spades+cent
+ 255. CHANGERODE    (3splits)  chang+erode / change+rode / changer+ode
+ 256. RANGERODE    (3splits)  rang+erode / range+rode / ranger+ode
+ 257. BRAVESTROLL    (3splits)  brave+stroll / braves+troll / bravest+roll  also: bra | vest | roll
+ 258. MODESTRAPS    (3splits)  mode+straps / modes+traps / modest+raps
+ 259. BOOSTRIPS    (3splits)  boo+strips / boos+trips / boost+rips
+ 260. BRAVESTRAINS    (3splits)  brave+strains / braves+trains / bravest+rains  also: bra | vest | rains
+ 261. PINTOWING    (3splits)  pin+towing / pint+owing / pinto+wing
+ 262. POINTERODE    (3splits)  point+erode / pointe+rode / pointer+ode
+ 263. BRAVESTRIPS    (3splits)  brave+strips / braves+trips / bravest+rips  also: bra | vest | rips
+ 264. BUTTERODE    (3splits)  butt+erode / butte+rode / butter+ode
+ 265. GRADERODE    (3splits)  grad+erode / grade+rode / grader+ode
+ 266. SKATESTING    (3splits)  ska+testing / skate+sting / skates+ting
+ 267. BLONDESTATE    (3splits)  blond+estate / blonde+state / blondes+tate
+ 268. CLOSESTRIPS    (3splits)  close+strips / closes+trips / closest+rips
+ 269. TONNESTING    (3splits)  ton+nesting / tonne+sting / tonnes+ting
+ 270. CARTERODE    (3splits)  cart+erode / carte+rode / carter+ode
+ 271. CASTERODE    (3splits)  cast+erode / caste+rode / caster+ode
+ 272. SPADESIRE    (3splits)  spa+desire / spade+sire / spades+ire
+ 273. BOOSTRAPS    (3splits)  boo+straps / boos+traps / boost+raps
+ 274. ROUTERODE    (3splits)  rout+erode / route+rode / router+ode
+ 275. SLIDERODE    (3splits)  slid+erode / slide+rode / slider+ode
+ 276. MINERALLIED    (3splits)  mine+rallied / miner+allied / mineral+lied
+ 277. BRAVESTRAPS    (3splits)  brave+straps / braves+traps / bravest+raps  also: bra | vest | raps
+ 278. BROWSERODE    (3splits)  brows+erode / browse+rode / browser+ode
+ 279. CLOSESTRAPS    (3splits)  close+straps / closes+traps / closest+raps
+ 280. TEASERODE    (3splits)  teas+erode / tease+rode / teaser+ode
+ 281. LITERALLIES    (3splits)  lite+rallies / liter+allies / literal+lies
+ 282. LITERALLIED    (3splits)  lite+rallied / liter+allied / literal+lied
+ 283. SHRINESTING    (3splits)  shri+nesting / shrine+sting / shrines+ting

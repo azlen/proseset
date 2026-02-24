@@ -1,0 +1,31 @@
+@import "../styles/globals.css";
+
+@layer base {
+  :root {
+    font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  body {
+    @apply grid items-start justify-items-stretch h-[100dvh] relative m-0 bg-background text-foreground touch-manipulation select-none overflow-hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .select-text, .select-text * {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}

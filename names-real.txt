@@ -1,0 +1,170 @@
+# Name candidates — 166 results
+# * = real dictionary word
+# Filters: len 6-12, zipf>=3.0, no-boring real-only 
+#
+   1. FACEDOWN *  (2splits)  face+down / faced+own
+   2. CARTABLE *  (2splits)  car+table / cart+able
+   3. SEATRAIN *  (2splits)  sea+train / seat+rain
+   4. WARPAGE *  (2splits)  war+page / warp+age
+   5. RESTABLE *  (2splits)  res+table / rest+able
+   6. CHINONE *  (2splits)  chi+none / chin+one
+   7. COMPACTION *  (2splits)  comp+action / compact+ion  also: comp | act | i | on ; comp | act | ion
+   8. RAMPART *  (2splits)  ram+part / ramp+art
+   9. RESTRAIN *  (2splits)  res+train / rest+rain
+  10. BOOTABLE *  (2splits)  boo+table / boot+able
+  11. PROFUSE *  (2splits)  pro+fuse / prof+use
+  12. RAMPAGE *  (2splits)  ram+page / ramp+age
+  13. TOMBLESS *  (2splits)  tom+bless / tomb+less
+  14. WARPLANE *  (2splits)  war+plane / warp+lane
+  15. WARPAGES *  (2splits)  war+pages / warp+ages
+  16. TILTABLE *  (2splits)  til+table / tilt+able
+  17. COVERAGE *  (2splits)  cove+rage / cover+age
+  18. SUNGLOW *  (2splits)  sun+glow / sung+low
+  19. CODEBOOK *  (2splits)  cod+ebook / code+book
+  20. CARTOUCH *  (2splits)  car+touch / cart+ouch
+  21. CLOSEDOWN *  (2splits)  close+down / closed+own
+  22. PASTALIKE *  (2splits)  past+alike / pasta+like  also: past | a | like
+  23. RAMPARTS *  (2splits)  ram+parts / ramp+arts
+  24. SKIPLANE *  (2splits)  ski+plane / skip+lane
+  25. WIREDRAW *  (2splits)  wire+draw / wired+raw
+  26. PEERAGE *  (2splits)  pee+rage / peer+age
+  27. FIREDAMP *  (2splits)  fire+damp / fired+amp
+  28. RAMPAGES *  (2splits)  ram+pages / ramp+ages
+  29. PALMATE *  (2splits)  pal+mate / palm+ate
+  30. RESTATE *  (2splits)  res+tate / rest+ate
+  31. RESTORE *  (2splits)  res+tore / rest+ore
+  32. PLANTABLE *  (2splits)  plan+table / plant+able
+  33. LISTENABLE *  (2splits)  list+enable / listen+able
+  34. PAINTABLE *  (2splits)  pain+table / paint+able
+  35. RAMPOLE *  (2splits)  ram+pole / ramp+ole
+  36. DENTATE *  (2splits)  den+tate / dent+ate
+  37. PARAMOUNT *  (2splits)  par+amount / para+mount  also: par | a | mount
+  38. TANGRAM *  (2splits)  tan+gram / tang+ram
+  39. CHINAWARE *  (2splits)  chin+aware / china+ware  also: chin | a | ware
+  40. PROPENDING *  (2splits)  pro+pending / prop+ending  also: pro | pen | ding
+  41. DENTALLY *  (2splits)  den+tally / dent+ally
+  42. WEEKNIGHT *  (2splits)  wee+knight / week+night
+  43. LATERALLY *  (2splits)  late+rally / later+ally
+  44. TANGRAMS *  (2splits)  tan+grams / tang+rams
+  45. FORESTAGE *  (2splits)  fore+stage / forest+age
+  46. SUPERBLOCK *  (2splits)  super+block / superb+lock
+  47. CLOSEDOWNS *  (2splits)  close+downs / closed+owns
+  48. BROKERAGE *  (2splits)  broke+rage / broker+age
+  49. CABINMATE *  (2splits)  cab+inmate / cabin+mate  also: cab | in | mate
+  50. FACEDOWNS *  (2splits)  face+downs / faced+owns
+  51. SEATRAINS *  (2splits)  sea+trains / seat+rains
+  52. WEEKNIGHTS *  (2splits)  wee+knights / week+nights
+  53. PARAMOUNTS *  (2splits)  par+amounts / para+mounts  also: par | a | mounts
+  54. CABINMATES *  (2splits)  cab+inmates / cabin+mates  also: cab | in | mates
+  55. PATROLLED *  (2splits)  pat+rolled / patrol+led
+  56. SUPERBRIGHT *  (2splits)  super+bright / superb+right
+  57. WARPLANES *  (2splits)  war+planes / warp+lanes
+  58. FORESTAGES *  (2splits)  fore+stages / forest+ages
+  59. RESTRAINS *  (2splits)  res+trains / rest+rains
+  60. DAREDEVIL *  (2splits)  dare+devil / dared+evil
+  61. SKIPLANES *  (2splits)  ski+planes / skip+lanes
+  62. PATROLLING *  (2splits)  pat+rolling / patrol+ling
+  63. OVERTONE *  (2splits)  over+tone / overt+one
+  64. COMPACTIONS *  (2splits)  comp+actions / compact+ions  also: comp | act | ions
+  65. MARABOUT *  (2splits)  mar+about / mara+bout  also: mar | a | bout
+  66. GRANDPARENT *  (2splits)  grand+parent / grandpa+rent
+  67. IMPACTION *  (2splits)  imp+action / impact+ion  also: imp | act | i | on ; imp | act | ion
+  68. GRANDPARENTS *  (2splits)  grand+parents / grandpa+rents
+  69. SUPERBLOCKS *  (2splits)  super+blocks / superb+locks
+  70. OVERTASK *  (2splits)  over+task / overt+ask
+  71. CHOKEDAMP *  (2splits)  choke+damp / choked+amp
+  72. SAGAMEN *  (2splits)  sag+amen / saga+men  also: sag | a | men
+  73. MANAKIN *  (2splits)  man+akin / mana+kin  also: man | a | kin
+  74. BOATABLE *  (2splits)  boa+table / boat+able
+  75. HUNTABLE *  (2splits)  hun+table / hunt+able
+  76. FROMAGE *  (2splits)  fro+mage / from+age
+  77. OVERTART *  (2splits)  over+tart / overt+art
+  78. OVERTURN *  (2splits)  over+turn / overt+urn
+  79. BARBLESS *  (2splits)  bar+bless / barb+less
+  80. RESTART *  (2splits)  res+tart / rest+art
+  81. OVERTOIL *  (2splits)  over+toil / overt+oil
+  82. SINGABLE *  (2splits)  sin+gable / sing+able
+  83. SEAMARK *  (2splits)  sea+mark / seam+ark
+  84. CAMERAMEN *  (2splits)  came+ramen / camera+men  also: cam | era | men
+  85. PUSHOVER *  (2splits)  pus+hover / push+over
+  86. OVERTRIM *  (2splits)  over+trim / overt+rim
+  87. OUTPUTTING *  (2splits)  out+putting / output+ting  also: out | put | ting
+  88. SPATHOSE *  (2splits)  spa+those / spat+hose
+  89. SUNGLASS *  (2splits)  sun+glass / sung+lass
+  90. GALLATE *  (2splits)  gal+late / gall+ate
+  91. PRODRUG *  (2splits)  pro+drug / prod+rug
+  92. SEATROUT *  (2splits)  sea+trout / seat+rout
+  93. OVERTIRE *  (2splits)  over+tire / overt+ire
+  94. DECORATE *  (2splits)  deco+rate / decor+ate
+  95. LITERATE *  (2splits)  lite+rate / liter+ate
+  96. CARPALE *  (2splits)  car+pale / carp+ale
+  97. GRANDADS *  (2splits)  gran+dads / grand+ads
+  98. PRODRUGS *  (2splits)  pro+drugs / prod+rugs
+  99. OUTFITTING *  (2splits)  out+fitting / outfit+ting  also: out | fit | ting
+ 100. OFFSETTING *  (2splits)  off+setting / offset+ting  also: off | set | ting
+ 101. PROGRAM *  (2splits)  pro+gram / prog+ram
+ 102. MOORAGE *  (2splits)  moo+rage / moor+age
+ 103. OVERTEACH *  (2splits)  over+teach / overt+each
+ 104. PEERAGES *  (2splits)  pee+rages / peer+ages
+ 105. PROGRAMS *  (2splits)  pro+grams / prog+rams
+ 106. CAMELIDS *  (2splits)  came+lids / camel+ids
+ 107. PHASEDOWN *  (2splits)  phase+down / phased+own
+ 108. PANGRAM *  (2splits)  pan+gram / pang+ram
+ 109. MATTINS *  (2splits)  mat+tins / matt+ins
+ 110. PROGRAMMED *  (2splits)  prog+rammed / program+med  also: pro | gram | med ; prog | ram | med
+ 111. CONCURRENT *  (2splits)  con+current / concur+rent  also: con | cur | rent
+ 112. REPAIRMEN *  (2splits)  rep+airmen / repair+men  also: rep | air | men
+ 113. PEARLASH *  (2splits)  pear+lash / pearl+ash
+ 114. OVERTRAIN *  (2splits)  over+train / overt+rain
+ 115. PANGRAMS *  (2splits)  pan+grams / pang+rams
+ 116. RAMPANT *  (2splits)  ram+pant / ramp+ant
+ 117. BETHUMP *  (2splits)  bet+hump / beth+ump
+ 118. COBBLED *  (2splits)  cob+bled / cobb+led
+ 119. MARTINS *  (2splits)  mar+tins / mart+ins
+ 120. DENTINS *  (2splits)  den+tins / dent+ins
+ 121. PASTORALLY *  (2splits)  past+orally / pastor+ally  also: past | or | ally
+ 122. GRANTABLE *  (2splits)  gran+table / grant+able
+ 123. PASTEDOWN *  (2splits)  paste+down / pasted+own
+ 124. IMPACTIONS *  (2splits)  imp+actions / impact+ions  also: imp | act | ions
+ 125. CHARTABLE *  (2splits)  char+table / chart+able
+ 126. OVERTASKED *  (2splits)  over+tasked / overt+asked
+ 127. OVERTONES *  (2splits)  over+tones / overt+ones
+ 128. OVERTRICK *  (2splits)  over+trick / overt+rick
+ 129. MOORAGES *  (2splits)  moo+rages / moor+ages
+ 130. OVERTASKS *  (2splits)  over+tasks / overt+asks
+ 131. TUMBLEDOWN *  (2splits)  tumble+down / tumbled+own
+ 132. CHITINS *  (2splits)  chi+tins / chit+ins
+ 133. TABLETTING *  (2splits)  tab+letting / tablet+ting  also: tab | let | ting
+ 134. CONTESTABLE *  (2splits)  conte+stable / contest+able  also: con | test | able
+ 135. GENERATING *  (2splits)  gene+rating / genera+ting  also: gen | era | ting
+ 136. OVERTRAINS *  (2splits)  over+trains / overt+rains
+ 137. CODEBOOKS *  (2splits)  cod+ebooks / code+books
+ 138. OVERTAXES *  (2splits)  over+taxes / overt+axes
+ 139. TEMPTABLE *  (2splits)  temp+table / tempt+able
+ 140. OVERTRUMP *  (2splits)  over+trump / overt+rump
+ 141. FIREDRAKE *  (2splits)  fire+drake / fired+rake
+ 142. KIDNAPPING *  (2splits)  kid+napping / kidnap+ping  also: kid | nap | ping
+ 143. JOINTWEED *  (2splits)  join+tweed / joint+weed
+ 144. SUPERBITCH *  (2splits)  super+bitch / superb+itch
+ 145. INTERNODE *  (2splits)  inter+node / intern+ode  also: in | tern | ode
+ 146. PEARLASHES *  (2splits)  pear+lashes / pearl+ashes  also: pearl | a | shes
+ 147. TEMPORALLY *  (2splits)  temp+orally / tempo+rally  also: temp | or | ally
+ 148. RESTRAINED *  (2splits)  res+trained / rest+rained
+ 149. HAIRCUTTING *  (2splits)  hair+cutting / haircut+ting  also: hair | cut | ting
+ 150. BABYSITTING *  (2splits)  baby+sitting / babysit+ting  also: baby | sit | ting
+ 151. OVERSEEDING *  (2splits)  over+seeding / oversee+ding  also: over | see | ding
+ 152. BROKERAGES *  (2splits)  broke+rages / broker+ages
+ 153. COVERAGES *  (2splits)  cove+rages / cover+ages
+ 154. PHASEDOWNS *  (2splits)  phase+downs / phased+owns
+ 155. CONTESTING *  (2splits)  con+testing / conte+sting
+ 156. LITERALLY *  (2splits)  lite+rally / liter+ally
+ 157. OVERTRAINED *  (2splits)  over+trained / overt+rained
+ 158. LEAFLETTING *  (2splits)  leaf+letting / leaflet+ting  also: leaf | let | ting
+ 159. CAREFULLEST *  (2splits)  care+fullest / careful+lest
+ 160. PASTEDOWNS *  (2splits)  paste+downs / pasted+owns
+ 161. DAREDEVILS *  (2splits)  dare+devils / dared+evils
+ 162. JOYFULLEST *  (2splits)  joy+fullest / joyful+lest
+ 163. PAINFULLEST *  (2splits)  pain+fullest / painful+lest
+ 164. GEMMATING *  (2splits)  gem+mating / gemma+ting
+ 165. FEARFULLEST *  (2splits)  fear+fullest / fearful+lest
+ 166. TELECOMMUTE *  (2splits)  tele+commute / telecom+mute

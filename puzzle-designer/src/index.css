@@ -1,0 +1,25 @@
+@import "../styles/globals.css";
+
+@layer base {
+  :root {
+    font-family: "Berkeley Mono", "IBM Plex Mono", "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  body {
+    @apply min-w-[320px] min-h-screen relative m-0 bg-white text-black;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  p, span, h1, h2, h3, h4, h5, h6, li, td, th, label, blockquote, figcaption, caption, input, textarea, pre, code, [contenteditable="true"] {
+    @apply select-text;
+  }
+}
+
+@layer utilities {
+  .select-text, .select-text * {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+}

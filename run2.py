@@ -56,7 +56,7 @@ def construct_lookups():
                 candidates = affix_lookup['backward'].get(first_segment, set())
                 for candidate in candidates:
                     remainder = candidate[:-len(first_segment)]
-                    forward_lookup.setdefault(remainder, set()).add(word)
+                    forward_lookup.setdefault(remainder, dict()).setdefault(word, []).append(segmentation)
 
     print(f"Built forward lookup containing {len(forward_lookup)} entries")
 
@@ -67,7 +67,7 @@ def construct_lookups():
                 candidates = affix_lookup['forward'].get(last_segment, set())
                 for candidate in candidates:
                     remainder = candidate[len(last_segment):]
-                    backward_lookup.setdefault(remainder, set()).add(word)
+                    backward_lookup.setdefault(remainder, dict()).setdefault(word, []).append(segmentation)
 
     print(f"Built backward lookup containing {len(backward_lookup)} entries")
 
@@ -101,8 +101,8 @@ def walk_graph(start_word: str, steps: int, score_func):
     for word in valid_words:
         segments = [{
             "segment": segment,
-            "left": backward_lookup.get(segment[0], set()),
-            "right": forward_lookup.get(segment[-1], set()),
+            "left": backward_lookup.get(segment[0], dict()),
+            "right": forward_lookup.get(segment[-1], dict()),
         } for segment in segment_word(word)]
 
         data[word] = segments
@@ -117,11 +117,11 @@ def walk_graph(start_word: str, steps: int, score_func):
 
         for word in chosen:
             for segment in data[word]:
-                left_filtered = (set(segment['left']) & set(chosen)) - {word}
-                right_filtered = (set(segment['right']) & set(chosen)) - {word}
+                left_filtered = (set(segment['left'].keys()) & set(chosen)) - {word}
+                right_filtered = (set(segment['right'].keys()) & set(chosen)) - {word}
 
                 for left_word in left_filtered:
-                    for right_word in set(segment['right']) - {left_word}:
+                    for right_word in set(segment['right'].keys()) - {left_word}:
                         if right_word not in chosen:
                             i+=1
                             if i < 20:
@@ -131,7 +131,7 @@ def walk_graph(start_word: str, steps: int, score_func):
                     # scores.setdefault(left_word, 0)
                     # scores[left_word] += (len(left_filtered) + 1) * len(right_filtered)
                 for right_word in right_filtered:
-                    for left_word in set(segment['left']) - {right_word}:
+                    for left_word in set(segment['left'].keys()) - {right_word}:
                         if left_word not in chosen:
                             scores.setdefault(left_word, 0)
                             scores[left_word] += 1
@@ -142,8 +142,8 @@ def walk_graph(start_word: str, steps: int, score_func):
             if word in chosen or word.startswith('s'):
                 continue
             for segment in data[word]:
-                left_filtered = set(segment['left']) & set(chosen + [word])
-                right_filtered = set(segment['right']) & set(chosen + [word])
+                left_filtered = set(segment['left'].keys()) & set(chosen + [word])
+                right_filtered = set(segment['right'].keys()) & set(chosen + [word])
                 
                 scores.setdefault(word, 0)
                 scores[word] += len(left_filtered) * len(right_filtered)

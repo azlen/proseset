@@ -25,6 +25,7 @@ export type GameAction =
   | { type: "SUBMIT_RESULT"; cards: string[]; result: ComboResult }
   | { type: "SUBMIT_INVALID" }
   | { type: "DISMISS_RESULT" }
+  | { type: "SHUFFLE_CARDS" }
   | { type: "RESTORE_PROGRESS"; combos: Array<{ key: string; result: ComboResult }> };
 
 export const initialState: GameState = {
@@ -52,7 +53,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case "DESELECT_CARD": {
       const idx = state.selectedCards.indexOf(action.card);
       if (idx === -1) return state;
-      return { ...state, selectedCards: state.selectedCards.slice(0, idx), shake: false };
+      return { ...state, selectedCards: state.selectedCards.filter((c) => c !== action.card), shake: false };
     }
 
     case "CLEAR_SELECTION":
@@ -113,6 +114,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "DISMISS_RESULT":
       return { ...state, lastResult: null };
+
+    case "SHUFFLE_CARDS": {
+      if (!state.puzzle) return state;
+      const shuffled = [...state.puzzle.cards];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
+      }
+      return { ...state, puzzle: { ...state.puzzle, cards: shuffled } };
+    }
 
     case "RESTORE_PROGRESS": {
       const newFoundCombos = new Map(state.foundCombos);

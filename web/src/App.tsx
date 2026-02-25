@@ -3,7 +3,7 @@ import { fetchRandomPuzzle, validateCombo, loadDictionary } from "@/lib/puzzle";
 import { gameReducer, initialState } from "@/lib/game-state";
 import { saveProgress, loadProgress } from "@/lib/storage";
 import { CardGrid } from "@/components/CardGrid";
-import { ComboBar } from "@/components/ComboBar";
+import { CardSlots, ActionButtons } from "@/components/ComboBar";
 import { WordTicker } from "@/components/WordTicker";
 import { ResultToast } from "@/components/ResultToast";
 import "./index.css";
@@ -72,6 +72,10 @@ export function App() {
     dispatch({ type: "DISMISS_RESULT" });
   }, []);
 
+  const handleShuffle = useCallback(() => {
+    dispatch({ type: "SHUFFLE_CARDS" });
+  }, []);
+
   const handleRandomPuzzle = useCallback(async () => {
     const puzzle = await fetchRandomPuzzle();
     dispatch({ type: "LOAD_PUZZLE", puzzle });
@@ -102,12 +106,15 @@ export function App() {
         <WordTicker
           foundMadeWords={state.foundMadeWords}
           totalCards={state.puzzle.cards.length}
+          totalWords={state.puzzle.totalWords}
+          wordLengths={state.puzzle.wordLengths}
           usedCards={state.usedCards.size}
         />
       </div>
 
-      {/* Middle: cards centered */}
-      <div className="flex-1 flex items-center w-full">
+      {/* Middle section: grid centered, slots centered in gap below grid, buttons at bottom */}
+      <div className="flex-1 flex flex-col items-center w-full">
+        <div className="flex-1" />
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
@@ -115,17 +122,19 @@ export function App() {
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />
-      </div>
-
-      {/* Bottom: submission area */}
-      <div className="w-full pb-4">
-        <ComboBar
+        <div className="flex-1 flex items-center w-full">
+          <div className="w-full">
+            <CardSlots selectedCards={state.selectedCards} shake={state.shake} />
+          </div>
+        </div>
+        <ActionButtons
           selectedCards={state.selectedCards}
           onClear={handleClear}
+          onShuffle={handleShuffle}
           onSubmit={handleSubmit}
-          shake={state.shake}
           submitting={state.submitting}
         />
+        <div className="pb-4" />
       </div>
 
       {state.lastResult && (

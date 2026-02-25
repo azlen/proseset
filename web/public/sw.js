@@ -1,5 +1,5 @@
-const CACHE_NAME = "proseset-v1";
-const PRECACHE = ["/", "/dictionary.txt", "/puzzles.json", "/manifest.json"];
+const CACHE_NAME = "proseset-v2";
+const PRECACHE = ["/", "/dictionary.txt", "/newpuzzle.json", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -34,18 +34,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for everything else (assets, dictionary, puzzles)
+  // Network-first for everything else, fall back to cache
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
-        // Cache same-origin responses
+    fetch(event.request)
+      .then((res) => {
         if (url.origin === self.location.origin) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return res;
-      });
-    })
+      })
+      .catch(() => caches.match(event.request))
   );
 });

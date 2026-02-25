@@ -24,18 +24,18 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
 
   const MIN_LEN = 4;
   const MAX_LEN = 10;
-  const MIN_H = 8;
-  const MAX_H = 32;
+  const MIN_H = 30;
+  const MAX_H = 100;
 
   return (
     <div className="w-full overflow-hidden">
       <div className="flex justify-between items-end text-sm text-muted-foreground mb-2">
         <span className="shrink-0">{displayWords.length} / {totalWords} words found</span>
-        <div className="flex gap-[2px] items-end h-5 mx-3 overflow-hidden">
+        <div className="flex items-end h-5 mx-3 w-48">
           {wordLengths.map((len, i) => {
             const clamped = Math.min(Math.max(len, MIN_LEN), MAX_LEN);
             const t = (clamped - MIN_LEN) / (MAX_LEN - MIN_LEN);
-            const h = MIN_H + t * (MAX_H - MIN_H);
+            const hPct = MIN_H + t * (MAX_H - MIN_H);
             const used = usedByLength.get(len) ?? 0;
             const found = foundByLength.get(len) ?? 0;
             const isFound = used < found;
@@ -43,9 +43,9 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
             return (
               <div
                 key={i}
+                className="flex-1"
                 style={{
-                  width: 2,
-                  height: h,
+                  height: `${hPct}%`,
                   backgroundColor: isFound ? "#000" : "#d4d4d4",
                 }}
               />

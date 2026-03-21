@@ -93,7 +93,7 @@ export function App() {
     <div className="max-w-lg w-full mx-auto px-4 py-6 h-[100dvh] flex flex-col items-center overflow-hidden box-border">
       {/* Top: header + found words */}
       <div className="w-full flex justify-between items-baseline">
-        <h1 className="text-xl font-bold tracking-tight">Proseset</h1>
+        <h1 className="text-xl font-bold tracking-tight">doublespeak</h1>
         <button
           onClick={handleRandomPuzzle}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

@@ -6,6 +6,7 @@ interface ComboRevealProps {
   cards: string[];
   previouslyFoundWords: Set<string>;
   onDismiss: () => void;
+  onWordRevealed?: (word: string) => void;
 }
 
 type Phase = "cards" | "merged" | "split";
@@ -64,7 +65,7 @@ function buildWordGroups(
   return groups;
 }
 
-export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: ComboRevealProps) {
+export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onWordRevealed }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
@@ -112,8 +113,20 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
   const handleDismiss = useCallback(() => {
     setDismissed(true);
     clearTimeout(timerRef.current);
+    // Clear pending word-reveal timers
+    for (const t of wordRevealTimersRef.current) clearTimeout(t);
+    wordRevealTimersRef.current = [];
+    // Flush any unrevealed new words immediately
+    if (onWordRevealed) {
+      for (const seg of segs) {
+        const groups = buildWordGroups(seg, cards, previouslyFoundWords);
+        for (const g of groups) {
+          if (g.cls === "new") onWordRevealed(g.word);
+        }
+      }
+    }
     onDismiss();
-  }, [onDismiss]);
+  }, [onDismiss, onWordRevealed, segs, cards, previouslyFoundWords]);
 
   // Compute boundaries
   const cardBoundaries = computeBoundaries(cards);
@@ -130,6 +143,36 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
   wordGroups.forEach((g, i) => {
     if (g.cls === "new") newWordIndices.push(i);
   });
+
+  // Timing constants for ghost word stagger
+  const GHOST_INITIAL_DELAY = 400; // ms after split before first ghost appears
+  const GHOST_STAGGER = 250; // ms between each ghost word
+
+  // Track timers for word-revealed callbacks
+  const wordRevealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Fire onWordRevealed for each new word, timed to match ghost animation
+  useEffect(() => {
+    // Clear any pending word-reveal timers
+    for (const t of wordRevealTimersRef.current) clearTimeout(t);
+    wordRevealTimersRef.current = [];
+
+    if (phase !== "split" || !onWordRevealed) return;
+
+    const newWords = wordGroups.filter((g) => g.cls === "new");
+    newWords.forEach((g, idx) => {
+      const delay = GHOST_INITIAL_DELAY + idx * GHOST_STAGGER;
+      const t = setTimeout(() => {
+        onWordRevealed(g.word);
+      }, delay);
+      wordRevealTimersRef.current.push(t);
+    });
+
+    return () => {
+      for (const t of wordRevealTimersRef.current) clearTimeout(t);
+      wordRevealTimersRef.current = [];
+    };
+  }, [phase, spiritKey]); // spiritKey changes each time we re-enter split
 
   // All possible gap positions (between any two adjacent letters)
   const gapWidths: number[] = [];
@@ -174,9 +217,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
                   (g) => g.cls === "new" && g.startPos === i
                 )
               );
-              if (newWordIndices.length >= 2) {
-                staggerDelay = newIdx * 150;
-              }
+              staggerDelay = GHOST_INITIAL_DELAY + newIdx * GHOST_STAGGER;
             }
 
             // Find the new word text for ghost rendering

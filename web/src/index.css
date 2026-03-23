@@ -29,3 +29,38 @@
 .animate-shake {
   animation: shake 0.4s ease-in-out;
 }
+
+/* Combo reveal animations */
+.combo-reveal {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.combo-reveal-words {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.combo-gap {
+  display: inline-block;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.combo-letter {
+  transition: color 0.35s ease;
+}
+
+.combo-letter-new {
+  color: #2563eb;
+}

@@ -75,6 +75,72 @@
   color: #9ca3af;
 }
 
+/* Word ticker chip animations */
+.word-ticker-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: 200px;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Phase 1: Collapsed — no width, invisible, inserted into DOM */
+.word-ticker-collapsed {
+  max-width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden;
+}
+
+/* Phase 2: Expanding — smoothly grow width to push existing words right */
+.word-ticker-expanding {
+  max-width: 200px;
+  padding: 2px 8px;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 350ms cubic-bezier(0.4, 0, 0.2, 1),
+              padding 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Phase 3: Pop in — become visible with blue color and a small scale pop */
+.word-ticker-pop {
+  opacity: 1;
+  color: #2563eb;
+  background-color: #dbeafe;
+  animation: ticker-pop-in 150ms ease-out forwards;
+}
+
+@keyframes ticker-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Phase 4: Fading — blue fades to normal gray over 2s */
+.word-ticker-fading {
+  opacity: 1;
+  color: inherit;
+  background-color: var(--muted);
+  transform: scale(1);
+  transition: color 2s ease, background-color 2s ease;
+}
+
 /* Ghost "spirit" that drifts up and fades out */
 .combo-spirit {
   position: absolute;

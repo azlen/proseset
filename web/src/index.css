@@ -77,3 +77,36 @@
   60% { transform: translateY(-2px); }
   80% { transform: translateY(1px); }
 }
+
+/* Word ticker animations */
+
+/* Phase 1: Slide — wrapper grows from 0 to target width, pushing siblings */
+@keyframes wordTickerSlide {
+  from { width: 0; }
+  to   { width: var(--target-w); }
+}
+
+.word-ticker-slide {
+  animation: wordTickerSlide 350ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Phase 2: Pop in — scale from 0 to 1 with overshoot */
+@keyframes wordTickerPop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.word-ticker-pop {
+  animation: wordTickerPop 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Phase 3: Fade — blue → foreground color over 2s */
+@keyframes wordTickerFade {
+  from { color: #2563eb; }
+  to   { color: inherit; }
+}
+
+.word-ticker-fade {
+  animation: wordTickerFade 2s ease forwards;
+}

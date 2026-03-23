@@ -64,3 +64,54 @@
 .combo-letter-new {
   color: #2563eb;
 }
+
+.combo-word-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Flying word chip: starts at source position, animates to target */
+@keyframes fly-to-ticker {
+  0% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(calc(-50% + var(--fly-dx)), calc(-50% + var(--fly-dy))) scale(0.95);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--fly-dx)), calc(-50% + var(--fly-dy))) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.flying-word {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  animation: fly-to-ticker 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* Word landing pop animation in the ticker */
+@keyframes word-land {
+  0% {
+    transform: scale(1.15);
+    background-color: #dbeafe;
+  }
+  100% {
+    transform: scale(1);
+    background-color: hsl(var(--muted));
+  }
+}
+
+.word-landed {
+  animation: word-land 0.4s ease-out;
+}

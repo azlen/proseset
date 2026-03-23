@@ -1,17 +1,33 @@
-import { useState } from "react";
+import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 
 interface WordTickerProps {
   foundMadeWords: string[];
+  /** Words that are animating in and should show as landed */
+  landedWords?: Set<string>;
   totalCards: number;
   totalWords: number;
   wordLengths: number[];
   usedCards: number;
 }
 
-export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths, usedCards }: WordTickerProps) {
+export interface WordTickerHandle {
+  getContainerRect(): DOMRect | null;
+}
+
+export const WordTicker = forwardRef<WordTickerHandle, WordTickerProps>(function WordTicker(
+  { foundMadeWords, landedWords, totalCards, totalWords, wordLengths, usedCards },
+  ref
+) {
   const [expanded, setExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const displayWords = foundMadeWords.filter((w) => w.length >= 4);
   const foundSet = new Set(displayWords.map((w) => w.length));
+
+  useImperativeHandle(ref, () => ({
+    getContainerRect() {
+      return containerRef.current?.getBoundingClientRect() ?? null;
+    },
+  }));
 
   // Build a map of how many words of each length are found vs total
   const foundByLength = new Map<number, number>();
@@ -55,6 +71,7 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         <span className="shrink-0">{usedCards}/{totalCards} cards used</span>
       </div>
       <div
+        ref={containerRef}
         onClick={() => setExpanded(true)}
         className="relative h-10 border-t border-b border-border cursor-pointer"
       >
@@ -62,7 +79,9 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
           {displayWords.map((word) => (
             <span
               key={word}
-              className="px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0"
+              className={`px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0${
+                landedWords?.has(word) ? " word-landed" : ""
+              }`}
             >
               {word}
             </span>
@@ -105,4 +124,4 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
       )}
     </div>
   );
-}
+});

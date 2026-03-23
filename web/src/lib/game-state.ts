@@ -6,6 +6,8 @@ export interface GameState {
   foundCombos: Map<string, ComboResult>;
   usedCards: Set<string>;
   foundMadeWords: string[];
+  /** Words waiting to animate into the found-words bar */
+  pendingNewWords: string[];
   longestFoundWord: string;
   lastResult: {
     combo: ComboResult;
@@ -25,6 +27,7 @@ export type GameAction =
   | { type: "SUBMIT_RESULT"; cards: string[]; result: ComboResult }
   | { type: "SUBMIT_INVALID" }
   | { type: "DISMISS_RESULT" }
+  | { type: "REVEAL_NEW_WORDS" }
   | { type: "SHUFFLE_CARDS" }
   | { type: "RESTORE_PROGRESS"; combos: Array<{ key: string; result: ComboResult }> };
 
@@ -34,6 +37,7 @@ export const initialState: GameState = {
   foundCombos: new Map(),
   usedCards: new Set(),
   foundMadeWords: [],
+  pendingNewWords: [],
   longestFoundWord: "",
   lastResult: null,
   shake: false,
@@ -43,7 +47,7 @@ export const initialState: GameState = {
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "LOAD_PUZZLE":
-      return { ...initialState, puzzle: action.puzzle };
+      return { ...initialState, puzzle: action.puzzle, pendingNewWords: [] };
 
     case "SELECT_CARD": {
       if (state.selectedCards.includes(action.card)) return state;
@@ -80,8 +84,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
 
         const existing = new Set(state.foundMadeWords);
-        const newWords = result.madeWords.filter((w) => !existing.has(w));
-        const newFoundMadeWords = [...newWords, ...state.foundMadeWords];
+        const newWords = result.madeWords.filter((w) => !existing.has(w) && w.length >= 4);
 
         let longestFoundWord = state.longestFoundWord;
         for (const word of result.madeWords) {
@@ -94,7 +97,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           ...state,
           foundCombos: newFoundCombos,
           usedCards: newUsedCards,
-          foundMadeWords: newFoundMadeWords,
+          pendingNewWords: newWords,
           longestFoundWord,
           selectedCards: [],
           lastResult: { combo: result, cards, isNew: true },
@@ -106,14 +109,34 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         selectedCards: [],
+        pendingNewWords: [],
         lastResult: { combo: result, cards, isNew: false },
         shake: false,
         submitting: false,
       };
     }
 
-    case "DISMISS_RESULT":
-      return { ...state, lastResult: null };
+    case "REVEAL_NEW_WORDS": {
+      if (state.pendingNewWords.length === 0) return state;
+      return {
+        ...state,
+        foundMadeWords: [...state.pendingNewWords, ...state.foundMadeWords],
+        pendingNewWords: [],
+      };
+    }
+
+    case "DISMISS_RESULT": {
+      // If there are still pending words that haven't animated in, reveal them immediately
+      const revealedWords = state.pendingNewWords.length > 0
+        ? [...state.pendingNewWords, ...state.foundMadeWords]
+        : state.foundMadeWords;
+      return {
+        ...state,
+        lastResult: null,
+        foundMadeWords: revealedWords,
+        pendingNewWords: [],
+      };
+    }
 
     case "SHUFFLE_CARDS": {
       if (!state.puzzle) return state;

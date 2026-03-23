@@ -1,15 +1,66 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useRef, useState } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary } from "@/lib/puzzle";
 import { gameReducer, initialState } from "@/lib/game-state";
 import { saveProgress, loadProgress } from "@/lib/storage";
 import { CardGrid } from "@/components/CardGrid";
 import { CardSlots, ActionButtons } from "@/components/ComboBar";
 import { WordTicker } from "@/components/WordTicker";
+import type { WordTickerHandle } from "@/components/WordTicker";
 import { ComboReveal } from "@/components/ComboReveal";
+import type { WordRect } from "@/components/ComboReveal";
 import "./index.css";
+
+interface FlyingWord {
+  word: string;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  id: number;
+}
+
+let flyingIdCounter = 0;
 
 export function App() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  const wordTickerRef = useRef<WordTickerHandle>(null);
+  const [flyingWords, setFlyingWords] = useState<FlyingWord[]>([]);
+  const [landedWords, setLandedWords] = useState<Set<string>>(new Set());
+
+  // Handle new words positioned from ComboReveal
+  const handleNewWordsPositioned = useCallback((wordRects: WordRect[]) => {
+    const tickerRect = wordTickerRef.current?.getContainerRect();
+    if (!tickerRect) {
+      // Fallback: just reveal immediately
+      dispatch({ type: "REVEAL_NEW_WORDS" });
+      return;
+    }
+
+    // Target: left side of ticker, vertically centered
+    const targetX = tickerRect.left + 12;
+    const targetY = tickerRect.top + tickerRect.height / 2;
+
+    const allWords = wordRects.map((wr, i) => ({
+      word: wr.word,
+      startX: wr.rect.left + wr.rect.width / 2,
+      startY: wr.rect.top + wr.rect.height / 2,
+      endX: targetX + i * 60,
+      endY: targetY,
+      id: ++flyingIdCounter,
+    }));
+
+    // Launch all flying words at once (no stagger for simplicity)
+    setFlyingWords(allWords);
+
+    // After animation completes, reveal words in state and clean up
+    setTimeout(() => {
+      dispatch({ type: "REVEAL_NEW_WORDS" });
+      setLandedWords(new Set(wordRects.map((wr) => wr.word)));
+      setFlyingWords([]);
+      // Clear landed animation class after it plays
+      setTimeout(() => setLandedWords(new Set()), 500);
+    }, 850);
+  }, []);
 
   // Load dictionary + puzzle
   useEffect(() => {
@@ -108,7 +159,9 @@ export function App() {
 
       <div className="w-full mt-2">
         <WordTicker
+          ref={wordTickerRef}
           foundMadeWords={state.foundMadeWords}
+          landedWords={landedWords}
           totalCards={state.puzzle.cards.length}
           totalWords={state.puzzle.totalWords}
           wordLengths={state.puzzle.wordLengths}
@@ -126,6 +179,7 @@ export function App() {
                 combo={state.lastResult.combo}
                 cards={state.lastResult.cards}
                 onDismiss={handleDismissResult}
+                onNewWordsPositioned={state.lastResult.isNew ? handleNewWordsPositioned : undefined}
               />
             )}
           </div>
@@ -151,6 +205,22 @@ export function App() {
         />
         <div className="pb-4" />
       </div>
+
+      {/* Flying word chips that animate from combo reveal to found-words bar */}
+      {flyingWords.map((fw) => (
+        <span
+          key={fw.id}
+          className="flying-word"
+          style={{
+            left: fw.startX,
+            top: fw.startY,
+            "--fly-dx": `${fw.endX - fw.startX}px`,
+            "--fly-dy": `${fw.endY - fw.startY}px`,
+          } as React.CSSProperties}
+        >
+          {fw.word}
+        </span>
+      ))}
     </div>
   );
 }

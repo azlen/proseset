@@ -95,7 +95,7 @@ export function App() {
 
   return (
     <div className="max-w-lg w-full mx-auto px-4 py-6 h-[100dvh] flex flex-col items-center overflow-hidden box-border">
-      {/* Top: header + found words */}
+      {/* Top: header */}
       <div className="w-full flex justify-between items-baseline">
         <h1 className="text-xl font-bold tracking-tight">doublespeak</h1>
         <button
@@ -106,19 +106,19 @@ export function App() {
         </button>
       </div>
 
-      <div className="w-full mt-2">
-        <WordTicker
-          foundMadeWords={state.foundMadeWords}
-          totalCards={state.puzzle.cards.length}
-          totalWords={state.puzzle.totalWords}
-          wordLengths={state.puzzle.wordLengths}
-          usedCards={state.usedCards.size}
-        />
-      </div>
-
-      {/* Middle section: grid centered, slots centered in gap below grid, buttons at bottom */}
+      {/* Middle section: grid centered, word ticker centered above, slots centered below */}
       <div className="flex-1 flex flex-col items-center w-full">
-        <div className="flex-1" />
+        <div className="flex-1 flex items-center w-full">
+          <div className="w-full">
+            <WordTicker
+              foundMadeWords={state.foundMadeWords}
+              totalCards={state.puzzle.cards.length}
+              totalWords={state.puzzle.totalWords}
+              wordLengths={state.puzzle.wordLengths}
+              usedCards={state.usedCards.size}
+            />
+          </div>
+        </div>
         {/* Combo reveal display above the grid */}
         <div className="w-full mb-1 min-h-11">
           {state.lastResult && (

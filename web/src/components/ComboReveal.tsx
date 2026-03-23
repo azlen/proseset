@@ -118,7 +118,7 @@ export function ComboReveal({ combo, cards, isNew, onDismiss }: ComboRevealProps
         {/* Label */}
         <div className="text-xs text-muted-foreground">
           {isNew ? (
-            segIndex > 0 ? `also... (${segIndex + 1}/${segs.length})` : "nice!"
+            segIndex > 0 ? `(${segIndex + 1}/${segs.length})` : ""
           ) : "already found"}
         </div>
 

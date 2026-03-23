@@ -137,3 +137,19 @@
     transform: translateY(-28px);
   }
 }
+
+/* Fade-out when all decompositions are done */
+.combo-reveal-fade-out {
+  animation: combo-fade-out 0.5s ease-out forwards;
+}
+
+@keyframes combo-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}

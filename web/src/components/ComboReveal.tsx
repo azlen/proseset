@@ -65,15 +65,19 @@ function buildWordGroups(
   return groups;
 }
 
+const FADE_OUT_DURATION = 500; // ms for the fade-out animation
+
 export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onWordRevealed }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("cards");
   const [dismissed, setDismissed] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
   // Increment spiritKey each time we enter split phase to retrigger ghost animations
   const [spiritKey, setSpiritKey] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const currentSeg = segs[segIndex] ?? segs[0]!;
   const concat = combo.concat.toUpperCase();
@@ -83,6 +87,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     setPhase("cards");
     setSegIndex(0);
     setDismissed(false);
+    setFadingOut(false);
     setSpiritKey(0);
   }, [combo]);
 
@@ -103,6 +108,9 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
           // Collapse back to merged before showing next split
           setPhase("merged");
           setSegIndex((i) => i + 1);
+        } else {
+          // Last segmentation finished — start fade out
+          setFadingOut(true);
         }
       }, 2800);
     }
@@ -110,9 +118,19 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     return () => clearTimeout(timerRef.current);
   }, [phase, segIndex, segs.length, dismissed]);
 
+  // When fade-out starts, wait for animation then dismiss
+  useEffect(() => {
+    if (!fadingOut) return;
+    fadeTimerRef.current = setTimeout(() => {
+      onDismiss();
+    }, FADE_OUT_DURATION);
+    return () => clearTimeout(fadeTimerRef.current);
+  }, [fadingOut, onDismiss]);
+
   const handleDismiss = useCallback(() => {
     setDismissed(true);
     clearTimeout(timerRef.current);
+    clearTimeout(fadeTimerRef.current);
     // Clear pending word-reveal timers
     for (const t of wordRevealTimersRef.current) clearTimeout(t);
     wordRevealTimersRef.current = [];
@@ -189,7 +207,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
 
   return (
     <div
-      className="combo-reveal w-full cursor-pointer"
+      className={`combo-reveal w-full cursor-pointer${fadingOut ? " combo-reveal-fade-out" : ""}`}
       onClick={handleDismiss}
     >
       <div className="flex flex-col items-center gap-1">

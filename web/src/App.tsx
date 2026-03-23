@@ -35,8 +35,8 @@ export function App() {
     const result = state.lastResult;
     const best = result.combo.bestSegmentations;
     const segCount = best?.length || result.combo.segmentations.length;
-    // Give enough time for all animations: 1.2s cards + 0.8s merge + 2.5s per seg + buffer
-    const duration = 2000 + segCount * 3300 + 1000;
+    // Give enough time for all animations: 1.2s cards + 0.8s merge + 2.5s per seg + 0.5s fade-out + buffer
+    const duration = 2000 + segCount * 3300 + 500 + 1000;
     const timer = setTimeout(() => {
       // Flush any words that may not have been revealed yet
       for (const word of result.combo.madeWords) {

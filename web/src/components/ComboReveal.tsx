@@ -4,6 +4,7 @@ import type { ComboResult } from "@/lib/puzzle";
 interface ComboRevealProps {
   combo: ComboResult;
   cards: string[];
+  previouslyFoundWords: Set<string>;
   onDismiss: () => void;
 }
 
@@ -19,10 +20,15 @@ function computeBoundaries(words: string[]): Set<number> {
   return b;
 }
 
-/** Check which seg words are "new" (not matching an original card at the same position) */
-function getNewWordRanges(seg: string[], cards: string[]): Set<number> {
-  // Returns set of letter indices that belong to a "new" 4+ letter word
-  const newIndices = new Set<number>();
+type WordClass = "original" | "already-found" | "new";
+
+/** Classify each letter index as original card, already-found word, or new word */
+function classifyLetters(
+  seg: string[],
+  cards: string[],
+  previouslyFoundWords: Set<string>
+): Map<number, WordClass> {
+  const classification = new Map<number, WordClass>();
   let segPos = 0;
   for (const word of seg) {
     let isOriginal = false;
@@ -34,17 +40,25 @@ function getNewWordRanges(seg: string[], cards: string[]): Set<number> {
       }
       cardPos += card.length;
     }
-    if (!isOriginal && word.length >= 4) {
-      for (let i = segPos; i < segPos + word.length; i++) {
-        newIndices.add(i);
-      }
+
+    let cls: WordClass;
+    if (isOriginal || word.length < 4) {
+      cls = "original";
+    } else if (previouslyFoundWords.has(word)) {
+      cls = "already-found";
+    } else {
+      cls = "new";
+    }
+
+    for (let i = segPos; i < segPos + word.length; i++) {
+      classification.set(i, cls);
     }
     segPos += word.length;
   }
-  return newIndices;
+  return classification;
 }
 
-export function ComboReveal({ combo, cards, onDismiss }: ComboRevealProps) {
+export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
@@ -92,7 +106,7 @@ export function ComboReveal({ combo, cards, onDismiss }: ComboRevealProps) {
   // Compute boundaries
   const cardBoundaries = computeBoundaries(cards);
   const segBoundaries = computeBoundaries(currentSeg);
-  const newWordIndices = getNewWordRanges(currentSeg, cards);
+  const letterClasses = classifyLetters(currentSeg, cards, previouslyFoundWords);
 
   // All possible gap positions (between any two adjacent letters)
   // For each position i (after letter i, before letter i+1), determine gap width
@@ -126,8 +140,14 @@ export function ComboReveal({ combo, cards, onDismiss }: ComboRevealProps) {
               )}
               <span
                 className={
-                  phase === "split" && newWordIndices.has(i)
-                    ? "combo-letter combo-letter-new"
+                  phase === "split"
+                    ? `combo-letter ${
+                        letterClasses.get(i) === "new"
+                          ? "combo-letter-new"
+                          : letterClasses.get(i) === "already-found"
+                            ? "combo-letter-found"
+                            : ""
+                      }`
                     : "combo-letter"
                 }
               >

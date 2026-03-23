@@ -118,17 +118,17 @@ export function App() {
 
       {/* Middle section: grid centered, slots centered in gap below grid, buttons at bottom */}
       <div className="flex-1 flex flex-col items-center w-full">
-        <div className="flex-1" />
-        {/* Combo reveal display above the grid */}
-        <div className="w-full mb-1 min-h-11">
-          {state.lastResult && (
-            <ComboReveal
-              combo={state.lastResult.combo}
-              cards={state.lastResult.cards}
-              isNew={state.lastResult.isNew}
-              onDismiss={handleDismissResult}
-            />
-          )}
+        {/* Combo reveal centered between found-word bar and grid (same pattern as CardSlots below) */}
+        <div className="flex-1 flex items-center justify-center w-full">
+          <div className="w-full">
+            {state.lastResult && (
+              <ComboReveal
+                combo={state.lastResult.combo}
+                cards={state.lastResult.cards}
+                onDismiss={handleDismissResult}
+              />
+            )}
+          </div>
         </div>
         <CardGrid
           cards={state.puzzle.cards}

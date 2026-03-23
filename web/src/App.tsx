@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useState, useRef } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary } from "@/lib/puzzle";
 import { gameReducer, initialState } from "@/lib/game-state";
 import { saveProgress, loadProgress } from "@/lib/storage";
@@ -10,6 +10,42 @@ import "./index.css";
 
 export function App() {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+
+  // Track which words have been "revealed" by ghost animations during ComboReveal.
+  // Words are added here one-by-one as each ghost word appears, so the ticker
+  // shows them staggered in sync with the decomposition display.
+  const [pendingWords, setPendingWords] = useState<string[]>([]);
+  const pendingWordsRef = useRef<string[]>([]);
+
+  // When a new combo is submitted, capture the new words as "pending" (not yet revealed)
+  const prevFoundWordsRef = useRef<string[]>([]);
+  useEffect(() => {
+    const prev = new Set(prevFoundWordsRef.current);
+    const newWords = state.foundMadeWords.filter((w) => !prev.has(w));
+    prevFoundWordsRef.current = state.foundMadeWords;
+
+    if (newWords.length > 0 && state.lastResult) {
+      // Hold these words back — they'll be revealed by ComboReveal callbacks
+      setPendingWords(newWords);
+      pendingWordsRef.current = newWords;
+    }
+    // If no active combo reveal (e.g., restored progress), words pass through
+    // immediately since they won't be in pendingWords.
+  }, [state.foundMadeWords]);
+
+  const handleRevealWord = useCallback((word: string) => {
+    setPendingWords((pending) => {
+      const next = pending.filter((w) => w !== word);
+      pendingWordsRef.current = next;
+      return next;
+    });
+  }, []);
+
+  // Compute the words to show in the ticker: revealed words + already-settled words
+  // (foundMadeWords minus any still-pending ones)
+  const tickerWords = state.foundMadeWords.filter(
+    (w) => !pendingWords.includes(w)
+  );
 
   // Load dictionary + puzzle
   useEffect(() => {
@@ -73,6 +109,11 @@ export function App() {
   }, [state.selectedCards, state.foundCombos]);
 
   const handleDismissResult = useCallback(() => {
+    // Flush any remaining pending words into the ticker immediately
+    if (pendingWordsRef.current.length > 0) {
+      setPendingWords([]);
+      pendingWordsRef.current = [];
+    }
     dispatch({ type: "DISMISS_RESULT" });
   }, []);
 
@@ -108,7 +149,7 @@ export function App() {
 
       <div className="w-full mt-2">
         <WordTicker
-          foundMadeWords={state.foundMadeWords}
+          foundMadeWords={tickerWords}
           totalCards={state.puzzle.cards.length}
           totalWords={state.puzzle.totalWords}
           wordLengths={state.puzzle.wordLengths}
@@ -127,6 +168,7 @@ export function App() {
                 cards={state.lastResult.cards}
                 previouslyFoundWords={state.lastResult.previouslyFoundWords}
                 onDismiss={handleDismissResult}
+                onRevealWord={handleRevealWord}
               />
             )}
           </div>

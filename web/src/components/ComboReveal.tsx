@@ -4,7 +4,6 @@ import type { ComboResult } from "@/lib/puzzle";
 interface ComboRevealProps {
   combo: ComboResult;
   cards: string[];
-  isNew: boolean;
   onDismiss: () => void;
 }
 
@@ -45,7 +44,7 @@ function getNewWordRanges(seg: string[], cards: string[]): Set<number> {
   return newIndices;
 }
 
-export function ComboReveal({ combo, cards, isNew, onDismiss }: ComboRevealProps) {
+export function ComboReveal({ combo, cards, onDismiss }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
@@ -115,13 +114,6 @@ export function ComboReveal({ combo, cards, isNew, onDismiss }: ComboRevealProps
       onClick={handleDismiss}
     >
       <div className="flex flex-col items-center gap-1">
-        {/* Label */}
-        <div className="text-xs text-muted-foreground">
-          {isNew ? (
-            segIndex > 0 ? `also... (${segIndex + 1}/${segs.length})` : "nice!"
-          ) : "already found"}
-        </div>
-
         {/* Animated letter display - stable DOM, gaps animate via CSS */}
         <div className="combo-reveal-words">
           {concat.split("").map((char, i) => (

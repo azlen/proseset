@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface WordTickerProps {
   foundMadeWords: string[];
@@ -12,6 +12,23 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
   const [expanded, setExpanded] = useState(false);
   const displayWords = foundMadeWords.filter((w) => w.length >= 4);
   const foundSet = new Set(displayWords.map((w) => w.length));
+
+  // Track which words are "new" (just added) so we can animate them
+  const [newWords, setNewWords] = useState<Set<string>>(new Set());
+  const prevWordsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    const prevSet = new Set(prevWordsRef.current);
+    const justAdded = displayWords.filter((w) => !prevSet.has(w));
+    if (justAdded.length > 0) {
+      setNewWords(new Set(justAdded));
+      // After 2s, clear the "new" status so the blue fades to gray
+      const timer = setTimeout(() => setNewWords(new Set()), 2000);
+      prevWordsRef.current = displayWords;
+      return () => clearTimeout(timer);
+    }
+    prevWordsRef.current = displayWords;
+  }, [displayWords.length]);
 
   // Build a map of how many words of each length are found vs total
   const foundByLength = new Map<number, number>();
@@ -58,15 +75,18 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         onClick={() => setExpanded(true)}
         className="relative h-10 border-t border-b border-border cursor-pointer"
       >
-        <div className="absolute inset-0 flex gap-1.5 items-center overflow-hidden">
-          {displayWords.map((word) => (
-            <span
-              key={word}
-              className="px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0"
-            >
-              {word}
-            </span>
-          ))}
+        <div className="absolute inset-0 flex gap-1.5 items-center overflow-hidden ticker-row">
+          {displayWords.map((word) => {
+            const isNew = newWords.has(word);
+            return (
+              <span
+                key={word}
+                className={`px-2 py-0.5 rounded-md text-sm font-medium shrink-0 ticker-word ${isNew ? "ticker-word-new" : ""}`}
+              >
+                {word}
+              </span>
+            );
+          })}
         </div>
       </div>
 

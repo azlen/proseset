@@ -77,3 +77,44 @@
   60% { transform: translateY(-2px); }
   80% { transform: translateY(1px); }
 }
+
+/* Word ticker animations */
+.ticker-row {
+  /* Enable smooth layout shifts when new words push existing ones right */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ticker-word {
+  /* Existing words smoothly slide to their new position */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.4s ease;
+}
+
+@keyframes ticker-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ticker-word-new {
+  background-color: #dbeafe; /* blue-100 */
+  color: #1d4ed8; /* blue-700 */
+  animation: ticker-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: background-color 2s ease, color 2s ease;
+}
+
+/* After the "new" class is removed, transition smoothly back to muted */
+.ticker-word:not(.ticker-word-new) {
+  background-color: var(--color-muted);
+  color: var(--color-muted-foreground);
+  transition: background-color 2s ease, color 2s ease;
+}

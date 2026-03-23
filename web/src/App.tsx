@@ -5,7 +5,7 @@ import { saveProgress, loadProgress } from "@/lib/storage";
 import { CardGrid } from "@/components/CardGrid";
 import { CardSlots, ActionButtons } from "@/components/ComboBar";
 import { WordTicker } from "@/components/WordTicker";
-import { ResultToast } from "@/components/ResultToast";
+import { ComboReveal } from "@/components/ComboReveal";
 import "./index.css";
 
 export function App() {
@@ -29,12 +29,16 @@ export function App() {
     saveProgress(state.puzzle.date, state.foundCombos);
   }, [state.foundCombos, state.puzzle]);
 
-  // Auto-dismiss result toast
+  // Auto-dismiss result display
   useEffect(() => {
     if (!state.lastResult) return;
+    const best = state.lastResult.combo.bestSegmentations;
+    const segCount = best?.length || state.lastResult.combo.segmentations.length;
+    // Give enough time for all animations: 1.2s cards + 0.8s merge + 2.5s per seg + buffer
+    const duration = 2000 + segCount * 3300 + 1000;
     const timer = setTimeout(() => {
       dispatch({ type: "DISMISS_RESULT" });
-    }, 3000);
+    }, duration);
     return () => clearTimeout(timer);
   }, [state.lastResult]);
 
@@ -115,6 +119,17 @@ export function App() {
       {/* Middle section: grid centered, slots centered in gap below grid, buttons at bottom */}
       <div className="flex-1 flex flex-col items-center w-full">
         <div className="flex-1" />
+        {/* Combo reveal display above the grid */}
+        <div className="w-full mb-1 min-h-11">
+          {state.lastResult && (
+            <ComboReveal
+              combo={state.lastResult.combo}
+              cards={state.lastResult.cards}
+              isNew={state.lastResult.isNew}
+              onDismiss={handleDismissResult}
+            />
+          )}
+        </div>
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
@@ -136,15 +151,6 @@ export function App() {
         />
         <div className="pb-4" />
       </div>
-
-      {state.lastResult && (
-        <ResultToast
-          combo={state.lastResult.combo}
-          cards={state.lastResult.cards}
-          isNew={state.lastResult.isNew}
-          onDismiss={handleDismissResult}
-        />
-      )}
     </div>
   );
 }

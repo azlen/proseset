@@ -36,7 +36,12 @@ export function App() {
     const segCount = best?.length || state.lastResult.combo.segmentations.length;
     // Give enough time for all animations: 1.2s cards + 0.8s merge + 2.5s per seg + buffer
     const duration = 2000 + segCount * 3300 + 1000;
+    const { combo } = state.lastResult;
     const timer = setTimeout(() => {
+      // Flush any words that haven't been revealed yet via staggered animation
+      for (const word of combo.madeWords) {
+        dispatch({ type: "REVEAL_WORD", word });
+      }
       dispatch({ type: "DISMISS_RESULT" });
     }, duration);
     return () => clearTimeout(timer);
@@ -71,6 +76,10 @@ export function App() {
       dispatch({ type: "SUBMIT_INVALID" });
     }
   }, [state.selectedCards, state.foundCombos]);
+
+  const handleRevealWord = useCallback((word: string) => {
+    dispatch({ type: "REVEAL_WORD", word });
+  }, []);
 
   const handleDismissResult = useCallback(() => {
     dispatch({ type: "DISMISS_RESULT" });
@@ -127,6 +136,7 @@ export function App() {
                 cards={state.lastResult.cards}
                 previouslyFoundWords={state.lastResult.previouslyFoundWords}
                 onDismiss={handleDismissResult}
+                onRevealWord={handleRevealWord}
               />
             )}
           </div>

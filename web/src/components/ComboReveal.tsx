@@ -6,6 +6,7 @@ interface ComboRevealProps {
   cards: string[];
   previouslyFoundWords: Set<string>;
   onDismiss: () => void;
+  onRevealWord?: (word: string) => void;
 }
 
 type Phase = "cards" | "merged" | "split";
@@ -64,7 +65,7 @@ function buildWordGroups(
   return groups;
 }
 
-export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: ComboRevealProps) {
+export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onRevealWord }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
@@ -73,6 +74,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
   // Increment spiritKey each time we enter split phase to retrigger ghost animations
   const [spiritKey, setSpiritKey] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const revealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const currentSeg = segs[segIndex] ?? segs[0]!;
   const concat = combo.concat.toUpperCase();
@@ -109,11 +111,46 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
     return () => clearTimeout(timerRef.current);
   }, [phase, segIndex, segs.length, dismissed]);
 
+  // Fire onRevealWord for each new word in sync with the ghost animation delays
+  useEffect(() => {
+    if (phase !== "split" || !onRevealWord) return;
+
+    const GHOST_BASE_DELAY = 500;
+    const GHOST_STAGGER = 250;
+
+    const groups = buildWordGroups(currentSeg, cards, previouslyFoundWords);
+    const newWords = groups.filter((g) => g.cls === "new");
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    newWords.forEach((g, idx) => {
+      const delay = GHOST_BASE_DELAY + idx * GHOST_STAGGER;
+      const t = setTimeout(() => onRevealWord(g.word), delay);
+      timers.push(t);
+    });
+    revealTimersRef.current = timers;
+
+    return () => {
+      for (const t of timers) clearTimeout(t);
+    };
+  }, [phase, spiritKey]); // spiritKey changes each time we re-enter split
+
   const handleDismiss = useCallback(() => {
     setDismissed(true);
     clearTimeout(timerRef.current);
+    // Clear pending reveal timers and flush all remaining new words immediately
+    for (const t of revealTimersRef.current) clearTimeout(t);
+    revealTimersRef.current = [];
+    if (onRevealWord) {
+      // Reveal any words from ALL segmentations that haven't been revealed yet
+      for (const seg of segs) {
+        const groups = buildWordGroups(seg, cards, previouslyFoundWords);
+        for (const g of groups) {
+          if (g.cls === "new") onRevealWord(g.word);
+        }
+      }
+    }
     onDismiss();
-  }, [onDismiss]);
+  }, [onDismiss, onRevealWord, segs, cards, previouslyFoundWords]);
 
   // Compute boundaries
   const cardBoundaries = computeBoundaries(cards);
@@ -166,7 +203,11 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
             );
             const letterClass = group?.cls ?? "original";
 
-            // If this is the start of a new word, compute stagger delay
+            // If this is the start of a new word, compute stagger delay.
+            // Base delay lets the split/decomposition gaps open first,
+            // then each successive ghost word staggers by 250ms.
+            const GHOST_BASE_DELAY = 500;
+            const GHOST_STAGGER = 250;
             let staggerDelay = 0;
             if (isNewWordStart) {
               const newIdx = newWordIndices.indexOf(
@@ -174,9 +215,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
                   (g) => g.cls === "new" && g.startPos === i
                 )
               );
-              if (newWordIndices.length >= 2) {
-                staggerDelay = newIdx * 150;
-              }
+              staggerDelay = GHOST_BASE_DELAY + newIdx * GHOST_STAGGER;
             }
 
             // Find the new word text for ghost rendering

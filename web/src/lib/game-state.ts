@@ -27,6 +27,7 @@ export type GameAction =
   | { type: "SUBMIT_RESULT"; cards: string[]; result: ComboResult }
   | { type: "SUBMIT_INVALID" }
   | { type: "DISMISS_RESULT" }
+  | { type: "REVEAL_WORD"; word: string }
   | { type: "SHUFFLE_CARDS" }
   | { type: "RESTORE_PROGRESS"; combos: Array<{ key: string; result: ComboResult }> };
 
@@ -82,10 +83,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           newUsedCards.add(card);
         }
 
-        const existing = new Set(state.foundMadeWords);
-        const newWords = result.madeWords.filter((w) => !existing.has(w));
-        const newFoundMadeWords = [...newWords, ...state.foundMadeWords];
-
+        // Don't add new words to foundMadeWords here — they get added
+        // one-by-one via REVEAL_WORD as the ghost animations play.
+        // Only update longestFoundWord eagerly so the stat is correct.
         let longestFoundWord = state.longestFoundWord;
         for (const word of result.madeWords) {
           if (word.length > longestFoundWord.length) {
@@ -97,7 +97,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           ...state,
           foundCombos: newFoundCombos,
           usedCards: newUsedCards,
-          foundMadeWords: newFoundMadeWords,
           longestFoundWord,
           selectedCards: [],
           lastResult: { combo: result, cards, isNew: true, previouslyFoundWords },
@@ -112,6 +111,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         lastResult: { combo: result, cards, isNew: false, previouslyFoundWords },
         shake: false,
         submitting: false,
+      };
+    }
+
+    case "REVEAL_WORD": {
+      const { word } = action;
+      if (state.foundMadeWords.includes(word)) return state;
+      return {
+        ...state,
+        foundMadeWords: [word, ...state.foundMadeWords],
       };
     }
 

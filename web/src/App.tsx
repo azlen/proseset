@@ -106,19 +106,21 @@ export function App() {
         </button>
       </div>
 
-      <div className="w-full mt-2">
-        <WordTicker
-          foundMadeWords={state.foundMadeWords}
-          totalCards={state.puzzle.cards.length}
-          totalWords={state.puzzle.totalWords}
-          wordLengths={state.puzzle.wordLengths}
-          usedCards={state.usedCards.size}
-        />
-      </div>
-
       {/* Middle section: grid centered, slots centered in gap below grid, buttons at bottom */}
       <div className="flex-1 flex flex-col items-center w-full">
-        <div className="flex-1" />
+        <div className="flex-1 relative w-full">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-full">
+              <WordTicker
+                foundMadeWords={state.foundMadeWords}
+                totalCards={state.puzzle.cards.length}
+                totalWords={state.puzzle.totalWords}
+                wordLengths={state.puzzle.wordLengths}
+                usedCards={state.usedCards.size}
+              />
+            </div>
+          </div>
+        </div>
         {/* Combo reveal display above the grid */}
         <div className="w-full mb-1 min-h-11">
           {state.lastResult && (

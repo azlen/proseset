@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
 
 interface WordTickerProps {
   foundMadeWords: string[];
@@ -9,12 +9,12 @@ interface WordTickerProps {
 }
 
 /**
- * Animation phases for newly added words:
- *  - idle: no animation in progress
- *  - push: new words expand from zero width, pushing existing words right.
- *          Words remain invisible (opacity 0) during this phase.
- *  - reveal: new words pop in (scale + opacity) with a blue color that
- *            fades to the normal gray over 2 seconds.
+ * Animation flow for newly added words:
+ *  1. "push"   — new word wrappers animate width from 0 → measured px,
+ *                pushing existing words right. Content is invisible.
+ *  2. "reveal" — new words pop in (scale + opacity) coloured blue,
+ *                then the blue fades to the normal text colour over 2 s.
+ *  3. "idle"   — no animation; all words render normally.
  */
 type Phase = "idle" | "push" | "reveal";
 
@@ -22,68 +22,94 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
   const [expanded, setExpanded] = useState(false);
   const displayWords = foundMadeWords.filter((w) => w.length >= 4);
 
-  // Track which words are "new" (just added) vs already rendered
   const prevWordsRef = useRef<string[]>([]);
   const [newWords, setNewWords] = useState<Set<string>>(new Set());
   const [phase, setPhase] = useState<Phase>("idle");
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Refs for measuring new-word natural widths
+  const wordElRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
+  const [measuredWidths, setMeasuredWidths] = useState<Map<string, number>>(new Map());
+  // Flipped after measurement to kick off the CSS width transition
+  const [expanding, setExpanding] = useState(false);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
   }, []);
 
-  // Clean up timers on unmount
   useEffect(() => clearTimers, [clearTimers]);
 
-  // Detect newly added words and kick off animation
+  // Detect new words → start animation
   useEffect(() => {
     const prevSet = new Set(prevWordsRef.current);
     const justAdded = displayWords.filter((w) => !prevSet.has(w));
 
     if (justAdded.length > 0 && prevWordsRef.current.length > 0) {
-      // Clear any in-flight animation
       clearTimers();
-
-      const newSet = new Set(justAdded);
-      setNewWords(newSet);
+      setNewWords(new Set(justAdded));
+      setMeasuredWidths(new Map());
+      setExpanding(false);
       setPhase("push");
-
-      // After push/expand animation (400ms), reveal the words
-      const t1 = setTimeout(() => {
-        setPhase("reveal");
-
-        // After 2s color fade, clean up
-        const t2 = setTimeout(() => {
-          setNewWords(new Set());
-          setPhase("idle");
-        }, 2100);
-        timersRef.current.push(t2);
-      }, 450);
-      timersRef.current.push(t1);
     } else if (justAdded.length > 0) {
-      // First words — pop in directly (no push needed)
+      // Very first words — skip push, go straight to reveal
       clearTimers();
-
       setNewWords(new Set(justAdded));
       setPhase("reveal");
+
+      // Clean up after animations finish (pop 350ms + colour fade 2s)
       const t = setTimeout(() => {
         setNewWords(new Set());
         setPhase("idle");
-      }, 2100);
+      }, 2500);
       timersRef.current.push(t);
     }
 
     prevWordsRef.current = displayWords;
   }, [displayWords.join(","), clearTimers]);
 
-  // Build a map of how many words of each length are found vs total
+  // After "push" renders (words in DOM at width 0), measure then expand
+  useLayoutEffect(() => {
+    if (phase !== "push") return;
+
+    // Measure natural widths of the hidden new-word inner spans
+    const widths = new Map<string, number>();
+    for (const word of newWords) {
+      const el = wordElRefs.current.get(word);
+      if (el) {
+        widths.set(word, el.offsetWidth);
+      }
+    }
+    setMeasuredWidths(widths);
+
+    // Next frame: flip expanding so CSS transitions width from 0 → measured
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setExpanding(true);
+
+        // After the width transition (400ms), switch to reveal
+        const t1 = setTimeout(() => {
+          setPhase("reveal");
+          setExpanding(false);
+
+          // Clean up after animations finish (pop 350ms + colour fade 2s)
+          const t2 = setTimeout(() => {
+            setNewWords(new Set());
+            setPhase("idle");
+            setMeasuredWidths(new Map());
+          }, 2500);
+          timersRef.current.push(t2);
+        }, 420);
+        timersRef.current.push(t1);
+      });
+    });
+  }, [phase, newWords]);
+
+  // ───────── histogram helpers ─────────
   const foundByLength = new Map<number, number>();
   for (const w of displayWords) {
     foundByLength.set(w.length, (foundByLength.get(w.length) ?? 0) + 1);
   }
-
-  // Track which word lengths have been "used up" as we render lines
   const usedByLength = new Map<number, number>();
 
   const MIN_LEN = 4;
@@ -118,6 +144,8 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         </div>
         <span className="shrink-0">{usedCards}/{totalCards} cards used</span>
       </div>
+
+      {/* ─── scrolling word ribbon ─── */}
       <div
         onClick={() => setExpanded(true)}
         className="relative h-10 border-t border-b border-border cursor-pointer"
@@ -125,16 +153,34 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         <div className="absolute inset-0 flex gap-1.5 items-center overflow-hidden">
           {displayWords.map((word) => {
             const isNew = newWords.has(word);
-            const isPushing = isNew && phase === "push";
-            const isRevealing = isNew && phase === "reveal";
+            const isPush = isNew && phase === "push";
+            const isReveal = isNew && phase === "reveal";
+
+            if (isPush) {
+              const targetW = expanding ? measuredWidths.get(word) ?? "auto" : 0;
+              return (
+                <span
+                  key={word}
+                  className="ticker-push-wrapper shrink-0"
+                  style={{ width: typeof targetW === "number" ? `${targetW}px` : targetW }}
+                >
+                  <span
+                    ref={(el) => { if (el) wordElRefs.current.set(word, el); }}
+                    className="px-2 py-0.5 rounded-md bg-muted text-sm font-medium whitespace-nowrap"
+                    style={{ visibility: "hidden" }}
+                  >
+                    {word}
+                  </span>
+                </span>
+              );
+            }
 
             return (
               <span
                 key={word}
                 className={[
                   "px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0",
-                  isPushing ? "ticker-word-push" : "",
-                  isRevealing ? "ticker-word-reveal" : "",
+                  isReveal ? "ticker-word-reveal" : "",
                 ].join(" ")}
               >
                 {word}
@@ -144,6 +190,7 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         </div>
       </div>
 
+      {/* ─── expanded overlay ─── */}
       {expanded && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/30"

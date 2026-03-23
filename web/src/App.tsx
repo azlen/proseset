@@ -125,6 +125,7 @@ export function App() {
               <ComboReveal
                 combo={state.lastResult.combo}
                 cards={state.lastResult.cards}
+                previouslyFoundWords={state.lastResult.previouslyFoundWords}
                 onDismiss={handleDismissResult}
               />
             )}

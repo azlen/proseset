@@ -11,6 +11,8 @@ export interface GameState {
     combo: ComboResult;
     cards: string[];
     isNew: boolean;
+    /** Words that had already been found before this combo was submitted */
+    previouslyFoundWords: Set<string>;
   } | null;
   shake: boolean;
   submitting: boolean;
@@ -69,6 +71,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const { cards, result } = action;
       const key = cards.join(",");
       const isNew = !state.foundCombos.has(key);
+      const previouslyFoundWords = new Set(state.foundMadeWords);
 
       if (isNew) {
         const newFoundCombos = new Map(state.foundCombos);
@@ -97,7 +100,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           foundMadeWords: newFoundMadeWords,
           longestFoundWord,
           selectedCards: [],
-          lastResult: { combo: result, cards, isNew: true },
+          lastResult: { combo: result, cards, isNew: true, previouslyFoundWords },
           shake: false,
           submitting: false,
         };
@@ -106,7 +109,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         selectedCards: [],
-        lastResult: { combo: result, cards, isNew: false },
+        lastResult: { combo: result, cards, isNew: false, previouslyFoundWords },
         shake: false,
         submitting: false,
       };

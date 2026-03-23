@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { ComboResult } from "@/lib/puzzle";
 
 interface ComboRevealProps {
@@ -22,40 +22,46 @@ function computeBoundaries(words: string[]): Set<number> {
 
 type WordClass = "original" | "already-found" | "new";
 
-/** Classify each letter index as original card, already-found word, or new word */
-function classifyLetters(
+/** Classify each word in the segmentation */
+function classifyWord(
+  word: string,
+  wordStartPos: number,
+  cards: string[],
+  previouslyFoundWords: Set<string>
+): WordClass {
+  let isOriginal = false;
+  let cardPos = 0;
+  for (const card of cards) {
+    if (word === card && wordStartPos === cardPos) {
+      isOriginal = true;
+      break;
+    }
+    cardPos += card.length;
+  }
+
+  if (isOriginal || word.length < 4) {
+    return "original";
+  } else if (previouslyFoundWords.has(word)) {
+    return "already-found";
+  } else {
+    return "new";
+  }
+}
+
+/** Build word groups from segmentation with their classifications and positions */
+function buildWordGroups(
   seg: string[],
   cards: string[],
   previouslyFoundWords: Set<string>
-): Map<number, WordClass> {
-  const classification = new Map<number, WordClass>();
-  let segPos = 0;
+): { word: string; cls: WordClass; startPos: number }[] {
+  const groups: { word: string; cls: WordClass; startPos: number }[] = [];
+  let pos = 0;
   for (const word of seg) {
-    let isOriginal = false;
-    let cardPos = 0;
-    for (const card of cards) {
-      if (word === card && segPos === cardPos) {
-        isOriginal = true;
-        break;
-      }
-      cardPos += card.length;
-    }
-
-    let cls: WordClass;
-    if (isOriginal || word.length < 4) {
-      cls = "original";
-    } else if (previouslyFoundWords.has(word)) {
-      cls = "already-found";
-    } else {
-      cls = "new";
-    }
-
-    for (let i = segPos; i < segPos + word.length; i++) {
-      classification.set(i, cls);
-    }
-    segPos += word.length;
+    const cls = classifyWord(word, pos, cards, previouslyFoundWords);
+    groups.push({ word, cls, startPos: pos });
+    pos += word.length;
   }
-  return classification;
+  return groups;
 }
 
 export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: ComboRevealProps) {
@@ -64,6 +70,8 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
   const [segIndex, setSegIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("cards");
   const [dismissed, setDismissed] = useState(false);
+  // Increment spiritKey each time we enter split phase to retrigger ghost animations
+  const [spiritKey, setSpiritKey] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const currentSeg = segs[segIndex] ?? segs[0]!;
@@ -74,6 +82,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
     setPhase("cards");
     setSegIndex(0);
     setDismissed(false);
+    setSpiritKey(0);
   }, [combo]);
 
   // Drive animation phases
@@ -83,7 +92,10 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
     if (phase === "cards") {
       timerRef.current = setTimeout(() => setPhase("merged"), 1200);
     } else if (phase === "merged") {
-      timerRef.current = setTimeout(() => setPhase("split"), 700);
+      timerRef.current = setTimeout(() => {
+        setSpiritKey((k) => k + 1);
+        setPhase("split");
+      }, 700);
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
@@ -106,19 +118,29 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
   // Compute boundaries
   const cardBoundaries = computeBoundaries(cards);
   const segBoundaries = computeBoundaries(currentSeg);
-  const letterClasses = classifyLetters(currentSeg, cards, previouslyFoundWords);
+
+  // Build word groups with classifications
+  const wordGroups = useMemo(
+    () => buildWordGroups(currentSeg, cards, previouslyFoundWords),
+    [currentSeg, cards, previouslyFoundWords]
+  );
+
+  // Count new words for stagger logic
+  const newWordIndices: number[] = [];
+  wordGroups.forEach((g, i) => {
+    if (g.cls === "new") newWordIndices.push(i);
+  });
 
   // All possible gap positions (between any two adjacent letters)
-  // For each position i (after letter i, before letter i+1), determine gap width
   const gapWidths: number[] = [];
   for (let i = 0; i < concat.length - 1; i++) {
     const boundary = i + 1;
     if (phase === "cards" && cardBoundaries.has(boundary)) {
-      gapWidths.push(10); // gap visible
+      gapWidths.push(10);
     } else if (phase === "split" && segBoundaries.has(boundary)) {
-      gapWidths.push(10); // gap visible
+      gapWidths.push(10);
     } else {
-      gapWidths.push(0); // no gap
+      gapWidths.push(0);
     }
   }
 
@@ -130,31 +152,75 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss }: C
       <div className="flex flex-col items-center gap-1">
         {/* Animated letter display - stable DOM, gaps animate via CSS */}
         <div className="combo-reveal-words">
-          {concat.split("").map((char, i) => (
-            <span key={i} className="inline-flex items-center">
-              {i > 0 && (
-                <span
-                  className="combo-gap"
-                  style={{ width: `${gapWidths[i - 1]}px` }}
-                />
-              )}
-              <span
-                className={
-                  phase === "split"
-                    ? `combo-letter ${
-                        letterClasses.get(i) === "new"
-                          ? "combo-letter-new"
-                          : letterClasses.get(i) === "already-found"
-                            ? "combo-letter-found"
-                            : ""
-                      }`
-                    : "combo-letter"
-                }
-              >
-                {char}
+          {concat.split("").map((char, i) => {
+            // Determine if this letter starts a new word that should get a ghost
+            const isNewWordStart =
+              phase === "split" &&
+              wordGroups.some(
+                (g) => g.cls === "new" && g.startPos === i
+              );
+
+            // Find the word group this letter belongs to (for classification)
+            const group = wordGroups.find(
+              (g) => i >= g.startPos && i < g.startPos + g.word.length
+            );
+            const letterClass = group?.cls ?? "original";
+
+            // If this is the start of a new word, compute stagger delay
+            let staggerDelay = 0;
+            if (isNewWordStart) {
+              const newIdx = newWordIndices.indexOf(
+                wordGroups.findIndex(
+                  (g) => g.cls === "new" && g.startPos === i
+                )
+              );
+              if (newWordIndices.length >= 2) {
+                staggerDelay = newIdx * 150;
+              }
+            }
+
+            // Find the new word text for ghost rendering
+            const newWord = isNewWordStart ? group : null;
+
+            return (
+              <span key={i} className="inline-flex items-center">
+                {i > 0 && (
+                  <span
+                    className="combo-gap"
+                    style={{ width: `${gapWidths[i - 1]}px` }}
+                  />
+                )}
+                <span className="combo-letter-wrapper">
+                  <span
+                    className={
+                      phase === "split"
+                        ? `combo-letter ${
+                            letterClass === "new"
+                              ? "combo-letter-new"
+                              : letterClass === "already-found"
+                                ? "combo-letter-found"
+                                : ""
+                          }`
+                        : "combo-letter"
+                    }
+                  >
+                    {char}
+                  </span>
+                  {/* Ghost "spirit" copy for the first letter of each new word */}
+                  {newWord && (
+                    <span
+                      key={`spirit-${spiritKey}-${i}`}
+                      className="combo-spirit"
+                      style={{ animationDelay: `${staggerDelay}ms` }}
+                      aria-hidden="true"
+                    >
+                      {newWord.word.toUpperCase()}
+                    </span>
+                  )}
+                </span>
               </span>
-            </span>
-          ))}
+            );
+          })}
         </div>
 
         {/* Segmentation dots indicator if multiple segs */}

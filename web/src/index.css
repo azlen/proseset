@@ -61,19 +61,39 @@
   transition: color 0.35s ease;
 }
 
+.combo-letter-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .combo-letter-new {
   color: #2563eb;
-  animation: wiggle 0.5s ease-in-out 0.5s;
 }
 
 .combo-letter-found {
   color: #9ca3af;
 }
 
-@keyframes wiggle {
-  0%, 100% { transform: translateY(0); }
-  20% { transform: translateY(-3px); }
-  40% { transform: translateY(2px); }
-  60% { transform: translateY(-2px); }
-  80% { transform: translateY(1px); }
+/* Ghost "spirit" that drifts up and fades out */
+.combo-spirit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #2563eb;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: spirit-rise 1s ease-out forwards;
+  animation-fill-mode: both;
+}
+
+@keyframes spirit-rise {
+  0% {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
 }

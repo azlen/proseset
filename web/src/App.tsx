@@ -32,11 +32,16 @@ export function App() {
   // Auto-dismiss result display
   useEffect(() => {
     if (!state.lastResult) return;
-    const best = state.lastResult.combo.bestSegmentations;
-    const segCount = best?.length || state.lastResult.combo.segmentations.length;
+    const result = state.lastResult;
+    const best = result.combo.bestSegmentations;
+    const segCount = best?.length || result.combo.segmentations.length;
     // Give enough time for all animations: 1.2s cards + 0.8s merge + 2.5s per seg + buffer
     const duration = 2000 + segCount * 3300 + 1000;
     const timer = setTimeout(() => {
+      // Flush any words that may not have been revealed yet
+      for (const word of result.combo.madeWords) {
+        dispatch({ type: "ADD_FOUND_WORD", word });
+      }
       dispatch({ type: "DISMISS_RESULT" });
     }, duration);
     return () => clearTimeout(timer);
@@ -74,6 +79,10 @@ export function App() {
 
   const handleDismissResult = useCallback(() => {
     dispatch({ type: "DISMISS_RESULT" });
+  }, []);
+
+  const handleWordRevealed = useCallback((word: string) => {
+    dispatch({ type: "ADD_FOUND_WORD", word });
   }, []);
 
   const handleShuffle = useCallback(() => {
@@ -127,6 +136,7 @@ export function App() {
                 cards={state.lastResult.cards}
                 previouslyFoundWords={state.lastResult.previouslyFoundWords}
                 onDismiss={handleDismissResult}
+                onWordRevealed={handleWordRevealed}
               />
             )}
           </div>

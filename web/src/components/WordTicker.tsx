@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface WordTickerProps {
   foundMadeWords: string[];
@@ -8,10 +8,74 @@ interface WordTickerProps {
   usedCards: number;
 }
 
+/**
+ * Animation phases for newly added words:
+ *  - idle: no animation in progress
+ *  - push: new words expand from zero width, pushing existing words right.
+ *          Words remain invisible (opacity 0) during this phase.
+ *  - reveal: new words pop in (scale + opacity) with a blue color that
+ *            fades to the normal gray over 2 seconds.
+ */
+type Phase = "idle" | "push" | "reveal";
+
 export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths, usedCards }: WordTickerProps) {
   const [expanded, setExpanded] = useState(false);
   const displayWords = foundMadeWords.filter((w) => w.length >= 4);
-  const foundSet = new Set(displayWords.map((w) => w.length));
+
+  // Track which words are "new" (just added) vs already rendered
+  const prevWordsRef = useRef<string[]>([]);
+  const [newWords, setNewWords] = useState<Set<string>>(new Set());
+  const [phase, setPhase] = useState<Phase>("idle");
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  }, []);
+
+  // Clean up timers on unmount
+  useEffect(() => clearTimers, [clearTimers]);
+
+  // Detect newly added words and kick off animation
+  useEffect(() => {
+    const prevSet = new Set(prevWordsRef.current);
+    const justAdded = displayWords.filter((w) => !prevSet.has(w));
+
+    if (justAdded.length > 0 && prevWordsRef.current.length > 0) {
+      // Clear any in-flight animation
+      clearTimers();
+
+      const newSet = new Set(justAdded);
+      setNewWords(newSet);
+      setPhase("push");
+
+      // After push/expand animation (400ms), reveal the words
+      const t1 = setTimeout(() => {
+        setPhase("reveal");
+
+        // After 2s color fade, clean up
+        const t2 = setTimeout(() => {
+          setNewWords(new Set());
+          setPhase("idle");
+        }, 2100);
+        timersRef.current.push(t2);
+      }, 450);
+      timersRef.current.push(t1);
+    } else if (justAdded.length > 0) {
+      // First words — pop in directly (no push needed)
+      clearTimers();
+
+      setNewWords(new Set(justAdded));
+      setPhase("reveal");
+      const t = setTimeout(() => {
+        setNewWords(new Set());
+        setPhase("idle");
+      }, 2100);
+      timersRef.current.push(t);
+    }
+
+    prevWordsRef.current = displayWords;
+  }, [displayWords.join(","), clearTimers]);
 
   // Build a map of how many words of each length are found vs total
   const foundByLength = new Map<number, number>();
@@ -59,14 +123,24 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
         className="relative h-10 border-t border-b border-border cursor-pointer"
       >
         <div className="absolute inset-0 flex gap-1.5 items-center overflow-hidden">
-          {displayWords.map((word) => (
-            <span
-              key={word}
-              className="px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0"
-            >
-              {word}
-            </span>
-          ))}
+          {displayWords.map((word) => {
+            const isNew = newWords.has(word);
+            const isPushing = isNew && phase === "push";
+            const isRevealing = isNew && phase === "reveal";
+
+            return (
+              <span
+                key={word}
+                className={[
+                  "px-2 py-0.5 rounded-md bg-muted text-sm font-medium shrink-0",
+                  isPushing ? "ticker-word-push" : "",
+                  isRevealing ? "ticker-word-reveal" : "",
+                ].join(" ")}
+              >
+                {word}
+              </span>
+            );
+          })}
         </div>
       </div>
 

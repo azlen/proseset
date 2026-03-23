@@ -77,3 +77,60 @@
   60% { transform: translateY(-2px); }
   80% { transform: translateY(1px); }
 }
+
+/* Word ticker animations */
+
+/* Phase 1: Push — word expands from zero width while invisible, pushing siblings right */
+@keyframes ticker-push {
+  from {
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+  }
+  to {
+    max-width: 12rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    opacity: 0;
+  }
+}
+
+.ticker-word-push {
+  animation: ticker-push 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Phase 2: Reveal — pop in with scale + blue color fading to inherit over 2s */
+@keyframes ticker-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ticker-color-fade {
+  0% {
+    color: #2563eb;
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+.ticker-word-reveal {
+  animation:
+    ticker-pop-in 400ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    ticker-color-fade 2s ease-out forwards;
+}

@@ -65,7 +65,7 @@ function buildWordGroups(
   return groups;
 }
 
-const FADE_OUT_DURATION = 500; // ms for the fade-out animation
+const FADE_OUT_DURATION = 350; // ms for the fade-out animation
 
 export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onWordRevealed }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
@@ -96,12 +96,12 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     if (dismissed) return;
 
     if (phase === "cards") {
-      timerRef.current = setTimeout(() => setPhase("merged"), 1200);
+      timerRef.current = setTimeout(() => setPhase("merged"), 600);
     } else if (phase === "merged") {
       timerRef.current = setTimeout(() => {
         setSpiritKey((k) => k + 1);
         setPhase("split");
-      }, 700);
+      }, 350);
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
@@ -112,7 +112,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
           // Last segmentation finished — start fade out
           setFadingOut(true);
         }
-      }, 2800);
+      }, 2000);
     }
 
     return () => clearTimeout(timerRef.current);
@@ -163,8 +163,8 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   });
 
   // Timing constants for ghost word stagger
-  const GHOST_INITIAL_DELAY = 400; // ms after split before first ghost appears
-  const GHOST_STAGGER = 250; // ms between each ghost word
+  const GHOST_INITIAL_DELAY = 200; // ms after split before first ghost appears
+  const GHOST_STAGGER = 150; // ms between each ghost word
 
   // Track timers for word-revealed callbacks
   const wordRevealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);

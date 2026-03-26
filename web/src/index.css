@@ -93,7 +93,7 @@
 
 .combo-gap {
   display: inline-block;
-  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 }
 
@@ -123,7 +123,7 @@
   color: #2563eb;
   pointer-events: none;
   white-space: nowrap;
-  animation: spirit-rise 1s ease-out forwards;
+  animation: spirit-rise 0.6s ease-out forwards;
   animation-fill-mode: both;
 }
 
@@ -140,7 +140,7 @@
 
 /* Fade-out when all decompositions are done */
 .combo-reveal-fade-out {
-  animation: combo-fade-out 0.5s ease-out forwards;
+  animation: combo-fade-out 0.35s ease-out forwards;
 }
 
 @keyframes combo-fade-out {

@@ -76,11 +76,21 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   const [fadingOut, setFadingOut] = useState(false);
   // Increment spiritKey each time we enter split phase to retrigger ghost animations
   const [spiritKey, setSpiritKey] = useState(0);
+  // Track words revealed during this combo reveal so subsequent segmentations show them as gray
+  const [revealedDuringCombo, setRevealedDuringCombo] = useState<Set<string>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const currentSeg = segs[segIndex] ?? segs[0]!;
   const concat = combo.concat.toUpperCase();
+
+  // Combine previouslyFoundWords with words revealed during this combo animation
+  const effectiveFoundWords = useMemo(() => {
+    if (revealedDuringCombo.size === 0) return previouslyFoundWords;
+    const combined = new Set(previouslyFoundWords);
+    for (const w of revealedDuringCombo) combined.add(w);
+    return combined;
+  }, [previouslyFoundWords, revealedDuringCombo]);
 
   // Reset on new combo
   useEffect(() => {
@@ -89,6 +99,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     setDismissed(false);
     setFadingOut(false);
     setSpiritKey(0);
+    setRevealedDuringCombo(new Set());
   }, [combo]);
 
   // Drive animation phases
@@ -105,6 +116,17 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
+          // Before advancing, record all "new" words from this segmentation
+          // so the next segmentation will show them as already-found (gray)
+          const currentGroups = buildWordGroups(currentSeg, cards, effectiveFoundWords);
+          const newWords = currentGroups.filter((g) => g.cls === "new").map((g) => g.word);
+          if (newWords.length > 0) {
+            setRevealedDuringCombo((prev) => {
+              const next = new Set(prev);
+              for (const w of newWords) next.add(w);
+              return next;
+            });
+          }
           // Collapse back to merged before showing next split
           setPhase("merged");
           setSegIndex((i) => i + 1);
@@ -135,25 +157,30 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     for (const t of wordRevealTimersRef.current) clearTimeout(t);
     wordRevealTimersRef.current = [];
     // Flush any unrevealed new words immediately
+    // Use a running set so we don't double-report words across segmentations
     if (onWordRevealed) {
+      const seen = new Set(effectiveFoundWords);
       for (const seg of segs) {
-        const groups = buildWordGroups(seg, cards, previouslyFoundWords);
+        const groups = buildWordGroups(seg, cards, seen);
         for (const g of groups) {
-          if (g.cls === "new") onWordRevealed(g.word);
+          if (g.cls === "new") {
+            onWordRevealed(g.word);
+            seen.add(g.word);
+          }
         }
       }
     }
     onDismiss();
-  }, [onDismiss, onWordRevealed, segs, cards, previouslyFoundWords]);
+  }, [onDismiss, onWordRevealed, segs, cards, effectiveFoundWords]);
 
   // Compute boundaries
   const cardBoundaries = computeBoundaries(cards);
   const segBoundaries = computeBoundaries(currentSeg);
 
-  // Build word groups with classifications
+  // Build word groups with classifications (using effectiveFoundWords to gray-out words revealed earlier in this combo)
   const wordGroups = useMemo(
-    () => buildWordGroups(currentSeg, cards, previouslyFoundWords),
-    [currentSeg, cards, previouslyFoundWords]
+    () => buildWordGroups(currentSeg, cards, effectiveFoundWords),
+    [currentSeg, cards, effectiveFoundWords]
   );
 
   // Count new words for stagger logic

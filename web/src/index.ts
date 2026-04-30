@@ -6,8 +6,11 @@ const puzzlesText = await Bun.file("public/newpuzzle.json").text();
 const manifestText = await Bun.file("public/manifest.json").text();
 const swText = await Bun.file("public/sw.js").text();
 
+const port = Number(process.env.PORT ?? 5173);
+
 const server = serve({
-  port: 5173,
+  port,
+  hostname: "127.0.0.1",
   routes: {
     "/dictionary.txt": () => new Response(dictText, {
       headers: { "Content-Type": "text/plain" },

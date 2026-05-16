@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type CSSProperties } from "react";
+import { scoreWord, scoreWords } from "../lib/scoring";
 
 interface WordTickerProps {
   foundMadeWords: string[];
@@ -11,6 +12,7 @@ interface WordTickerProps {
 export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths, usedCards }: WordTickerProps) {
   const [expanded, setExpanded] = useState(false);
   const displayWords = foundMadeWords.filter((w) => w.length >= 4);
+  const score = scoreWords(displayWords);
 
   // Animation phases for newly added words:
   // "hidden"   — in DOM with max-width:0, invisible, no space taken
@@ -118,7 +120,7 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
   return (
     <div className="w-full overflow-hidden">
       <div className="flex justify-between items-end text-sm text-muted-foreground mb-2">
-        <span className="shrink-0">{displayWords.length} / {totalWords} words found</span>
+        <span className="shrink-0 font-bold text-foreground tabular-nums">{score} points</span>
         <div className="flex items-end h-5 mx-3 w-48">
           {wordLengths.map((len, i) => {
             const clamped = Math.min(Math.max(len, MIN_LEN), MAX_LEN);
@@ -192,9 +194,12 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="font-bold text-lg">
-                {displayWords.length} / {totalWords} words found
-              </h2>
+              <div>
+                <h2 className="font-bold text-lg tabular-nums">{score} points</h2>
+                <div className="text-sm text-muted-foreground">
+                  {displayWords.length} / {totalWords} words found
+                </div>
+              </div>
               <button
                 onClick={() => setExpanded(false)}
                 className="text-muted-foreground text-2xl leading-none cursor-pointer"
@@ -209,6 +214,9 @@ export function WordTicker({ foundMadeWords, totalCards, totalWords, wordLengths
                   className="px-2 py-0.5 rounded-md bg-muted text-sm font-medium"
                 >
                   {word}
+                  <span className="ml-1 text-muted-foreground tabular-nums">
+                    +{scoreWord(word)}
+                  </span>
                 </span>
               ))}
             </div>

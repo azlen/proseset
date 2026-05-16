@@ -183,15 +183,17 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     [currentSeg, cards, effectiveFoundWords]
   );
 
-  // Count new words for stagger logic
-  const newWordIndices: number[] = [];
-  wordGroups.forEach((g, i) => {
-    if (g.cls === "new") newWordIndices.push(i);
-  });
-
   // Timing constants for ghost word stagger
   const GHOST_INITIAL_DELAY = 400; // ms after split before first ghost appears
   const GHOST_STAGGER = 250; // ms between each ghost word
+
+  // Map each new word start to its shared ghost animation delay.
+  const newWordDelayByStart = new Map<number, number>();
+  wordGroups
+    .filter((g) => g.cls === "new")
+    .forEach((g, idx) => {
+      newWordDelayByStart.set(g.startPos, GHOST_INITIAL_DELAY + idx * GHOST_STAGGER);
+    });
 
   // Track timers for word-revealed callbacks
   const wordRevealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -241,32 +243,13 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
         {/* Animated letter display - stable DOM, gaps animate via CSS */}
         <div className="combo-reveal-words">
           {concat.split("").map((char, i) => {
-            // Determine if this letter starts a new word that should get a ghost
-            const isNewWordStart =
-              phase === "split" &&
-              wordGroups.some(
-                (g) => g.cls === "new" && g.startPos === i
-              );
-
             // Find the word group this letter belongs to (for classification)
             const group = wordGroups.find(
               (g) => i >= g.startPos && i < g.startPos + g.word.length
             );
             const letterClass = group?.cls ?? "original";
-
-            // If this is the start of a new word, compute stagger delay
-            let staggerDelay = 0;
-            if (isNewWordStart) {
-              const newIdx = newWordIndices.indexOf(
-                wordGroups.findIndex(
-                  (g) => g.cls === "new" && g.startPos === i
-                )
-              );
-              staggerDelay = GHOST_INITIAL_DELAY + newIdx * GHOST_STAGGER;
-            }
-
-            // Find the new word text for ghost rendering
-            const newWord = isNewWordStart ? group : null;
+            const isInNewWord = phase === "split" && group?.cls === "new";
+            const staggerDelay = group ? newWordDelayByStart.get(group.startPos) ?? 0 : 0;
 
             return (
               <span key={i} className="inline-flex items-center">
@@ -292,15 +275,15 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
                   >
                     {char}
                   </span>
-                  {/* Ghost "spirit" copy for the first letter of each new word */}
-                  {newWord && (
+                  {/* Ghost each letter in place so it stays aligned with the rendered word. */}
+                  {isInNewWord && (
                     <span
                       key={`spirit-${spiritKey}-${i}`}
                       className="combo-spirit"
                       style={{ animationDelay: `${staggerDelay}ms` }}
                       aria-hidden="true"
                     >
-                      {newWord.word.toUpperCase()}
+                      {char}
                     </span>
                   )}
                 </span>

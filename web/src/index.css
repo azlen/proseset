@@ -30,6 +30,35 @@
   animation: shake 0.4s ease-in-out;
 }
 
+/* Completion dialog */
+.completion-backdrop {
+  animation: completion-backdrop-in 0.24s ease-out both;
+}
+
+.completion-dialog {
+  animation: completion-dialog-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes completion-backdrop-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes completion-dialog-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Word ticker animations */
 .ticker-word {
   overflow: hidden;

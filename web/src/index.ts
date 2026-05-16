@@ -2,7 +2,7 @@ import { serve } from "bun";
 import index from "./index.html";
 
 const dictText = await Bun.file("public/dictionary.txt").text();
-const puzzlesText = await Bun.file("public/newpuzzle.json").text();
+const puzzlesText = await Bun.file("public/puzzles/megapuzzle2-1000-20260430-154557.json").text();
 const manifestText = await Bun.file("public/manifest.json").text();
 const swText = await Bun.file("public/sw.js").text();
 
@@ -16,6 +16,9 @@ const server = serve({
       headers: { "Content-Type": "text/plain" },
     }),
     "/newpuzzle.json": () => new Response(puzzlesText, {
+      headers: { "Content-Type": "application/json" },
+    }),
+    "/puzzles/megapuzzle2-1000-20260430-154557.json": () => new Response(puzzlesText, {
       headers: { "Content-Type": "application/json" },
     }),
     "/manifest.json": () => new Response(manifestText, {

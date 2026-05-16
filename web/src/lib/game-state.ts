@@ -7,6 +7,8 @@ export interface GameState {
   usedCards: Set<string>;
   foundMadeWords: string[];
   longestFoundWord: string;
+  completed: boolean;
+  showCompletion: boolean;
   lastResult: {
     combo: ComboResult;
     cards: string[];
@@ -27,6 +29,7 @@ export type GameAction =
   | { type: "SUBMIT_RESULT"; cards: string[]; result: ComboResult }
   | { type: "SUBMIT_INVALID" }
   | { type: "DISMISS_RESULT" }
+  | { type: "DISMISS_COMPLETION" }
   | { type: "SHUFFLE_CARDS" }
   | { type: "RESTORE_PROGRESS"; combos: Array<{ key: string; result: ComboResult }> }
   | { type: "ADD_FOUND_WORD"; word: string };
@@ -38,6 +41,8 @@ export const initialState: GameState = {
   usedCards: new Set(),
   foundMadeWords: [],
   longestFoundWord: "",
+  completed: false,
+  showCompletion: false,
   lastResult: null,
   shake: false,
   submitting: false,
@@ -82,6 +87,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         for (const card of cards) {
           newUsedCards.add(card);
         }
+        const completedNow =
+          !state.completed &&
+          state.puzzle !== null &&
+          newUsedCards.size === state.puzzle.cards.length;
 
         // Don't add words to foundMadeWords yet — they'll be added
         // one-by-one via ADD_FOUND_WORD as each ghost word is revealed
@@ -97,6 +106,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           foundCombos: newFoundCombos,
           usedCards: newUsedCards,
           longestFoundWord,
+          completed: state.completed || completedNow,
+          showCompletion: state.showCompletion || completedNow,
           selectedCards: [],
           lastResult: { combo: result, cards, isNew: true, previouslyFoundWords },
           shake: false,
@@ -124,6 +135,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "DISMISS_RESULT":
       return { ...state, lastResult: null };
+
+    case "DISMISS_COMPLETION":
+      return { ...state, showCompletion: false };
 
     case "SHUFFLE_CARDS": {
       if (!state.puzzle) return state;

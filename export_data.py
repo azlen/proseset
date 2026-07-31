@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Export Proseset game data as JSON for the web-based puzzle designer.
+Export Split game data as JSON for the web-based puzzle designer.
 
 Reads:
   - puzzle2-stub pickle cache (decomposition table, fragment indexes)

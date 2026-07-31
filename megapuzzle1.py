@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Batch Puzzle Generator - megapuzzle1.py
+Split Batch Puzzle Generator - megapuzzle1.py
 
 Generates 1000+ diverse puzzles by tracking card and made-word usage
 across all previously generated puzzles. Words that have been used before
@@ -682,7 +682,7 @@ def _print_summary(puzzles: List[dict], tracker: DiversityTracker):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate a batch of diverse Proseset puzzles"
+        description="Generate a batch of diverse Split puzzles"
     )
     parser.add_argument('--num-puzzles', '-n', type=int, default=1000,
                         help='Number of puzzles to generate (default: 1000)')

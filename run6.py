@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run6.py
+Split Deck Generator - run6.py
 
 TRUE O(1) scoring via incremental counters + precomputed participation lists.
 

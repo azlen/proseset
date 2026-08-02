@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { GameApp } from "./GameApp";
 import { loadPuzzles, puzzleFromRaw, type RawPuzzle } from "../lib/puzzle";
 
-const SCHEDULE_KEY = "doublespeak-planner-schedule";
+const SCHEDULE_KEY = "split-planner-schedule";
+const LEGACY_SCHEDULE_KEY = "doublespeak-planner-schedule";
 const SLOT_COUNT = 21;
 
 type DragPayload =
@@ -40,9 +41,10 @@ export function AdminPlanner() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [schedule, setSchedule] = useState<Array<number | null>>(() => {
     try {
-      const saved = localStorage.getItem(SCHEDULE_KEY);
+      const saved = localStorage.getItem(SCHEDULE_KEY) ?? localStorage.getItem(LEGACY_SCHEDULE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as Array<number | null>;
+        localStorage.setItem(SCHEDULE_KEY, saved);
         return Array.from({ length: SLOT_COUNT }, (_, i) => parsed[i] ?? null);
       }
     } catch {

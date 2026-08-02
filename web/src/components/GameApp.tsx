@@ -121,7 +121,7 @@ export function GameApp({
   return (
     <div className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}>
       <div className="w-full flex justify-between items-baseline">
-        <h1 className="text-xl font-bold tracking-tight">doublespeak</h1>
+        <h1 className="text-xl font-bold tracking-tight">Split</h1>
         {showRandom && (
           <button
             onClick={handleRandomPuzzle}

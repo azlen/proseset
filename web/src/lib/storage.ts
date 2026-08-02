@@ -1,6 +1,7 @@
 import type { ComboResult } from "./puzzle";
 
-const STORAGE_KEY = "proseset-progress";
+const STORAGE_KEY = "split-progress";
+const LEGACY_STORAGE_KEY = "proseset-progress";
 
 interface SavedCombo {
   key: string;
@@ -26,10 +27,11 @@ export function saveProgress(date: string, combos: Map<string, ComboResult>): vo
 
 export function loadProgress(date: string): SavedCombo[] | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return null;
     const data: SavedProgress = JSON.parse(raw);
     if (data.date !== date) return null;
+    localStorage.setItem(STORAGE_KEY, raw);
     return data.combos;
   } catch {
     return null;

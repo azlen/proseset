@@ -1,4 +1,4 @@
-const CACHE_NAME = "split-v3";
+const CACHE_NAME = "split-v4";
 const PRECACHE = ["/", "/dictionary.txt", "/newpuzzle.json", "/manifest.json"];
 
 self.addEventListener("install", (event) => {

@@ -25,7 +25,10 @@ const server = serve({
       headers: { "Content-Type": "application/json" },
     }),
     "/sw.js": () => new Response(swText, {
-      headers: { "Content-Type": "application/javascript" },
+      headers: {
+        "Content-Type": "application/javascript",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+      },
     }),
     "/icon-192.png": async () => new Response(await Bun.file("public/icon-192.png").arrayBuffer(), {
       headers: { "Content-Type": "image/png" },

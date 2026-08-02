@@ -1,1 +1,1 @@
-{ "artifact": "web", "note": "The home screen now displays the Split name in the header and browser/PWA metadata." }
+{ "artifact": "web", "path": "/", "note": "The home screen header and page title now read Split; service-worker cache busting prevents the old doublespeak bundle from persisting." }

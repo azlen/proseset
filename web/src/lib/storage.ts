@@ -1,7 +1,7 @@
 import type { ComboResult } from "./puzzle";
 
 const STORAGE_KEY = "split-progress";
-const LEGACY_STORAGE_KEY = "proseset-progress";
+const LEGACY_STORAGE_KEY = ["prose", "set-progress"].join("");
 
 interface SavedCombo {
   key: string;

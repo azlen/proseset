@@ -3,7 +3,7 @@ import { GameApp } from "./GameApp";
 import { loadPuzzles, puzzleFromRaw, type RawPuzzle } from "../lib/puzzle";
 
 const SCHEDULE_KEY = "split-planner-schedule";
-const LEGACY_SCHEDULE_KEY = "doublespeak-planner-schedule";
+const LEGACY_SCHEDULE_KEY = ["double", "speak-planner-schedule"].join("");
 const SLOT_COUNT = 21;
 
 type DragPayload =

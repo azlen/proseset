@@ -9,6 +9,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 
+document.title = "Split";
+
 const elem = document.getElementById("root")!;
 const app = (
   <StrictMode>

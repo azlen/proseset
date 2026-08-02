@@ -1,4 +1,4 @@
-# Proseset
+# Split
 
 Read README.md for game rules and concept.
 

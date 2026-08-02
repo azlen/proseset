@@ -1,5 +1,5 @@
 /**
- * Proseset Puzzle Designer Engine
+ * Split Puzzle Designer Engine
  *
  * Ports core logic from the Python puzzle scripts:
  * - Word segmentation (run15.py)

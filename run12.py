@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run12.py
+Split Deck Generator - run12.py
 
 Based on run11.py with parallelization:
 - Parallelizes candidate scoring during deck building

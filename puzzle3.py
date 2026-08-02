@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Analyzer v3 - puzzle3.py
+Split Puzzle Analyzer v3 - puzzle3.py
 
 Runs puzzle2's anchor-based optimizer, then performs brute-force
 enumeration of ALL valid triplets (and optionally quadruplets) over

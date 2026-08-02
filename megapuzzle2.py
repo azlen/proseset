@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Batch Puzzle Generator v2 - megapuzzle2.py
+Split Batch Puzzle Generator v2 - megapuzzle2.py
 
 Changes from megapuzzle1:
   1. Includes doublets (2-card combos) and optionally quads (4-card)
@@ -367,7 +367,7 @@ def generate_batch_v2(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate a batch of diverse Proseset puzzles (v2: doublets, 4+ letter filter)"
+        description="Generate a batch of diverse Split puzzles (v2: doublets, 4+ letter filter)"
     )
     parser.add_argument('--num-puzzles', '-n', type=int, default=1000,
                         help='Number of puzzles to generate (default: 1000)')

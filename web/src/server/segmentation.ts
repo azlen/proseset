@@ -1,5 +1,5 @@
 /**
- * Server-side segmentation engine for validating Proseset combos.
+ * Server-side segmentation engine for validating Split combos.
  * Ports the core logic from puzzle1.py's segment_word + puzzle3.py's boundary check.
  */
 

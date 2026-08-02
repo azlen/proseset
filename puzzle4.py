@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Builder v4 - puzzle4.py
+Split Puzzle Builder v4 - puzzle4.py
 
 Constructive puzzle builder using decomposition reverse-indexes.
 No swaps — builds the deck card by card, choosing each card to

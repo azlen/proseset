@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Utility script for Proseset prototyping.
+"""Utility script for Split prototyping.
 
 Features
 - Loads a dictionary (default: macOS ``/usr/share/dict/words``).

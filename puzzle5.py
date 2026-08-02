@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Builder v5 - puzzle5.py
+Split Puzzle Builder v5 - puzzle5.py
 
 Same constructive greedy approach as puzzle4, but with fully incremental scoring.
 

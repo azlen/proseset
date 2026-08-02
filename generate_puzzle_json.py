@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate puzzle JSON for the Proseset web game.
+Generate puzzle JSON for the Split web game.
 
 Usage:
   python3 generate_puzzle_json.py --deck word1,word2,...,word12 --date 2026-02-22
@@ -15,7 +15,7 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate puzzle JSON for Proseset web game")
+    parser = argparse.ArgumentParser(description="Generate puzzle JSON for Split web game")
     parser.add_argument("--deck", required=True, help="Comma-separated 12 words")
     parser.add_argument("--date", required=True, help="Puzzle date (YYYY-MM-DD)")
     parser.add_argument("--output", default="web/public/puzzles/", help="Output directory")

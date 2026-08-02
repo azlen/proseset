@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run7.py
+Split Deck Generator - run7.py
 
 Based on run6.py with additional optimizations:
 1. Balance bonus: Prefer words that participate as left, middle, AND right

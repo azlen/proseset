@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run11.py
+Split Deck Generator - run11.py
 
 Based on run10.py with long merge word optimization:
 - Scores templates based on the maximum length of words that can be formed at merge points

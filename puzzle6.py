@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Builder v6 - puzzle6.py
+Split Puzzle Builder v6 - puzzle6.py
 
 Builds on puzzle5's incremental scoring, adding top-K sampling with temperature
 to produce diverse puzzles instead of always converging to the same "universally

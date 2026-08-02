@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run10.py
+Split Deck Generator - run10.py
 
 Based on run9.py with novelty optimization:
 - Tracks all "made words" (segments after merging triplets)

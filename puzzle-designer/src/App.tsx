@@ -343,7 +343,7 @@ export function App() {
       {/* HEADER */}
       <header className="border-b border-black px-4 py-1.5 flex items-center justify-between">
         <h1 className="text-xs font-bold tracking-widest uppercase">
-          Proseset Designer
+          Split Designer
         </h1>
         <div className="flex items-center gap-4 text-xs">
           {enabledCount > 0 && (

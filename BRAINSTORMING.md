@@ -1,4 +1,4 @@
-# Brainstorming: Building an Optimal Proseset Deck
+# Brainstorming: Building an Optimal Split Deck
 
 ## Goals
 - Generate a deck of word cards that maximizes the number and diversity of valid re-segmentation sets.

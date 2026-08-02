@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Optimizer v2 - puzzle2.py
+Split Puzzle Optimizer v2 - puzzle2.py
 
 Builds puzzles around pre-computed word decompositions from puzzle2-stub.
 Starts with 1-2 random "anchor" decompositions (long target words that

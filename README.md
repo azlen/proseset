@@ -1,4 +1,4 @@
-# Proseset
+# Split
 
 Fast-paced lexical spotting game about fusing and refactoring words.
 

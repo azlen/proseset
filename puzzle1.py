@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Puzzle Optimizer - puzzle1.py
+Split Puzzle Optimizer - puzzle1.py
 
 Optimizes a fixed set of 12 words for gameplay:
 - Starts with 12 random words

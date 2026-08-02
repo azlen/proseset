@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run9.py
+Split Deck Generator - run9.py
 
 Based on run8.py with smarter 's' handling:
 - Words are only banned if 's' can appear as a single-letter segment at start or end

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Word Decomposition Precomputer - puzzle2-stub.py
+Split Word Decomposition Precomputer - puzzle2-stub.py
 
 Pre-computes which words (of ANY length) can be broken down into
 sequences of valid card-length words, allowing edge fragments that
@@ -511,7 +511,7 @@ def display_results(
 # ============================================================================ #
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Pre-compute word decompositions for Proseset puzzles")
+    parser = argparse.ArgumentParser(description="Pre-compute word decompositions for Split puzzles")
     parser.add_argument('--card-min', type=int, default=CARD_MIN_LENGTH,
                         help=f'Min length for card words (default: {CARD_MIN_LENGTH})')
     parser.add_argument('--card-max', type=int, default=CARD_MAX_LENGTH,

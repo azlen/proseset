@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Proseset Deck Generator - run14.py
+Split Deck Generator - run14.py
 
 Based on run13.py with connectivity-based scoring:
 - Uses word connectivity (left/right neighbor percentages) instead of combo counts

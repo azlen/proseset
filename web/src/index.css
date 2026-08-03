@@ -219,12 +219,12 @@
 
 .split-chip-pop-top {
   top: 0;
-  transform: translateX(0.16rem);
+  transform: translateX(calc(0.16rem + 2px));
 }
 
 .split-chip-pop-bottom {
   bottom: 0;
-  transform: translateX(-0.16rem);
+  transform: translateX(calc(-0.16rem - 2px));
 }
 
 .split-chip-pop-line {

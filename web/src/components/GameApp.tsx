@@ -143,14 +143,6 @@ export function GameApp({
       </div>
 
       <div className="flex-1 flex flex-col items-center w-full">
-        <div className="flex-1 w-full" />
-        <CardGrid
-          cards={state.puzzle.cards}
-          selectedCards={state.selectedCards}
-          usedCards={state.usedCards}
-          onSelectCard={handleSelectCard}
-          onDeselectCard={handleDeselectCard}
-        />
         <div className="flex-1 flex items-center w-full">
           <div className="w-full">
             {state.lastResult
@@ -172,6 +164,14 @@ export function GameApp({
                 )}
           </div>
         </div>
+        <CardGrid
+          cards={state.puzzle.cards}
+          selectedCards={state.selectedCards}
+          usedCards={state.usedCards}
+          onSelectCard={handleSelectCard}
+          onDeselectCard={handleDeselectCard}
+        />
+        <div className="flex-1 w-full" />
         <ActionButtons
           selectedCards={state.selectedCards}
           onClear={handleClear}

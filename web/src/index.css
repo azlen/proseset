@@ -40,14 +40,14 @@
   max-width: 100%;
   overflow: hidden;
   border-radius: 0.625rem;
-  padding: var(--split-chip-padding-block) 0.75rem;
+  padding: var(--split-chip-padding-block) 0.875rem;
   background: #050505;
   color: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
   font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(0.8rem, 3.8vw, 1rem);
-  font-weight: 800;
-  letter-spacing: 0.025em;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1.25rem;
   text-transform: uppercase;
 }
@@ -74,7 +74,7 @@
   top: -8%;
   bottom: -8%;
   left: 50%;
-  width: 2px;
+  width: 3px;
   background: #fff;
   opacity: 0;
   transform: translateX(-50%) rotate(14deg);
@@ -83,7 +83,7 @@
 }
 
 .split-chip-boundary-visible {
-  width: 0.8rem;
+  width: 1.125rem;
 }
 
 .split-chip-boundary-visible::after {
@@ -169,17 +169,14 @@
 
 /* Combo reveal animations */
 .combo-reveal {
-  min-height: 2.75rem;
+  min-height: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .combo-reveal-chip {
-  --split-chip-padding-block: 0.7rem;
-
   overflow: visible;
-  font-size: 1.15rem;
 }
 
 .split-chip-letter-new {

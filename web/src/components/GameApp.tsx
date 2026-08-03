@@ -143,19 +143,7 @@ export function GameApp({
       </div>
 
       <div className="flex-1 flex flex-col items-center w-full">
-        <div className="flex-1 flex items-center justify-center w-full">
-          <div className="w-full">
-            {state.lastResult && (
-              <ComboReveal
-                combo={state.lastResult.combo}
-                cards={state.lastResult.cards}
-                previouslyFoundWords={state.lastResult.previouslyFoundWords}
-                onDismiss={handleDismissResult}
-                onWordRevealed={handleWordRevealed}
-              />
-            )}
-          </div>
-        </div>
+        <div className="flex-1 w-full" />
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
@@ -165,11 +153,23 @@ export function GameApp({
         />
         <div className="flex-1 flex items-center w-full">
           <div className="w-full">
-            <CardSlots
-              key={state.invalidSubmitCount}
-              selectedCards={state.selectedCards}
-              shake={state.invalidSubmitCount > 0}
-            />
+            {state.lastResult
+              ? (
+                  <ComboReveal
+                    combo={state.lastResult.combo}
+                    cards={state.lastResult.cards}
+                    previouslyFoundWords={state.lastResult.previouslyFoundWords}
+                    onDismiss={handleDismissResult}
+                    onWordRevealed={handleWordRevealed}
+                  />
+                )
+              : (
+                  <CardSlots
+                    key={state.invalidSubmitCount}
+                    selectedCards={state.selectedCards}
+                    shake={state.invalidSubmitCount > 0}
+                  />
+                )}
           </div>
         </div>
         <ActionButtons

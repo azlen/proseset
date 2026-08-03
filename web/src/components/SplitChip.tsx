@@ -54,7 +54,14 @@ export function SplitChip({
               style={{
                 "--split-chip-boundary-order": boundaryOrder.get(index) ?? 0,
               } as CSSProperties}
-            />
+            >
+              <span className="split-chip-burst" aria-hidden="true">
+                <span className="split-chip-burst-line" />
+                <span className="split-chip-burst-line" />
+                <span className="split-chip-burst-line" />
+                <span className="split-chip-burst-line" />
+              </span>
+            </span>
           )}
           <span className={cn("split-chip-letter", letterClassName?.(index))}>
             {character}

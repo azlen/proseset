@@ -82,6 +82,48 @@
   transition: opacity 0.16s ease;
 }
 
+/* Decorative rays used by the combo reveal when a new seam pops open. */
+.split-chip-burst {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.split-chip-burst-line {
+  --split-chip-burst-angle: 0deg;
+
+  position: absolute;
+  top: -0.1875rem;
+  left: -0.0625rem;
+  width: 0.125rem;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: linear-gradient(to top, #60a5fa, #dbeafe);
+  box-shadow: 0 0 0.25rem rgb(96 165 250 / 55%);
+  opacity: 0;
+  transform-origin: 50% 50%;
+}
+
+.split-chip-burst-line:nth-child(1) {
+  --split-chip-burst-angle: -68deg;
+}
+
+.split-chip-burst-line:nth-child(2) {
+  --split-chip-burst-angle: -22deg;
+}
+
+.split-chip-burst-line:nth-child(3) {
+  --split-chip-burst-angle: 24deg;
+}
+
+.split-chip-burst-line:nth-child(4) {
+  --split-chip-burst-angle: 70deg;
+}
+
 .split-chip-boundary-visible {
   width: 1.125rem;
 }
@@ -195,7 +237,7 @@
 .combo-reveal-chip-split .split-chip-boundary {
   transition-duration: 0.32s;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--split-chip-boundary-order, 0) * 55ms);
+  transition-delay: calc(var(--split-chip-boundary-order, 0) * 85ms);
 }
 
 .combo-reveal-chip-split .split-chip-boundary::after {
@@ -203,7 +245,30 @@
 }
 
 .combo-reveal-chip-split .split-chip-boundary-visible::after {
-  transition-delay: calc(35ms + var(--split-chip-boundary-order, 0) * 55ms);
+  transition-delay: calc(35ms + var(--split-chip-boundary-order, 0) * 85ms);
+}
+
+.combo-reveal-chip-split .split-chip-boundary-visible {
+  overflow: visible;
+}
+
+.combo-reveal-chip-split .split-chip-boundary-visible .split-chip-burst-line {
+  animation: split-chip-burst 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(115ms + var(--split-chip-boundary-order, 0) * 85ms);
+}
+
+@keyframes split-chip-burst {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--split-chip-burst-angle)) translateY(-0.125rem) scaleY(0.25);
+  }
+  24% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--split-chip-burst-angle)) translateY(-1rem) scaleY(0.75);
+  }
 }
 
 .split-chip-letter-new {
@@ -258,5 +323,9 @@
   .combo-reveal-chip-split .split-chip-boundary::after {
     transition-duration: 0.01ms;
     transition-delay: 0ms;
+  }
+
+  .combo-reveal-chip-split .split-chip-boundary-visible .split-chip-burst-line {
+    animation: none;
   }
 }

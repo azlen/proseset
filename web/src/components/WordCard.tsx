@@ -21,7 +21,7 @@ export function WordCard({
     <button
       onClick={selected ? onDeselect : onSelect}
       className={cn(
-        "relative min-w-0 rounded-lg border-[3px] border-solid border-foreground py-4 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
+        "relative min-w-0 rounded-lg border-[3px] border-solid border-foreground py-5 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
         selected
           ? "bg-[#ddd1b2]"
           : "bg-card hover:bg-[#e9dfc2]",

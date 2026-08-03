@@ -2,7 +2,7 @@
 
 @layer base {
   :root {
-    font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 
   body {
@@ -44,7 +44,7 @@
   background: #050505;
   color: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
-  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -94,7 +94,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  /* Nunito's capitals sit slightly high within its line box. */
+  /* Keep capitals optically centered within the chip. */
   transform: translateY(0.0625rem);
   transition: color 0.35s ease;
 }

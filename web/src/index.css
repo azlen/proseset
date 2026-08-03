@@ -86,18 +86,27 @@
 .split-chip-burst {
   position: absolute;
   z-index: 2;
-  top: 50%;
-  left: 50%;
   width: 0;
   height: 0;
   pointer-events: none;
+}
+
+/* Follow the diagonal seam so each fan begins at its exposed endpoint. */
+.split-chip-burst-top {
+  top: 0;
+  left: calc(50% + 0.3rem);
+}
+
+.split-chip-burst-bottom {
+  top: 100%;
+  left: calc(50% - 0.3rem);
 }
 
 .split-chip-burst-line {
   --split-chip-burst-angle: 0deg;
 
   position: absolute;
-  top: -0.1875rem;
+  top: -0.375rem;
   left: -0.0625rem;
   width: 0.125rem;
   height: 0.375rem;
@@ -105,23 +114,31 @@
   background: linear-gradient(to top, #60a5fa, #dbeafe);
   box-shadow: 0 0 0.25rem rgb(96 165 250 / 55%);
   opacity: 0;
-  transform-origin: 50% 50%;
+  transform-origin: 50% 100%;
 }
 
-.split-chip-burst-line:nth-child(1) {
-  --split-chip-burst-angle: -68deg;
+.split-chip-burst-top .split-chip-burst-line:nth-child(1) {
+  --split-chip-burst-angle: -58deg;
 }
 
-.split-chip-burst-line:nth-child(2) {
-  --split-chip-burst-angle: -22deg;
+.split-chip-burst-top .split-chip-burst-line:nth-child(2) {
+  --split-chip-burst-angle: 0deg;
 }
 
-.split-chip-burst-line:nth-child(3) {
-  --split-chip-burst-angle: 24deg;
+.split-chip-burst-top .split-chip-burst-line:nth-child(3) {
+  --split-chip-burst-angle: 58deg;
 }
 
-.split-chip-burst-line:nth-child(4) {
-  --split-chip-burst-angle: 70deg;
+.split-chip-burst-bottom .split-chip-burst-line:nth-child(1) {
+  --split-chip-burst-angle: 122deg;
+}
+
+.split-chip-burst-bottom .split-chip-burst-line:nth-child(2) {
+  --split-chip-burst-angle: 180deg;
+}
+
+.split-chip-burst-bottom .split-chip-burst-line:nth-child(3) {
+  --split-chip-burst-angle: 238deg;
 }
 
 .split-chip-boundary-visible {
@@ -260,14 +277,14 @@
 @keyframes split-chip-burst {
   0% {
     opacity: 0;
-    transform: rotate(var(--split-chip-burst-angle)) translateY(-0.125rem) scaleY(0.25);
+    transform: rotate(var(--split-chip-burst-angle)) translateY(0) scaleY(0.25);
   }
-  24% {
+  8% {
     opacity: 0.95;
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--split-chip-burst-angle)) translateY(-1rem) scaleY(0.75);
+    transform: rotate(var(--split-chip-burst-angle)) translateY(-0.875rem) scaleY(0.75);
   }
 }
 

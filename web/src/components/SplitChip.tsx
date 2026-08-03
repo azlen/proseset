@@ -55,8 +55,12 @@ export function SplitChip({
                 "--split-chip-boundary-order": boundaryOrder.get(index) ?? 0,
               } as CSSProperties}
             >
-              <span className="split-chip-burst" aria-hidden="true">
+              <span className="split-chip-burst split-chip-burst-top" aria-hidden="true">
                 <span className="split-chip-burst-line" />
+                <span className="split-chip-burst-line" />
+                <span className="split-chip-burst-line" />
+              </span>
+              <span className="split-chip-burst split-chip-burst-bottom" aria-hidden="true">
                 <span className="split-chip-burst-line" />
                 <span className="split-chip-burst-line" />
                 <span className="split-chip-burst-line" />

@@ -291,17 +291,3 @@
     opacity: 0;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .combo-reveal-chip-merged .split-chip-boundary,
-  .combo-reveal-chip-split .split-chip-boundary,
-  .combo-reveal-chip-merged .split-chip-boundary::after,
-  .combo-reveal-chip-split .split-chip-boundary::after {
-    transition-duration: 0.01ms;
-    transition-delay: 0ms;
-  }
-
-  .combo-reveal-chip-split .split-chip-boundary-visible .split-chip-pop-line {
-    animation: none;
-  }
-}

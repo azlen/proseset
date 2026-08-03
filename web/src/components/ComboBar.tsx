@@ -9,24 +9,24 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   return (
     <div
       className={cn(
-        "flex gap-2 justify-center items-center min-h-12 transition-all",
+        "flex justify-center items-center min-h-12 transition-all",
         shake && "animate-shake",
       )}
     >
       {selectedCards.length > 0
-        ? selectedCards.map((card, i) => (
-            <div
-              key={`${card}-${i}`}
-              className="px-3 py-2 rounded-lg font-semibold text-sm uppercase tracking-wide text-center"
-              style={{ backgroundColor: "#000", color: "#fff", border: "2px solid #000" }}
-            >
-              {card}
+        ? (
+            <div className="selected-word-strip" aria-label={`Selected words: ${selectedCards.join(", ")}`}>
+              {selectedCards.map((card, i) => (
+                <div key={`${card}-${i}`} className="selected-word-segment">
+                  {card}
+                </div>
+              ))}
             </div>
-          ))
+          )
         : Array.from({ length: 2 }, (_, i) => (
             <div
               key={`empty-${i}`}
-              className="px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
+              className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
             />
           ))}
     </div>

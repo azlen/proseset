@@ -30,6 +30,44 @@
   animation: shake 0.4s ease-in-out;
 }
 
+/* Selected cards read as one pill, with each word cut by a diagonal seam. */
+.selected-word-strip {
+  display: inline-flex;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  background: #000;
+  color: #fff;
+}
+
+.selected-word-segment {
+  position: relative;
+  min-width: 0;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  line-height: 1.25rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.selected-word-segment + .selected-word-segment {
+  padding-left: 0.875rem;
+}
+
+.selected-word-segment + .selected-word-segment::before {
+  content: "";
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: 0;
+  width: 3px;
+  background: #fff;
+  transform: rotate(14deg);
+  transform-origin: center;
+}
+
 /* Completion dialog */
 .completion-backdrop {
   animation: completion-backdrop-in 0.24s ease-out both;

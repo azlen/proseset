@@ -24,7 +24,7 @@ export function WordCard({
       onClick={selected ? onDeselect : onSelect}
       style={selected ? { borderColor: "var(--primary)", backgroundColor: "#f0f0f0" } : { borderColor: "#000" }}
       className={cn(
-        "relative min-w-0 py-4 rounded-lg border-2 font-semibold text-base uppercase tracking-wide transition-colors duration-150 cursor-pointer text-center text-card-foreground",
+        "word-card relative min-w-0 py-4 rounded-lg border-2 font-semibold text-base uppercase tracking-wide transition-colors duration-150 cursor-pointer text-center text-card-foreground",
         !used && "border-dotted",
         !selected && "bg-card hover:border-primary/50"
       )}

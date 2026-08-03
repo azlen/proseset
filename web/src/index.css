@@ -30,6 +30,10 @@
   animation: shake 0.4s ease-in-out;
 }
 
+.word-card {
+  font-family: "Mallio", ui-sans-serif, system-ui, sans-serif;
+}
+
 /* Selected cards read as one pill, with each word cut by a diagonal seam. */
 .selected-word-strip {
   display: inline-flex;

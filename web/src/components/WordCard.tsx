@@ -22,11 +22,13 @@ export function WordCard({
   return (
     <button
       onClick={selected ? onDeselect : onSelect}
-      style={selected ? { borderColor: "var(--primary)", backgroundColor: "#f0f0f0" } : { borderColor: "#000" }}
       className={cn(
-        "relative min-w-0 py-4 rounded-lg border-2 font-semibold text-base uppercase tracking-wide transition-colors duration-150 cursor-pointer text-center text-card-foreground",
-        !used && "border-dotted",
-        !selected && "bg-card hover:border-primary/50"
+        "relative min-w-0 rounded-lg border-[3px] border-solid border-foreground py-4 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
+        selected
+          ? "bg-[#ddd1b2]"
+          : used
+            ? "bg-[#e7dec6] hover:bg-[#e1d5b6]"
+            : "bg-card hover:bg-[#e9dfc2]",
       )}
     >
       {selected && selectionIndex !== null && (

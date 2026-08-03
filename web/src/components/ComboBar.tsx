@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { getWordBoundaries, SplitChip } from "./SplitChip";
 
 interface CardSlotsProps {
   selectedCards: string[];
@@ -15,13 +16,11 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
     >
       {selectedCards.length > 0
         ? (
-            <div className="selected-word-strip" aria-label={`Selected words: ${selectedCards.join(", ")}`}>
-              {selectedCards.map((card, i) => (
-                <div key={`${card}-${i}`} className="selected-word-segment">
-                  {card}
-                </div>
-              ))}
-            </div>
+            <SplitChip
+              text={selectedCards.join("")}
+              boundaries={getWordBoundaries(selectedCards)}
+              ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
+            />
           )
         : Array.from({ length: 2 }, (_, i) => (
             <div

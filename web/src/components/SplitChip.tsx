@@ -55,11 +55,17 @@ export function SplitChip({
                 "--split-chip-boundary-order": boundaryOrder.get(index) ?? 0,
               } as CSSProperties}
             >
-              <span className="split-chip-pop" aria-hidden="true">
-                {Array.from({ length: 6 }, (_, lineIndex) => (
-                  <span className="split-chip-pop-line" key={lineIndex} />
-                ))}
-              </span>
+              {(["top", "bottom"] as const).map((edge) => (
+                <span
+                  className={cn("split-chip-pop", `split-chip-pop-${edge}`)}
+                  key={edge}
+                  aria-hidden="true"
+                >
+                  {Array.from({ length: 3 }, (_, lineIndex) => (
+                    <span className="split-chip-pop-line" key={lineIndex} />
+                  ))}
+                </span>
+              ))}
             </span>
           )}
           <span className={cn("split-chip-letter", letterClassName?.(index))}>

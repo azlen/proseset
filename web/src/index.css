@@ -209,11 +209,20 @@
 /* A tiny radial snap at each seam makes the stagger land as a series of pops. */
 .split-chip-pop {
   position: absolute;
-  top: 50%;
   left: 50%;
   width: 0;
   height: 0;
   pointer-events: none;
+}
+
+.split-chip-pop-top {
+  top: 0;
+  transform: translateX(-0.1rem);
+}
+
+.split-chip-pop-bottom {
+  bottom: 0;
+  transform: translateX(0.1rem);
 }
 
 .split-chip-pop-line {
@@ -230,12 +239,12 @@
   transform-origin: left center;
 }
 
-.split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: -150deg; }
-.split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: -95deg; }
-.split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: -35deg; }
-.split-chip-pop-line:nth-child(4) { --split-chip-pop-angle: 30deg; }
-.split-chip-pop-line:nth-child(5) { --split-chip-pop-angle: 85deg; }
-.split-chip-pop-line:nth-child(6) { --split-chip-pop-angle: 145deg; }
+.split-chip-pop-top .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: -150deg; }
+.split-chip-pop-top .split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: -90deg; }
+.split-chip-pop-top .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: -30deg; }
+.split-chip-pop-bottom .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: 30deg; }
+.split-chip-pop-bottom .split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: 90deg; }
+.split-chip-pop-bottom .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: 150deg; }
 
 .combo-reveal-chip-split .split-chip-boundary-visible {
   overflow: visible;

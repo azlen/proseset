@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 interface SplitChipProps {
@@ -7,7 +7,6 @@ interface SplitChipProps {
   ariaLabel: string;
   className?: string;
   letterClassName?: (index: number) => string | undefined;
-  renderLetterOverlay?: (character: string, index: number) => ReactNode;
 }
 
 /** Return the character positions where each word in a split ends. */
@@ -33,7 +32,6 @@ export function SplitChip({
   ariaLabel,
   className,
   letterClassName,
-  renderLetterOverlay,
 }: SplitChipProps) {
   const boundaryOrder = new Map(
     [...boundaries]
@@ -70,7 +68,6 @@ export function SplitChip({
           )}
           <span className={cn("split-chip-letter", letterClassName?.(index))}>
             {character}
-            {renderLetterOverlay?.(character, index)}
           </span>
         </span>
       ))}

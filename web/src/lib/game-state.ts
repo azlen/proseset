@@ -101,7 +101,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           newUsedCards.size === state.puzzle.cards.length;
 
         // Don't add words to foundMadeWords yet — they'll be added
-        // one-by-one via ADD_FOUND_WORD as each ghost word is revealed
+        // one-by-one via ADD_FOUND_WORD as each split is revealed.
         let longestFoundWord = state.longestFoundWord;
         for (const word of result.madeWords) {
           if (word.length > longestFoundWord.length) {

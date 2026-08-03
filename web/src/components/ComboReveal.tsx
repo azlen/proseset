@@ -67,8 +67,6 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   const [phase, setPhase] = useState<Phase>("cards");
   const [dismissed, setDismissed] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
-  // Increment spiritKey each time we enter split phase to retrigger ghost animations
-  const [spiritKey, setSpiritKey] = useState(0);
   // Track words revealed during this combo reveal so subsequent segmentations show them as gray
   const [revealedDuringCombo, setRevealedDuringCombo] = useState<Set<string>>(new Set());
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -91,7 +89,6 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     setSegIndex(0);
     setDismissed(false);
     setFadingOut(false);
-    setSpiritKey(0);
     setRevealedDuringCombo(new Set());
   }, [combo]);
 
@@ -102,10 +99,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     if (phase === "cards") {
       timerRef.current = setTimeout(() => setPhase("merged"), CARDS_HOLD_DURATION);
     } else if (phase === "merged") {
-      timerRef.current = setTimeout(() => {
-        setSpiritKey((k) => k + 1);
-        setPhase("split");
-      }, MERGED_HOLD_DURATION);
+      timerRef.current = setTimeout(() => setPhase("split"), MERGED_HOLD_DURATION);
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
@@ -181,22 +175,13 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     [currentSeg, cards, effectiveFoundWords]
   );
 
-  // Timing constants for ghost word stagger
-  const GHOST_INITIAL_DELAY = 400; // ms after split before first ghost appears
-  const GHOST_STAGGER = 250; // ms between each ghost word
-
-  // Map each new word start to its shared ghost animation delay.
-  const newWordDelayByStart = new Map<number, number>();
-  wordGroups
-    .filter((g) => g.cls === "new")
-    .forEach((g, idx) => {
-      newWordDelayByStart.set(g.startPos, GHOST_INITIAL_DELAY + idx * GHOST_STAGGER);
-    });
+  const WORD_REVEAL_INITIAL_DELAY = 400;
+  const WORD_REVEAL_STAGGER = 250;
 
   // Track timers for word-revealed callbacks
   const wordRevealTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Fire onWordRevealed for each new word, timed to match ghost animation
+  // Add each new word to the ticker shortly after the split is shown.
   useEffect(() => {
     // Clear any pending word-reveal timers
     for (const t of wordRevealTimersRef.current) clearTimeout(t);
@@ -206,7 +191,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
 
     const newWords = wordGroups.filter((g) => g.cls === "new");
     newWords.forEach((g, idx) => {
-      const delay = GHOST_INITIAL_DELAY + idx * GHOST_STAGGER;
+      const delay = WORD_REVEAL_INITIAL_DELAY + idx * WORD_REVEAL_STAGGER;
       const t = setTimeout(() => {
         onWordRevealed(g.word);
       }, delay);
@@ -217,7 +202,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
       for (const t of wordRevealTimersRef.current) clearTimeout(t);
       wordRevealTimersRef.current = [];
     };
-  }, [phase, spiritKey]); // spiritKey changes each time we re-enter split
+  }, [phase]);
 
   return (
     <div
@@ -241,27 +226,8 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
             const group = wordGroups.find(
               (candidate) => index >= candidate.startPos && index < candidate.startPos + candidate.word.length
             );
-            if (group?.cls === "new") return "split-chip-letter-new";
             if (group?.cls === "already-found") return "split-chip-letter-found";
             return undefined;
-          }}
-          renderLetterOverlay={(character, index) => {
-            if (phase !== "split") return null;
-            const group = wordGroups.find(
-              (candidate) => index >= candidate.startPos && index < candidate.startPos + candidate.word.length
-            );
-            if (group?.cls !== "new") return null;
-
-            return (
-              <span
-                key={`spirit-${spiritKey}-${index}`}
-                className="combo-spirit"
-                style={{ animationDelay: `${newWordDelayByStart.get(group.startPos) ?? 0}ms` }}
-                aria-hidden="true"
-              >
-                {character}
-              </span>
-            );
           }}
         />
 

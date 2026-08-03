@@ -165,7 +165,11 @@ export function GameApp({
         />
         <div className="flex-1 flex items-center w-full">
           <div className="w-full">
-            <CardSlots selectedCards={state.selectedCards} shake={state.shake} />
+            <CardSlots
+              key={state.invalidSubmitCount}
+              selectedCards={state.selectedCards}
+              shake={state.invalidSubmitCount > 0}
+            />
           </div>
         </div>
         <ActionButtons

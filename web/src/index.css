@@ -76,10 +76,9 @@
   left: 50%;
   width: 3px;
   background: #fff;
-  opacity: 0;
-  transform: translateX(-50%) rotate(14deg);
+  transform: translateX(-50%) rotate(14deg) scaleX(0);
   transform-origin: center;
-  transition: opacity 0.16s ease;
+  transition: transform 0.16s ease;
 }
 
 .split-chip-boundary-visible {
@@ -87,7 +86,7 @@
 }
 
 .split-chip-boundary-visible::after {
-  opacity: 1;
+  transform: translateX(-50%) rotate(14deg) scaleX(1);
   transition-delay: 0.08s;
 }
 

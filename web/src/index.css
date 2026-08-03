@@ -217,12 +217,12 @@
 
 .split-chip-pop-top {
   top: 0;
-  transform: translateX(-0.1rem);
+  transform: translateX(-0.16rem);
 }
 
 .split-chip-pop-bottom {
   bottom: 0;
-  transform: translateX(0.1rem);
+  transform: translateX(0.16rem);
 }
 
 .split-chip-pop-line {
@@ -231,41 +231,45 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 0.35rem;
-  height: 0.1rem;
+  width: 0.48rem;
+  height: 0.125rem;
   border-radius: 999px;
-  background: #93c5fd;
+  background: #bfdbfe;
+  box-shadow: 0 0 0.25rem rgb(96 165 250 / 85%);
   opacity: 0;
   transform-origin: left center;
 }
 
-.split-chip-pop-top .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: -150deg; }
+.split-chip-pop-top .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: -160deg; }
 .split-chip-pop-top .split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: -90deg; }
-.split-chip-pop-top .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: -30deg; }
-.split-chip-pop-bottom .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: 30deg; }
+.split-chip-pop-top .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: -20deg; }
+.split-chip-pop-bottom .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: 20deg; }
 .split-chip-pop-bottom .split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: 90deg; }
-.split-chip-pop-bottom .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: 150deg; }
+.split-chip-pop-bottom .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: 160deg; }
 
 .combo-reveal-chip-split .split-chip-boundary-visible {
   overflow: visible;
 }
 
 .combo-reveal-chip-split .split-chip-boundary-visible .split-chip-pop-line {
-  animation: split-chip-pop-line 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: split-chip-pop-line 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(90ms + var(--split-chip-boundary-order, 0) * 80ms);
 }
 
 @keyframes split-chip-pop-line {
   0% {
     opacity: 0;
-    transform: rotate(var(--split-chip-pop-angle)) translateX(0.08rem) scaleX(0.25);
+    transform: rotate(var(--split-chip-pop-angle)) translateX(0.04rem) scaleX(0.2);
   }
-  28% {
-    opacity: 0.95;
+  22% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.9;
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--split-chip-pop-angle)) translateX(0.8rem) scaleX(0.75);
+    transform: rotate(var(--split-chip-pop-angle)) translateX(1.2rem) scaleX(0.8);
   }
 }
 

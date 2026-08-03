@@ -34,7 +34,7 @@ export function WordCard({
           {selectionIndex + 1}
         </span>
       )}
-      {displayWord}
+      <span className="card-word">{displayWord}</span>
     </button>
   );
 }

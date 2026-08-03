@@ -1,4 +1,5 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useState } from "react";
+import type { CSSProperties } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary, type PuzzleData } from "../lib/puzzle";
 import { gameReducer, initialState } from "../lib/game-state";
 import { saveProgress } from "../lib/storage";
@@ -8,6 +9,9 @@ import { CardSlots, ActionButtons } from "./ComboBar";
 import { WordTicker } from "./WordTicker";
 import { ComboReveal } from "./ComboReveal";
 import { CompletionDialog } from "./CompletionDialog";
+import { CARD_FONTS, FontPicker, type CardFont } from "./FontPicker";
+
+const CARD_FONT_STORAGE_KEY = "split-card-font";
 
 interface GameAppProps {
   initialPuzzle?: PuzzleData | null;
@@ -23,6 +27,23 @@ export function GameApp({
   compact = false,
 }: GameAppProps) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [cardFont, setCardFont] = useState<CardFont>(() => {
+    try {
+      const savedId = window.localStorage.getItem(CARD_FONT_STORAGE_KEY);
+      return CARD_FONTS.find((font) => font.id === savedId) ?? CARD_FONTS[0]!;
+    } catch {
+      return CARD_FONTS[0]!;
+    }
+  });
+
+  const handleFontChange = useCallback((font: CardFont) => {
+    setCardFont(font);
+    try {
+      window.localStorage.setItem(CARD_FONT_STORAGE_KEY, font.id);
+    } catch {
+      // The font still changes for this session if storage is unavailable.
+    }
+  }, []);
 
   useEffect(() => {
     Promise.all([loadDictionary(), initialPuzzle ? Promise.resolve(initialPuzzle) : fetchRandomPuzzle()])
@@ -119,17 +140,30 @@ export function GameApp({
   const score = scoreWords(foundScoringWords);
 
   return (
-    <div className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}>
-      <div className="w-full flex justify-between items-baseline">
+    <div
+      className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}
+      style={{
+        "--card-font-family": cardFont.family,
+        "--card-font-weight": cardFont.weight,
+      } as CSSProperties}
+    >
+      <div className="relative z-40 flex w-full items-center justify-between">
         <h1 className="text-xl font-bold tracking-tight">Split</h1>
-        {showRandom && (
-          <button
-            onClick={handleRandomPuzzle}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            Random
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {showRandom && (
+            <button
+              onClick={handleRandomPuzzle}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              Random
+            </button>
+          )}
+          <FontPicker
+            value={cardFont}
+            sampleWord={state.puzzle.cards.find((card) => card.length >= 4) ?? state.puzzle.cards[0] ?? "Split"}
+            onChange={handleFontChange}
+          />
+        </div>
       </div>
 
       <div className="w-full mt-2">

@@ -30,6 +30,17 @@
   animation: shake 0.4s ease-in-out;
 }
 
+/* Font-lab values are scoped to each game so the planner UI stays unchanged. */
+.card-word {
+  font-family: var(--card-font-family, "Nunito", ui-sans-serif, system-ui, sans-serif);
+  font-weight: var(--card-font-weight, 600);
+}
+
+.font-picker-options {
+  max-height: min(31rem, calc(100dvh - 8rem));
+  overscroll-behavior: contain;
+}
+
 /* Shared selection/reveal surface: one chip whose diagonal seams can move. */
 .split-chip {
   --split-chip-padding-block: 0.625rem;
@@ -44,9 +55,9 @@
   background: #050505;
   color: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
-  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--card-font-family, "Nunito", ui-sans-serif, system-ui, sans-serif);
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: var(--card-font-weight, 700);
   letter-spacing: 0.04em;
   line-height: 1.25rem;
   text-transform: uppercase;

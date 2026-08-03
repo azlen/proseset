@@ -236,8 +236,8 @@
   width: 0.48rem;
   height: 0.125rem;
   border-radius: 999px;
-  background: #bfdbfe;
-  box-shadow: 0 0 0.25rem rgb(96 165 250 / 85%);
+  background: #000;
+  box-shadow: 0 0 0.25rem rgb(0 0 0 / 85%);
   opacity: 0;
   transform-origin: left center;
 }

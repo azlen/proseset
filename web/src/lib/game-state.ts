@@ -16,7 +16,7 @@ export interface GameState {
     /** Words that had already been found before this combo was submitted */
     previouslyFoundWords: Set<string>;
   } | null;
-  shake: boolean;
+  invalidSubmitCount: number;
   submitting: boolean;
 }
 
@@ -44,7 +44,7 @@ export const initialState: GameState = {
   completed: false,
   showCompletion: false,
   lastResult: null,
-  shake: false,
+  invalidSubmitCount: 0,
   submitting: false,
 };
 
@@ -55,23 +55,31 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "SELECT_CARD": {
       if (state.selectedCards.includes(action.card)) return state;
-      return { ...state, selectedCards: [...state.selectedCards, action.card], shake: false };
+      return { ...state, selectedCards: [...state.selectedCards, action.card], invalidSubmitCount: 0 };
     }
 
     case "DESELECT_CARD": {
       const idx = state.selectedCards.indexOf(action.card);
       if (idx === -1) return state;
-      return { ...state, selectedCards: state.selectedCards.filter((c) => c !== action.card), shake: false };
+      return {
+        ...state,
+        selectedCards: state.selectedCards.filter((c) => c !== action.card),
+        invalidSubmitCount: 0,
+      };
     }
 
     case "CLEAR_SELECTION":
-      return { ...state, selectedCards: [], shake: false };
+      return { ...state, selectedCards: [], invalidSubmitCount: 0 };
 
     case "SUBMIT_START":
-      return { ...state, submitting: true, shake: false };
+      return { ...state, submitting: true, invalidSubmitCount: 0 };
 
     case "SUBMIT_INVALID":
-      return { ...state, submitting: false, shake: true };
+      return {
+        ...state,
+        submitting: false,
+        invalidSubmitCount: state.invalidSubmitCount + 1,
+      };
 
     case "SUBMIT_RESULT": {
       const { cards, result } = action;
@@ -110,7 +118,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           showCompletion: state.showCompletion || completedNow,
           selectedCards: [],
           lastResult: { combo: result, cards, isNew: true, previouslyFoundWords },
-          shake: false,
+          invalidSubmitCount: 0,
           submitting: false,
         };
       }
@@ -119,7 +127,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         selectedCards: [],
         lastResult: { combo: result, cards, isNew: false, previouslyFoundWords },
-        shake: false,
+        invalidSubmitCount: 0,
         submitting: false,
       };
     }

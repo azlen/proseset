@@ -57,6 +57,8 @@ function buildWordGroups(
 }
 
 const FADE_OUT_DURATION = 500; // ms for the fade-out animation
+const CARDS_HOLD_DURATION = 950;
+const MERGED_HOLD_DURATION = 450;
 
 export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onWordRevealed }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
@@ -69,8 +71,8 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   const [spiritKey, setSpiritKey] = useState(0);
   // Track words revealed during this combo reveal so subsequent segmentations show them as gray
   const [revealedDuringCombo, setRevealedDuringCombo] = useState<Set<string>>(new Set());
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const currentSeg = segs[segIndex] ?? segs[0]!;
   const concat = combo.concat.toUpperCase();
@@ -98,12 +100,12 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     if (dismissed) return;
 
     if (phase === "cards") {
-      timerRef.current = setTimeout(() => setPhase("merged"), 1200);
+      timerRef.current = setTimeout(() => setPhase("merged"), CARDS_HOLD_DURATION);
     } else if (phase === "merged") {
       timerRef.current = setTimeout(() => {
         setSpiritKey((k) => k + 1);
         setPhase("split");
-      }, 700);
+      }, MERGED_HOLD_DURATION);
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
@@ -226,7 +228,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
         <SplitChip
           text={concat}
           boundaries={visibleBoundaries}
-          className="combo-reveal-chip"
+          className={`combo-reveal-chip combo-reveal-chip-${phase}`}
           ariaLabel={
             phase === "cards"
               ? `Selected words: ${cards.join(", ")}`

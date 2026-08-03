@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface SplitChipProps {
@@ -35,6 +35,12 @@ export function SplitChip({
   letterClassName,
   renderLetterOverlay,
 }: SplitChipProps) {
+  const boundaryOrder = new Map(
+    [...boundaries]
+      .sort((left, right) => left - right)
+      .map((position, index) => [position, index]),
+  );
+
   return (
     <div className={cn("split-chip", className)} aria-label={ariaLabel}>
       {text.toUpperCase().split("").map((character, index) => (
@@ -45,6 +51,9 @@ export function SplitChip({
                 "split-chip-boundary",
                 boundaries.has(index) && "split-chip-boundary-visible",
               )}
+              style={{
+                "--split-chip-boundary-order": boundaryOrder.get(index) ?? 0,
+              } as CSSProperties}
             />
           )}
           <span className={cn("split-chip-letter", letterClassName?.(index))}>

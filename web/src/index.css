@@ -95,6 +95,8 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  /* Nunito's capitals sit slightly high within its line box. */
+  transform: translateY(0.0625rem);
   transition: color 0.35s ease;
 }
 

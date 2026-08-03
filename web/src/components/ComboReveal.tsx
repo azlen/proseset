@@ -58,13 +58,31 @@ function buildWordGroups(
 
 const FADE_OUT_DURATION = 500; // ms for the fade-out animation
 const CARDS_HOLD_DURATION = 950;
-const MERGED_HOLD_DURATION = 450;
+// Leave enough room for the seams to push apart, then snap closed in sequence.
+const MERGED_HOLD_DURATION = 700;
+const MERGED_BOUNDARY_STAGGER = 45;
+const SPLIT_HOLD_DURATION = 2800;
+
+/** Total reveal time, used by the parent as a safety timeout. */
+export function getComboRevealDuration(cards: string[], segmentations: string[][]): number {
+  const collapsingGroups = [cards, ...segmentations.slice(0, -1)];
+  const staggerDuration = collapsingGroups.reduce(
+    (total, words) => total + Math.max(0, words.length - 2) * MERGED_BOUNDARY_STAGGER,
+    0,
+  );
+
+  return CARDS_HOLD_DURATION
+    + segmentations.length * (MERGED_HOLD_DURATION + SPLIT_HOLD_DURATION)
+    + staggerDuration
+    + FADE_OUT_DURATION;
+}
 
 export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onWordRevealed }: ComboRevealProps) {
   // Fall back to segmentations if bestSegmentations is missing (e.g., from older saved progress)
   const segs = combo.bestSegmentations?.length ? combo.bestSegmentations : combo.segmentations;
   const [segIndex, setSegIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("cards");
+  const [collapsingBoundaries, setCollapsingBoundaries] = useState<ReadonlySet<number>>(new Set());
   const [dismissed, setDismissed] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
   // Track words revealed during this combo reveal so subsequent segmentations show them as gray
@@ -86,6 +104,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   // Reset on new combo
   useEffect(() => {
     setPhase("cards");
+    setCollapsingBoundaries(new Set());
     setSegIndex(0);
     setDismissed(false);
     setFadingOut(false);
@@ -97,9 +116,17 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     if (dismissed) return;
 
     if (phase === "cards") {
-      timerRef.current = setTimeout(() => setPhase("merged"), CARDS_HOLD_DURATION);
+      timerRef.current = setTimeout(() => {
+        // Keep the submitted card seams mounted while their close animation runs.
+        setCollapsingBoundaries(getWordBoundaries(cards));
+        setPhase("merged");
+      }, CARDS_HOLD_DURATION);
     } else if (phase === "merged") {
-      timerRef.current = setTimeout(() => setPhase("split"), MERGED_HOLD_DURATION);
+      const staggerDuration = Math.max(0, collapsingBoundaries.size - 1) * MERGED_BOUNDARY_STAGGER;
+      timerRef.current = setTimeout(
+        () => setPhase("split"),
+        MERGED_HOLD_DURATION + staggerDuration,
+      );
     } else if (phase === "split") {
       timerRef.current = setTimeout(() => {
         if (segIndex < segs.length - 1) {
@@ -115,17 +142,18 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
             });
           }
           // Collapse back to merged before showing next split
+          setCollapsingBoundaries(getWordBoundaries(currentSeg));
           setPhase("merged");
           setSegIndex((i) => i + 1);
         } else {
           // Last segmentation finished — start fade out
           setFadingOut(true);
         }
-      }, 2800);
+      }, SPLIT_HOLD_DURATION);
     }
 
     return () => clearTimeout(timerRef.current);
-  }, [phase, segIndex, segs.length, dismissed]);
+  }, [phase, segIndex, segs.length, dismissed, collapsingBoundaries]);
 
   // When fade-out starts, wait for animation then dismiss
   useEffect(() => {
@@ -167,7 +195,7 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     ? cardBoundaries
     : phase === "split"
       ? segBoundaries
-      : new Set<number>();
+      : collapsingBoundaries;
 
   // Build word groups with classifications (using effectiveFoundWords to gray-out words revealed earlier in this combo)
   const wordGroups = useMemo(

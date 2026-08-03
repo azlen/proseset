@@ -180,16 +180,60 @@
   overflow: visible;
 }
 
-/* Pull the submitted cards together briskly before revealing the new split. */
-.combo-reveal-chip-merged .split-chip-boundary {
-  transition-duration: 0.26s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: 0ms;
+/*
+ * Anticipate the merge by stretching each gap and slash, then pull the words
+ * sharply together. Keeping the old seams mounted lets this play for both the
+ * initial card merge and the collapse between alternate decompositions.
+ */
+.combo-reveal-chip-merged .split-chip-boundary-visible {
+  overflow: visible;
+  animation: split-chip-snap-closed 0.54s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--split-chip-boundary-order, 0) * 45ms);
 }
 
-.combo-reveal-chip-merged .split-chip-boundary::after {
-  transition-duration: 0.1s;
-  transition-delay: 0ms;
+.combo-reveal-chip-merged .split-chip-boundary-visible::after {
+  animation: split-chip-slash-snap 0.54s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--split-chip-boundary-order, 0) * 45ms);
+}
+
+@keyframes split-chip-snap-closed {
+  0% {
+    width: 1.125rem;
+  }
+  38% {
+    width: 2rem;
+  }
+  52% {
+    width: 1.9rem;
+  }
+  73% {
+    width: 0;
+  }
+  84% {
+    width: 0.18rem;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes split-chip-slash-snap {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scale(1);
+  }
+  38% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scale(1.55);
+  }
+  52% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scale(1.42);
+  }
+  73%, 100% {
+    opacity: 0;
+    transform: translateX(-50%) rotate(14deg) scale(0);
+  }
 }
 
 /* Pop the new seams open one at a time from left to right. */

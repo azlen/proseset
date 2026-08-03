@@ -6,7 +6,7 @@ import { scoreWords } from "../lib/scoring";
 import { CardGrid } from "./CardGrid";
 import { CardSlots, ActionButtons } from "./ComboBar";
 import { WordTicker } from "./WordTicker";
-import { ComboReveal } from "./ComboReveal";
+import { ComboReveal, getComboRevealDuration } from "./ComboReveal";
 import { CompletionDialog } from "./CompletionDialog";
 
 interface GameAppProps {
@@ -45,8 +45,8 @@ export function GameApp({
     if (!state.lastResult) return;
     const result = state.lastResult;
     const best = result.combo.bestSegmentations;
-    const segCount = best?.length || result.combo.segmentations.length;
-    const duration = 2000 + segCount * 3300 + 500 + 1000;
+    const segmentations = best?.length ? best : result.combo.segmentations;
+    const duration = getComboRevealDuration(result.cards, segmentations) + 1000;
     const timer = setTimeout(() => {
       for (const word of result.combo.madeWords) {
         dispatch({ type: "ADD_FOUND_WORD", word });

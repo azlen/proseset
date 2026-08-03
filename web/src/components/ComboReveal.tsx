@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import type { ComboResult } from "@/lib/puzzle";
+import { getWordBoundaries, SplitChip } from "./SplitChip";
 
 interface ComboRevealProps {
   combo: ComboResult;
@@ -10,16 +11,6 @@ interface ComboRevealProps {
 }
 
 type Phase = "cards" | "merged" | "split";
-
-function computeBoundaries(words: string[]): Set<number> {
-  const b = new Set<number>();
-  let pos = 0;
-  for (let i = 0; i < words.length - 1; i++) {
-    pos += words[i]!.length;
-    b.add(pos);
-  }
-  return b;
-}
 
 type WordClass = "original" | "already-found" | "new";
 
@@ -174,8 +165,13 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
   }, [onDismiss, onWordRevealed, segs, cards, effectiveFoundWords]);
 
   // Compute boundaries
-  const cardBoundaries = computeBoundaries(cards);
-  const segBoundaries = computeBoundaries(currentSeg);
+  const cardBoundaries = getWordBoundaries(cards);
+  const segBoundaries = getWordBoundaries(currentSeg);
+  const visibleBoundaries = phase === "cards"
+    ? cardBoundaries
+    : phase === "split"
+      ? segBoundaries
+      : new Set<number>();
 
   // Build word groups with classifications (using effectiveFoundWords to gray-out words revealed earlier in this combo)
   const wordGroups = useMemo(
@@ -221,76 +217,51 @@ export function ComboReveal({ combo, cards, previouslyFoundWords, onDismiss, onW
     };
   }, [phase, spiritKey]); // spiritKey changes each time we re-enter split
 
-  // All possible gap positions (between any two adjacent letters)
-  const gapWidths: number[] = [];
-  for (let i = 0; i < concat.length - 1; i++) {
-    const boundary = i + 1;
-    if (phase === "cards" && cardBoundaries.has(boundary)) {
-      gapWidths.push(10);
-    } else if (phase === "split" && segBoundaries.has(boundary)) {
-      gapWidths.push(10);
-    } else {
-      gapWidths.push(0);
-    }
-  }
-
   return (
     <div
       className={`combo-reveal w-full cursor-pointer${fadingOut ? " combo-reveal-fade-out" : ""}`}
       onClick={handleDismiss}
     >
       <div className="flex flex-col items-center gap-1">
-        {/* Animated letter display - stable DOM, gaps animate via CSS */}
-        <div className="combo-reveal-words">
-          {concat.split("").map((char, i) => {
-            // Find the word group this letter belongs to (for classification)
+        <SplitChip
+          text={concat}
+          boundaries={visibleBoundaries}
+          className="combo-reveal-chip"
+          ariaLabel={
+            phase === "cards"
+              ? `Selected words: ${cards.join(", ")}`
+              : phase === "merged"
+                ? `Combined letters: ${concat}`
+                : `New split: ${currentSeg.join(", ")}`
+          }
+          letterClassName={(index) => {
+            if (phase !== "split") return undefined;
             const group = wordGroups.find(
-              (g) => i >= g.startPos && i < g.startPos + g.word.length
+              (candidate) => index >= candidate.startPos && index < candidate.startPos + candidate.word.length
             );
-            const letterClass = group?.cls ?? "original";
-            const isInNewWord = phase === "split" && group?.cls === "new";
-            const staggerDelay = group ? newWordDelayByStart.get(group.startPos) ?? 0 : 0;
+            if (group?.cls === "new") return "split-chip-letter-new";
+            if (group?.cls === "already-found") return "split-chip-letter-found";
+            return undefined;
+          }}
+          renderLetterOverlay={(character, index) => {
+            if (phase !== "split") return null;
+            const group = wordGroups.find(
+              (candidate) => index >= candidate.startPos && index < candidate.startPos + candidate.word.length
+            );
+            if (group?.cls !== "new") return null;
 
             return (
-              <span key={i} className="inline-flex items-center">
-                {i > 0 && (
-                  <span
-                    className="combo-gap"
-                    style={{ width: `${gapWidths[i - 1]}px` }}
-                  />
-                )}
-                <span className="combo-letter-wrapper">
-                  <span
-                    className={
-                      phase === "split"
-                        ? `combo-letter ${
-                            letterClass === "new"
-                              ? "combo-letter-new"
-                              : letterClass === "already-found"
-                                ? "combo-letter-found"
-                                : ""
-                          }`
-                        : "combo-letter"
-                    }
-                  >
-                    {char}
-                  </span>
-                  {/* Ghost each letter in place so it stays aligned with the rendered word. */}
-                  {isInNewWord && (
-                    <span
-                      key={`spirit-${spiritKey}-${i}`}
-                      className="combo-spirit"
-                      style={{ animationDelay: `${staggerDelay}ms` }}
-                      aria-hidden="true"
-                    >
-                      {char}
-                    </span>
-                  )}
-                </span>
+              <span
+                key={`spirit-${spiritKey}-${index}`}
+                className="combo-spirit"
+                style={{ animationDelay: `${newWordDelayByStart.get(group.startPos) ?? 0}ms` }}
+                aria-hidden="true"
+              >
+                {character}
               </span>
             );
-          })}
-        </div>
+          }}
+        />
 
         {/* Segmentation dots indicator if multiple segs */}
         {segs.length > 1 && (

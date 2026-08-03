@@ -30,42 +30,72 @@
   animation: shake 0.4s ease-in-out;
 }
 
-/* Selected cards read as one pill, with each word cut by a diagonal seam. */
-.selected-word-strip {
+/* Shared selection/reveal surface: one chip whose diagonal seams can move. */
+.split-chip {
+  --split-chip-padding-block: 0.625rem;
+
   display: inline-flex;
+  align-items: stretch;
+  justify-content: center;
   max-width: 100%;
   overflow: hidden;
   border-radius: 0.625rem;
-  background: #000;
+  padding: var(--split-chip-padding-block) 0.75rem;
+  background: #050505;
   color: #fff;
-}
-
-.selected-word-segment {
-  position: relative;
-  min-width: 0;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.8rem, 3.8vw, 1rem);
+  font-weight: 800;
   letter-spacing: 0.025em;
   line-height: 1.25rem;
-  text-align: center;
   text-transform: uppercase;
 }
 
-.selected-word-segment + .selected-word-segment {
-  padding-left: 0.875rem;
+.split-chip-unit {
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 0;
 }
 
-.selected-word-segment + .selected-word-segment::before {
+.split-chip-boundary {
+  position: relative;
+  width: 0;
+  margin-block: calc(-1 * var(--split-chip-padding-block));
+  overflow: hidden;
+  flex: 0 0 auto;
+  align-self: stretch;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.split-chip-boundary::after {
   content: "";
   position: absolute;
-  top: -25%;
-  bottom: -25%;
-  left: 0;
-  width: 3px;
+  top: -8%;
+  bottom: -8%;
+  left: 50%;
+  width: 2px;
   background: #fff;
-  transform: rotate(14deg);
+  opacity: 0;
+  transform: translateX(-50%) rotate(14deg);
   transform-origin: center;
+  transition: opacity 0.16s ease;
+}
+
+.split-chip-boundary-visible {
+  width: 0.8rem;
+}
+
+.split-chip-boundary-visible::after {
+  opacity: 1;
+  transition-delay: 0.08s;
+}
+
+.split-chip-letter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.35s ease;
 }
 
 /* Completion dialog */
@@ -145,40 +175,18 @@
   justify-content: center;
 }
 
-.combo-reveal-words {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  font-weight: 800;
+.combo-reveal-chip {
+  --split-chip-padding-block: 0.7rem;
+
+  overflow: visible;
   font-size: 1.15rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  line-height: 1.4;
 }
 
-.combo-gap {
-  display: inline-block;
-  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+.split-chip-letter-new {
+  color: #60a5fa;
 }
 
-.combo-letter {
-  transition: color 0.35s ease;
-}
-
-.combo-letter-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.combo-letter-new {
-  color: #2563eb;
-}
-
-.combo-letter-found {
+.split-chip-letter-found {
   color: #9ca3af;
 }
 
@@ -187,7 +195,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  color: #2563eb;
+  color: #60a5fa;
   pointer-events: none;
   white-space: nowrap;
   animation: spirit-rise 1s ease-out forwards;

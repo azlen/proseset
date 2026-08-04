@@ -33,12 +33,13 @@
 /* Shared selection/reveal surface: one chip whose diagonal seams can move. */
 .split-chip {
   --split-chip-padding-block: 0.625rem;
+  --split-chip-cutout-color: var(--background);
 
   display: inline-flex;
   align-items: stretch;
   justify-content: center;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 0.625rem;
   padding: var(--split-chip-padding-block) 0.875rem;
   background: #050505;
@@ -71,11 +72,12 @@
 .split-chip-boundary::after {
   content: "";
   position: absolute;
-  top: -8%;
-  bottom: -8%;
+  top: -0.25rem;
+  bottom: -0.25rem;
   left: 50%;
   width: 3px;
-  background: #fff;
+  /* Match the surface behind the chip so the seam reads as a cutout. */
+  background: var(--split-chip-cutout-color);
   transform: translateX(-50%) rotate(14deg) scaleX(0);
   transform-origin: center;
   transition: transform 0.16s ease;
@@ -83,6 +85,7 @@
 
 .split-chip-boundary-visible {
   width: 1.125rem;
+  overflow: visible;
 }
 
 .split-chip-boundary-visible::after {
@@ -220,35 +223,60 @@
 @keyframes split-chip-slash-snap {
   0% {
     opacity: 1;
-    transform: translateX(-50%) rotate(14deg) scale(1);
+    transform: translateX(-50%) rotate(14deg) scaleX(1);
   }
   38% {
     opacity: 1;
-    transform: translateX(-50%) rotate(14deg) scale(1.55);
+    transform: translateX(-50%) rotate(14deg) scaleX(1.55);
   }
   52% {
     opacity: 1;
-    transform: translateX(-50%) rotate(14deg) scale(1.42);
+    transform: translateX(-50%) rotate(14deg) scaleX(1.42);
   }
   73%, 100% {
     opacity: 0;
-    transform: translateX(-50%) rotate(14deg) scale(0);
+    transform: translateX(-50%) rotate(14deg) scaleX(0);
   }
 }
 
-/* Pop the new seams open one at a time from left to right. */
+/*
+ * Pop the new seams open one at a time from left to right. Explicit opening
+ * animations ensure a seam restarts even when that boundary was also present
+ * in the previous decomposition and its visible class never changed.
+ */
 .combo-reveal-chip-split .split-chip-boundary {
-  transition-duration: 0.32s;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--split-chip-boundary-order, 0) * 80ms);
+  transition: none;
 }
 
 .combo-reveal-chip-split .split-chip-boundary::after {
-  transition-duration: 0.1s;
+  transition: none;
+}
+
+.combo-reveal-chip-split .split-chip-boundary-visible {
+  overflow: visible;
+  animation: split-chip-gap-open 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--split-chip-boundary-order, 0) * 80ms);
 }
 
 .combo-reveal-chip-split .split-chip-boundary-visible::after {
-  transition-delay: calc(35ms + var(--split-chip-boundary-order, 0) * 80ms);
+  animation: split-chip-slash-open 0.1s ease both;
+  animation-delay: calc(35ms + var(--split-chip-boundary-order, 0) * 80ms);
+}
+
+@keyframes split-chip-gap-open {
+  from { width: 0; }
+  to { width: 1.125rem; }
+}
+
+@keyframes split-chip-slash-open {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) rotate(14deg) scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scaleX(1);
+  }
 }
 
 /* A tiny radial snap at each seam makes the stagger land as a series of pops. */
@@ -291,10 +319,6 @@
 .split-chip-pop-bottom .split-chip-pop-line:nth-child(1) { --split-chip-pop-angle: 20deg; }
 .split-chip-pop-bottom .split-chip-pop-line:nth-child(2) { --split-chip-pop-angle: 90deg; }
 .split-chip-pop-bottom .split-chip-pop-line:nth-child(3) { --split-chip-pop-angle: 160deg; }
-
-.combo-reveal-chip-split .split-chip-boundary-visible {
-  overflow: visible;
-}
 
 .combo-reveal-chip-split .split-chip-boundary-visible .split-chip-pop-line {
   animation: split-chip-pop-line 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;

@@ -23,24 +23,24 @@
  * transparent, allowing the page beneath to show through.
  */
 .word-card-face {
-  fill: var(--card);
-  stroke: var(--foreground);
+  fill: #000;
+  stroke: #000;
   stroke-width: 3px;
   transition: fill 150ms ease-out;
 }
 
 .group:hover .word-card-face {
-  fill: #e9dfc2;
+  fill: #000;
 }
 
 .word-card-face-selected,
 .group:hover .word-card-face-selected {
-  fill: #ddd1b2;
+  fill: #000;
 }
 
 /* This is the union edge, not one ring per circle, so holes may overlap. */
 .word-card-hole-edge {
-  fill: var(--foreground);
+  fill: #000;
 }
 
 /* A quick paper-speck burst lands with each staggered hole punch. */

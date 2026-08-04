@@ -236,7 +236,7 @@ export function WordCard({
         aria-label={selected && selectionIndex !== null
           ? `${word}, selection ${selectionIndex + 1}`
           : word}
-        className="group relative z-[1] flex h-[80px] w-full min-w-0 cursor-pointer items-center justify-center rounded-[16px] text-center text-base font-semibold uppercase tracking-wide text-card-foreground"
+        className="group relative z-[1] flex h-[80px] w-full min-w-0 cursor-pointer items-center justify-center rounded-[16px] text-center text-base font-semibold uppercase tracking-wide text-white"
       >
         <PerforatedCardSurface holes={holes} selected={selected} />
         {selected && selectionIndex !== null && (

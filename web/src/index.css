@@ -49,9 +49,29 @@
   fill: #ddd1b2;
 }
 
-/* This is the union edge, not one ring per circle, so holes may overlap. */
+/* This is the union edge, not one ring per cut, so punched holes may overlap. */
 .word-card-hole-edge {
   fill: var(--foreground);
+}
+
+/* A faint tear guide joins the curved bites at the ticket's top and bottom. */
+.word-card-ticket-seam {
+  stroke: var(--foreground);
+  stroke-width: 1.25px;
+  stroke-linecap: round;
+  stroke-dasharray: 1 4;
+  opacity: 0.3;
+  transition: opacity 150ms ease-out;
+}
+
+.group:hover .word-card-ticket-seam,
+.group[aria-pressed="true"] .word-card-ticket-seam {
+  opacity: 0.48;
+}
+
+/* Center the word in the usable ticket body, excluding the narrow tear stub. */
+.word-card-label {
+  transform: translateX(-7px);
 }
 
 /* A quick paper-speck burst lands with each staggered hole punch. */

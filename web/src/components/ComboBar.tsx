@@ -9,6 +9,7 @@ interface CardSlotsProps {
 }
 
 const CHIP_RESIZE_DURATION = 500;
+const MINIMUM_COMBO_SIZE = 2;
 
 export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -94,26 +95,29 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   useEffect(() => {
     previousCardsRef.current = selectedCards;
   }, [selectionKey, selectedCards]);
-  const emptySlotCount = Math.max(0, 2 - selectedCards.length);
-
   return (
     <div
       className={cn(
-        "flex justify-center items-center min-h-12 transition-all",
+        "selection-slot-track flex justify-center items-center min-h-12",
+        resizeDirection && `selection-slot-track-${resizeDirection}`,
         shake && "animate-shake",
       )}
     >
-      {renderedCards.length > 0 && (
-        <div
-          className={cn(
-            "selection-chip-resizer",
-            emptySlotCount > 0 && "mx-1",
-            isRemoving && "selection-chip-resizer-removing",
-            removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
-          )}
-          ref={resizerRef}
-          style={{ width: chipWidthRef.current }}
-        >
+      <div
+        className={cn(
+          "selection-chip-resizer",
+          isRemoving && "selection-chip-resizer-removing",
+          removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
+        )}
+        ref={resizerRef}
+        style={{
+          // A live empty track must start at zero so the first chip can grow
+          // out of it. A non-empty remount (used to restart the invalid shake)
+          // should keep its intrinsic width instead of replaying that entry.
+          width: selectedCards.length === 0 ? 0 : chipWidthRef.current,
+        }}
+      >
+        {renderedCards.length > 0 && (
           <div
             className={cn(
               "selection-chip-shell",
@@ -150,20 +154,26 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
               />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {Array.from({
-        length: renderedCards.length > 0 && selectedCards.length === 0
-          ? 0
-          : emptySlotCount,
-      }, (_, i) => (
-        <div
-          key={`empty-${i}`}
-          aria-hidden="true"
-          className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
-        />
-      ))}
+      {Array.from({ length: MINIMUM_COMBO_SIZE }, (_, index) => {
+        // Keeping both wrappers mounted lets a consumed placeholder collapse
+        // into the growing chip (and re-expand out of it when a word leaves).
+        const active = index >= Math.min(selectedCards.length, MINIMUM_COMBO_SIZE);
+        return (
+          <div
+            key={`empty-${index}`}
+            aria-hidden="true"
+            className={cn(
+              "selection-empty-slot",
+              active ? "selection-empty-slot-active" : "selection-empty-slot-inactive",
+            )}
+          >
+            <div className="selection-empty-slot-box" />
+          </div>
+        );
+      })}
 
       {selectedCards.length > 0 && (
         <div className="selection-chip-target-sizer" ref={targetContentRef} aria-hidden="true">
@@ -189,7 +199,7 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ selectedCards, onClear, onShuffle, onSubmit, submitting }: ActionButtonsProps) {
-  const canSubmit = selectedCards.length >= 2;
+  const canSubmit = selectedCards.length >= MINIMUM_COMBO_SIZE;
 
   return (
     <div className="flex gap-4 justify-center items-center">

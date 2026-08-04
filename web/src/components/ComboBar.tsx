@@ -21,6 +21,7 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const resizeAnimationRef = useRef<Animation>();
   const transitionRestoreFrameRef = useRef<number>();
   const previousCardsRef = useRef(selectedCards);
+  const entryDeadlinesRef = useRef(new Map<string, number>());
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const chipWidthRef = useRef<number>();
   const segmentWidthsRef = useRef(new Map<string, number>());
@@ -65,6 +66,12 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const isFirstSlotEmpty = isRemoving
     && previousCards.length === 1
     && selectedCards.length === 0;
+  const isReversingEntry = removedCards.some(
+    (card) => (entryDeadlinesRef.current.get(card) ?? 0) > Date.now(),
+  );
+  const isReversingGenericEntry = isReversingEntry
+    && !isSecondSlotEmpty
+    && !isFirstSlotEmpty;
   const resizeDirection = selectedCards.length > previousCards.length
     ? "expanding"
     : selectedCards.length < previousCards.length
@@ -73,6 +80,13 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
 
   useLayoutEffect(() => {
     clearTimeout(exitTimerRef.current);
+    cancelAnimationFrame(transitionRestoreFrameRef.current ?? 0);
+    transitionRestoreFrameRef.current = undefined;
+    resizerRef.current?.style.removeProperty("transition");
+
+    const entryDeadline = Date.now() + SLOT_FILL_DURATION;
+    enteringCards.forEach((card) => entryDeadlinesRef.current.set(card, entryDeadline));
+    removedCards.forEach((card) => entryDeadlinesRef.current.delete(card));
 
     const renderedUnits = contentRef.current?.querySelectorAll<HTMLElement>(".split-chip-unit");
     renderedUnits?.forEach((unit, index) => {
@@ -94,6 +108,32 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
           : nextWidth;
       resizeAnimationRef.current?.cancel();
       resizeAnimationRef.current = undefined;
+
+      /*
+       * If a trailing card is removed before its entry has finished, only part
+       * of its unit has made it inside the shell. Collapse that visible part,
+       * not the unit's full intrinsic width. This keeps the outgoing seam on
+       * the live right edge as the outer width reverses, so it cannot strand a
+       * detached piece of the black surface.
+       */
+      if (
+        isReversingGenericEntry
+        && removalEdge === "trailing"
+        && removedIndex >= 0
+        && currentWidth !== undefined
+      ) {
+        const exitingUnit = renderedUnits?.[removedIndex];
+        const fullExitWidth = exitingUnit?.offsetWidth ?? 0;
+        const visibleExitWidth = Math.min(
+          fullExitWidth,
+          Math.max(0, currentWidth - nextWidth),
+        );
+        exitingUnit?.style.setProperty(
+          "--selection-chip-exit-width",
+          `${visibleExitWidth}px`,
+        );
+      }
+
       if (currentWidth !== undefined && removalEdge && !isSecondSlotEmpty) {
         const direction = removalEdge === "leading" ? 1 : -1;
         const anchorShift = Math.max(0, currentWidth - nextWidth) * direction / 2;
@@ -185,6 +225,8 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
     isFirstSlotEmpty,
     isFirstSlotFill,
     isRemoving,
+    isReversingGenericEntry,
+    isReversingEntry,
     isSecondSlotEmpty,
     removalEdge,
     renderedSelectionKey,
@@ -222,6 +264,7 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
             "selection-chip-resizer",
             "mx-1",
             isRemoving && "selection-chip-resizer-removing",
+            isReversingGenericEntry && "selection-chip-resizer-reversing-entry",
             removalEdge
               && !isSecondSlotEmpty
               && `selection-chip-resizer-removing-${removalEdge}`,
@@ -237,6 +280,7 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
               isSecondSlotFill && "selection-chip-shell-second-fill",
               isFirstSlotEmpty && "selection-chip-shell-first-empty",
               isSecondSlotEmpty && "selection-chip-shell-second-empty",
+              isReversingGenericEntry && "selection-chip-shell-reversing-entry",
             )}
             key={renderedSelectionKey}
             aria-hidden={selectedCards.length === 0 || undefined}

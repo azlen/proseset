@@ -18,6 +18,17 @@
   }
 }
 
+/* The selected card lifts away to reveal the reference game's paper hatch. */
+.word-card-hatch-shadow {
+  background-color: #f3f1e8;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 2.75px,
+    rgb(186 181 166 / 72%) 2.75px 4.25px,
+    transparent 4.25px 7px
+  );
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-4px); }

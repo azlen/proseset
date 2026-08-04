@@ -127,7 +127,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           y="1.5"
           width="calc(100% - 3px)"
           height="77"
-          rx="10.5"
+          rx="14.5"
           className={cn("word-card-face", selected && "word-card-face-selected")}
           mask={holes.length > 0 ? `url(#${faceMaskId})` : undefined}
         />
@@ -226,29 +226,17 @@ export function WordCard({
   return (
     <div
       className={cn(
-        "relative h-[80px] min-w-0 rounded-[12px]",
-        (selected || punchBursts.length > 0) && "z-10",
+        "relative h-[80px] min-w-0 rounded-[16px]",
+        punchBursts.length > 0 && "z-10",
       )}
     >
-      <span
-        aria-hidden="true"
-        className={cn(
-          "word-card-hatch-shadow pointer-events-none absolute inset-0 rounded-[12px] transition-opacity duration-150",
-          selected ? "opacity-100" : "opacity-0",
-        )}
-      />
       <button
         onClick={selected ? onDeselect : onSelect}
         aria-pressed={selected}
         aria-label={selected && selectionIndex !== null
           ? `${word}, selection ${selectionIndex + 1}`
           : word}
-        className={cn(
-          "group relative z-[1] flex h-[80px] w-full min-w-0 items-center justify-center rounded-[12px] text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-transform duration-150 ease-out cursor-pointer",
-          selected
-            ? "-translate-x-1 -translate-y-1"
-            : "translate-x-0 translate-y-0",
-        )}
+        className="group relative z-[1] flex h-[80px] w-full min-w-0 cursor-pointer items-center justify-center rounded-[16px] text-center text-base font-semibold uppercase tracking-wide text-card-foreground"
       >
         <PerforatedCardSurface holes={holes} selected={selected} />
         {selected && selectionIndex !== null && (

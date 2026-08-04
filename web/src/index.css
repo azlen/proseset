@@ -18,20 +18,9 @@
   }
 }
 
-/* The selected card lifts away to reveal the reference game's paper hatch. */
-.word-card-hatch-shadow {
-  background-color: #f3f1e8;
-  background-image: repeating-linear-gradient(
-    45deg,
-    #000 0 1.5px,
-    transparent 1.5px 3px
-  );
-}
-
 /*
  * A used card's face is an SVG compound shape so its holes are genuinely
- * transparent. A resting card reveals the page through its holes; the hatch
- * beneath is visible only while the card is selected and lifted.
+ * transparent, allowing the page beneath to show through.
  */
 .word-card-face {
   fill: var(--card);

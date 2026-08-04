@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useMemo } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary, type PuzzleData } from "../lib/puzzle";
 import { gameReducer, initialState } from "../lib/game-state";
 import { saveProgress } from "../lib/storage";
@@ -107,6 +107,16 @@ export function GameApp({
     dispatch({ type: "LOAD_PUZZLE", puzzle });
   }, []);
 
+  const cardUseCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const key of state.foundCombos.keys()) {
+      for (const card of key.split(",")) {
+        counts.set(card, (counts.get(card) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [state.foundCombos]);
+
   if (!state.puzzle) {
     return (
       <div className="max-w-lg w-full mx-auto p-8 text-center">
@@ -169,7 +179,7 @@ export function GameApp({
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
-          usedCards={state.usedCards}
+          cardUseCounts={cardUseCounts}
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />

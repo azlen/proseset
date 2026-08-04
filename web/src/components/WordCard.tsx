@@ -11,21 +11,29 @@ interface CardHole {
 interface FallingChad {
   id: number;
   label: number | null;
+  x: number;
+  y: number;
 }
 
-const USED_CARD_HOLE: CardHole = {
-  id: "used-card",
-  x: 16,
-  y: 16,
-  radius: 10,
-};
-
+const CARD_HOLE_RADIUS = 7;
+const CARD_MARKER_RADIUS = 10;
+const CARD_HOLE_SPACING = 18;
+const CARD_HOLES_PER_ROW = 4;
 const CHAD_FALL_DURATION = 1400;
+
+function getCardHole(index: number): CardHole {
+  return {
+    id: `use-${index}`,
+    x: 16 + (index % CARD_HOLES_PER_ROW) * CARD_HOLE_SPACING,
+    y: 16 + Math.floor(index / CARD_HOLES_PER_ROW) * CARD_HOLE_SPACING,
+    radius: CARD_HOLE_RADIUS,
+  };
+}
 
 interface WordCardProps {
   word: string;
   selected: boolean;
-  used: boolean;
+  useCount: number;
   selectionIndex: number | null;
   onSelect: () => void;
   onDeselect: () => void;
@@ -137,15 +145,16 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
 export function WordCard({
   word,
   selected,
-  used,
+  useCount,
   selectionIndex,
   onSelect,
   onDeselect,
 }: WordCardProps) {
   const displayWord = word;
-  const holes: CardHole[] = used ? [USED_CARD_HOLE] : [];
+  const holes = Array.from({ length: useCount }, (_, index) => getCardHole(index));
+  const nextHole = getCardHole(useCount);
   const [fallingChads, setFallingChads] = useState<FallingChad[]>([]);
-  const wasUsedRef = useRef(used);
+  const previousUseCountRef = useRef(useCount);
   const lastSelectionIndexRef = useRef<number | null>(selectionIndex);
   const nextChadIdRef = useRef(0);
   const chadTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -155,25 +164,33 @@ export function WordCard({
   }
 
   useEffect(() => {
-    const wasJustPunched = used && !wasUsedRef.current;
-    wasUsedRef.current = used;
-    if (!wasJustPunched) return;
+    const previousUseCount = previousUseCountRef.current;
+    previousUseCountRef.current = useCount;
+    if (useCount <= previousUseCount) return;
 
-    const id = nextChadIdRef.current++;
-    const chad = {
-      id,
-      label: lastSelectionIndexRef.current === null
-        ? null
-        : lastSelectionIndexRef.current + 1,
-    };
-    setFallingChads((current) => [...current, chad]);
+    const newChads = Array.from(
+      { length: useCount - previousUseCount },
+      (_, offset): FallingChad => {
+        const hole = getCardHole(previousUseCount + offset);
+        return {
+          id: nextChadIdRef.current++,
+          label: lastSelectionIndexRef.current === null
+            ? null
+            : lastSelectionIndexRef.current + 1,
+          x: hole.x,
+          y: hole.y,
+        };
+      },
+    );
+    const chadIds = new Set(newChads.map((chad) => chad.id));
+    setFallingChads((current) => [...current, ...newChads]);
 
     const timer = setTimeout(() => {
-      setFallingChads((current) => current.filter((candidate) => candidate.id !== id));
+      setFallingChads((current) => current.filter((candidate) => !chadIds.has(candidate.id)));
       chadTimersRef.current = chadTimersRef.current.filter((candidate) => candidate !== timer);
     }, CHAD_FALL_DURATION);
     chadTimersRef.current.push(timer);
-  }, [used]);
+  }, [useCount]);
 
   useEffect(() => () => {
     for (const timer of chadTimersRef.current) clearTimeout(timer);
@@ -211,7 +228,11 @@ export function WordCard({
         {selected && selectionIndex !== null && (
           <span
             aria-hidden="true"
-            className="absolute left-[6px] top-[6px] z-[2] flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+            className="absolute z-[2] flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+            style={{
+              left: nextHole.x - CARD_MARKER_RADIUS,
+              top: nextHole.y - CARD_MARKER_RADIUS,
+            }}
           >
             {selectionIndex + 1}
           </span>
@@ -223,8 +244,10 @@ export function WordCard({
         <span
           key={chad.id}
           aria-hidden="true"
-          className="word-card-chad pointer-events-none absolute left-[6px] top-[6px] z-20 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+          className="word-card-chad pointer-events-none absolute z-20 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
           style={{
+            left: chad.x - CARD_MARKER_RADIUS,
+            top: chad.y - CARD_MARKER_RADIUS,
             "--word-card-chad-drift": chad.label !== null && chad.label % 2 === 0
               ? "36px"
               : "-34px",

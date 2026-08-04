@@ -8,9 +8,8 @@ interface CardHole {
   radius: number;
 }
 
-interface FallingChad {
+interface PunchBurst {
   id: number;
-  label: number | null;
   x: number;
   y: number;
 }
@@ -20,7 +19,10 @@ const CARD_MARKER_RADIUS = 10;
 // Tighter than the 14px opening diameter so adjacent punches merge into one hole.
 const CARD_HOLE_SPACING = 11;
 const CARD_HOLES_PER_ROW = 4;
-const CHAD_FALL_DURATION = 1400;
+const PUNCH_INITIAL_DELAY = 90;
+const PUNCH_STAGGER = 140;
+const PUNCH_BURST_DURATION = 520;
+const PUNCH_PARTICLES = 8;
 
 function getCardHole(index: number): CardHole {
   return {
@@ -152,13 +154,14 @@ export function WordCard({
   onDeselect,
 }: WordCardProps) {
   const displayWord = word;
-  const holes = Array.from({ length: useCount }, (_, index) => getCardHole(index));
+  const [visibleUseCount, setVisibleUseCount] = useState(useCount);
+  const holes = Array.from({ length: visibleUseCount }, (_, index) => getCardHole(index));
   const nextHole = getCardHole(useCount);
-  const [fallingChads, setFallingChads] = useState<FallingChad[]>([]);
+  const [punchBursts, setPunchBursts] = useState<PunchBurst[]>([]);
   const previousUseCountRef = useRef(useCount);
   const lastSelectionIndexRef = useRef<number | null>(selectionIndex);
-  const nextChadIdRef = useRef(0);
-  const chadTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const nextBurstIdRef = useRef(0);
+  const punchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   if (selectionIndex !== null) {
     lastSelectionIndexRef.current = selectionIndex;
@@ -167,42 +170,64 @@ export function WordCard({
   useEffect(() => {
     const previousUseCount = previousUseCountRef.current;
     previousUseCountRef.current = useCount;
-    if (useCount <= previousUseCount) return;
+    if (useCount === previousUseCount) return;
 
-    const newChads = Array.from(
+    if (useCount < previousUseCount) {
+      setVisibleUseCount(useCount);
+      setPunchBursts([]);
+      return;
+    }
+
+    const selectionIndex = lastSelectionIndexRef.current;
+    if (selectionIndex === null) {
+      setVisibleUseCount(useCount);
+      return;
+    }
+
+    const delay = PUNCH_INITIAL_DELAY + selectionIndex * PUNCH_STAGGER;
+    const newBursts = Array.from(
       { length: useCount - previousUseCount },
-      (_, offset): FallingChad => {
+      (_, offset): PunchBurst => {
         const hole = getCardHole(previousUseCount + offset);
         return {
-          id: nextChadIdRef.current++,
-          label: lastSelectionIndexRef.current === null
-            ? null
-            : lastSelectionIndexRef.current + 1,
+          id: nextBurstIdRef.current++,
           x: hole.x,
           y: hole.y,
         };
       },
     );
-    const chadIds = new Set(newChads.map((chad) => chad.id));
-    setFallingChads((current) => [...current, ...newChads]);
+    const burstIds = new Set(newBursts.map((burst) => burst.id));
 
-    const timer = setTimeout(() => {
-      setFallingChads((current) => current.filter((candidate) => !chadIds.has(candidate.id)));
-      chadTimersRef.current = chadTimersRef.current.filter((candidate) => candidate !== timer);
-    }, CHAD_FALL_DURATION);
-    chadTimersRef.current.push(timer);
+    const punchTimer = setTimeout(() => {
+      setVisibleUseCount((current) => Math.max(current, useCount));
+      setPunchBursts((current) => [...current, ...newBursts]);
+      punchTimersRef.current = punchTimersRef.current.filter(
+        (candidate) => candidate !== punchTimer,
+      );
+
+      const cleanupTimer = setTimeout(() => {
+        setPunchBursts((current) => current.filter(
+          (candidate) => !burstIds.has(candidate.id),
+        ));
+        punchTimersRef.current = punchTimersRef.current.filter(
+          (candidate) => candidate !== cleanupTimer,
+        );
+      }, PUNCH_BURST_DURATION);
+      punchTimersRef.current.push(cleanupTimer);
+    }, delay);
+    punchTimersRef.current.push(punchTimer);
   }, [useCount]);
 
   useEffect(() => () => {
-    for (const timer of chadTimersRef.current) clearTimeout(timer);
-    chadTimersRef.current = [];
+    for (const timer of punchTimersRef.current) clearTimeout(timer);
+    punchTimersRef.current = [];
   }, []);
 
   return (
     <div
       className={cn(
         "relative h-[80px] min-w-0 rounded-[12px]",
-        (selected || fallingChads.length > 0) && "z-10",
+        (selected || punchBursts.length > 0) && "z-10",
       )}
     >
       <span
@@ -241,23 +266,23 @@ export function WordCard({
         <span className="relative z-[1]">{displayWord}</span>
       </button>
 
-      {fallingChads.map((chad) => (
+      {punchBursts.map((burst) => (
         <span
-          key={chad.id}
+          key={burst.id}
           aria-hidden="true"
-          className="word-card-chad pointer-events-none absolute z-20 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+          className="word-card-punch-burst pointer-events-none absolute z-20"
           style={{
-            left: chad.x - CARD_MARKER_RADIUS,
-            top: chad.y - CARD_MARKER_RADIUS,
-            "--word-card-chad-drift": chad.label !== null && chad.label % 2 === 0
-              ? "36px"
-              : "-34px",
-            "--word-card-chad-spin": chad.label !== null && chad.label % 2 === 0
-              ? "720deg"
-              : "-680deg",
-          } as CSSProperties}
+            left: burst.x,
+            top: burst.y,
+          }}
         >
-          {chad.label}
+          {Array.from({ length: PUNCH_PARTICLES }, (_, index) => (
+            <span
+              key={index}
+              className="word-card-punch-particle"
+              style={{ "--word-card-particle-index": index } as CSSProperties}
+            />
+          ))}
         </span>
       ))}
     </div>

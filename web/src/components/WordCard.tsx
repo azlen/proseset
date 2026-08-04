@@ -20,11 +20,12 @@ export function WordCard({
   return (
     <button
       onClick={selected ? onDeselect : onSelect}
+      aria-pressed={selected}
       className={cn(
-        "relative min-w-0 rounded-lg border-[3px] border-solid border-foreground py-4 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
+        "relative flex h-[80px] min-w-0 items-center justify-center rounded-[12px] border-[3px] border-solid border-foreground text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-[background-color,translate,box-shadow] duration-150 ease-out cursor-pointer",
         selected
-          ? "bg-[#ddd1b2]"
-          : "bg-card hover:bg-[#e9dfc2]",
+          ? "-translate-x-1 -translate-y-1 bg-[#ddd1b2] shadow-[4px_4px_0_var(--foreground)]"
+          : "translate-x-0 translate-y-0 bg-card shadow-none hover:bg-[#e9dfc2]",
       )}
     >
       {selected && selectionIndex !== null && (

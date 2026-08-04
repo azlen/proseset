@@ -18,11 +18,11 @@ export function WordCard({
   const displayWord = word;
 
   return (
-    <div className={cn("relative min-w-0 rounded-lg", selected && "z-10")}>
+    <div className={cn("relative h-[80px] min-w-0 rounded-[12px]", selected && "z-10")}>
       <span
         aria-hidden="true"
         className={cn(
-          "word-card-hatch-shadow pointer-events-none absolute inset-0 rounded-lg transition-opacity duration-150",
+          "word-card-hatch-shadow pointer-events-none absolute inset-0 rounded-[12px] transition-opacity duration-150",
           selected ? "opacity-100" : "opacity-0",
         )}
       />
@@ -30,7 +30,7 @@ export function WordCard({
         onClick={selected ? onDeselect : onSelect}
         aria-pressed={selected}
         className={cn(
-          "relative z-[1] w-full min-w-0 rounded-lg border-[3px] border-solid border-foreground py-4 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-[background-color,translate] duration-150 ease-out cursor-pointer",
+          "relative z-[1] flex h-[80px] w-full min-w-0 items-center justify-center rounded-[12px] border-[3px] border-solid border-foreground text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-[background-color,translate] duration-150 ease-out cursor-pointer",
           selected
             ? "-translate-x-1 -translate-y-1 bg-[#ddd1b2]"
             : "translate-x-0 translate-y-0 bg-card hover:bg-[#e9dfc2]",

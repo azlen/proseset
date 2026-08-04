@@ -3,6 +3,7 @@ import { WordCard } from "./WordCard";
 interface CardGridProps {
   cards: string[];
   selectedCards: string[];
+  cardUseCounts: ReadonlyMap<string, number>;
   onSelectCard: (card: string) => void;
   onDeselectCard: (card: string) => void;
 }
@@ -10,6 +11,7 @@ interface CardGridProps {
 export function CardGrid({
   cards,
   selectedCards,
+  cardUseCounts,
   onSelectCard,
   onDeselectCard,
 }: CardGridProps) {
@@ -22,6 +24,7 @@ export function CardGrid({
             key={card}
             word={card}
             selected={selIdx !== -1}
+            useCount={cardUseCounts.get(card) ?? 0}
             selectionIndex={selIdx !== -1 ? selIdx : null}
             onSelect={() => onSelectCard(card)}
             onDeselect={() => onDeselectCard(card)}

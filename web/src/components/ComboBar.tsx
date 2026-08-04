@@ -35,13 +35,14 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const renderedCards = isRemoving ? previousCards : selectedCards;
   const selectionKey = selectedCards.join("\u0000");
   const renderedSelectionKey = renderedCards.join("\u0000");
-  // Separators live on the segment to their right. When the first word exits,
-  // collapse the next word's leading separator without collapsing that word.
-  const leadingBoundaryExitCard = removedCardSet.has(previousCards[0] ?? "")
-    && previousCards[1] !== undefined
-    && !removedCardSet.has(previousCards[1])
-      ? previousCards[1]
-      : undefined;
+  // Separators live on the segment to their right. Only a separator becoming
+  // an outside edge should disappear; separators around an interior removal
+  // remain full-size and simply overlap as the empty word slot closes.
+  const edgeBoundaryExitIndex = removalEdge === "leading"
+    ? 1
+    : removalEdge === "trailing"
+      ? removedIndex
+      : -1;
   const enteringCards = new Set(
     selectedCards.filter((card) => !previousCards.includes(card)),
   );
@@ -130,10 +131,10 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
                       : enteringCards.has(segment)
                         ? "selection-chip-word-entering"
                         : undefined}
-                    segmentUnitClassName={(segment) => cn(
+                    segmentUnitClassName={(segment, index) => cn(
                       removedCardSet.has(segment) && "selection-chip-unit-exiting",
-                      segment === leadingBoundaryExitCard
-                        && "selection-chip-leading-boundary-exiting",
+                      index === edgeBoundaryExitIndex
+                        && "selection-chip-edge-boundary-exiting",
                     )}
                     segmentUnitStyle={(segment) => {
                       const width = segmentWidthsRef.current.get(segment);

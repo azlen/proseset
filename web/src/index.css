@@ -146,23 +146,36 @@
 }
 
 .selection-chip-shell {
+  position: relative;
+  isolation: isolate;
   width: 100%;
   overflow: hidden;
   border-radius: 0.625rem;
+}
+
+/* Spring the black surface without scaling the words or separator strokes. */
+.selection-chip-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
   background: #050505;
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
   transform-origin: center;
 }
 
-.selection-chip-shell-expanding {
+.selection-chip-shell-expanding::before {
   animation: selection-chip-expand-spring 0.42s ease-out both;
 }
 
-.selection-chip-shell-contracting {
+.selection-chip-shell-contracting::before {
   animation: selection-chip-contract-spring 0.42s ease-out both;
 }
 
 .selection-chip-content {
+  position: relative;
+  z-index: 1;
   width: max-content;
 }
 
@@ -185,10 +198,14 @@
   animation: selection-chip-word-pop 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) 90ms both;
 }
 
-/* Collapse the removed word's original flex slot so later words slide into it. */
+/*
+ * Collapse the removed word's slot while letting its separator remain
+ * full-size. On an interior removal the two separators converge and overlap,
+ * reading as one unchanged slash instead of a slash being squeezed away.
+ */
 .selection-chip-unit-exiting {
   flex: 0 0 auto;
-  overflow: hidden;
+  overflow: visible;
   animation: selection-chip-unit-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
 }
 
@@ -196,9 +213,13 @@
   animation: selection-chip-word-pop-out 0.18s cubic-bezier(0.4, 0, 0.8, 0.2) both;
 }
 
-.selection-chip-leading-boundary-exiting > .split-chip-boundary-visible {
-  overflow: hidden;
-  animation: selection-chip-leading-boundary-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
+.selection-chip-edge-boundary-exiting > .split-chip-boundary-visible {
+  overflow: visible;
+  animation: selection-chip-edge-boundary-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
+}
+
+.selection-chip-edge-boundary-exiting > .split-chip-boundary-visible::after {
+  animation: selection-chip-edge-boundary-thin 0.34s ease-out 0.16s both;
 }
 
 @keyframes selection-chip-expand-spring {
@@ -235,8 +256,13 @@
   to { width: 0; }
 }
 
-@keyframes selection-chip-leading-boundary-collapse {
+@keyframes selection-chip-edge-boundary-collapse {
   from { width: 1.125rem; }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-edge-boundary-thin {
+  from { width: 3px; }
   to { width: 0; }
 }
 
@@ -261,11 +287,12 @@
     transition-delay: 0s;
   }
 
-  .selection-chip-shell-expanding,
-  .selection-chip-shell-contracting,
+  .selection-chip-shell-expanding::before,
+  .selection-chip-shell-contracting::before,
   .selection-chip-word-entering,
   .selection-chip-unit-exiting,
-  .selection-chip-leading-boundary-exiting > .split-chip-boundary-visible,
+  .selection-chip-edge-boundary-exiting > .split-chip-boundary-visible,
+  .selection-chip-edge-boundary-exiting > .split-chip-boundary-visible::after,
   .selection-chip-word-exiting {
     animation: none;
   }

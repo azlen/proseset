@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useState, type CSSProperties } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary, type PuzzleData } from "../lib/puzzle";
 import { gameReducer, initialState } from "../lib/game-state";
 import { saveProgress } from "../lib/storage";
@@ -16,6 +16,95 @@ interface GameAppProps {
   compact?: boolean;
 }
 
+const DEFAULT_HATCH_LINE_WIDTH = 1.5;
+const DEFAULT_HATCH_GAP_WIDTH = 5.5;
+const DEFAULT_HATCH_LINE_COLOR = "#000000";
+
+interface HatchControlsProps {
+  lineWidth: number;
+  gapWidth: number;
+  lineColor: string;
+  onLineWidthChange: (value: number) => void;
+  onGapWidthChange: (value: number) => void;
+  onLineColorChange: (value: string) => void;
+  onReset: () => void;
+}
+
+function HatchControls({
+  lineWidth,
+  gapWidth,
+  lineColor,
+  onLineWidthChange,
+  onGapWidthChange,
+  onLineColorChange,
+  onReset,
+}: HatchControlsProps) {
+  return (
+    <details
+      open
+      className="fixed top-3 left-3 z-[100] w-56 rounded-lg border-2 border-foreground bg-[#faf8f2]/95 shadow-lg backdrop-blur-sm"
+    >
+      <summary className="cursor-pointer px-3 py-2 text-xs font-black uppercase tracking-wide">
+        Hatch tuning
+      </summary>
+      <div className="border-t border-foreground/20 px-3 pt-2 pb-3">
+        <label className="block text-xs font-semibold">
+          <span className="flex justify-between gap-3">
+            <span>Line thickness</span>
+            <output className="font-mono tabular-nums">{lineWidth}px</output>
+          </span>
+          <input
+            type="range"
+            min="0.5"
+            max="6"
+            step="0.5"
+            value={lineWidth}
+            onChange={(event) => onLineWidthChange(Number(event.target.value))}
+            className="mt-1 w-full cursor-pointer accent-black"
+          />
+        </label>
+
+        <label className="mt-2 block text-xs font-semibold">
+          <span className="flex justify-between gap-3">
+            <span>Gap / frequency</span>
+            <output className="font-mono tabular-nums">{gapWidth}px</output>
+          </span>
+          <input
+            type="range"
+            min="1"
+            max="16"
+            step="0.5"
+            value={gapWidth}
+            onChange={(event) => onGapWidthChange(Number(event.target.value))}
+            className="mt-1 w-full cursor-pointer accent-black"
+          />
+        </label>
+
+        <label className="mt-2 flex items-center justify-between gap-3 text-xs font-semibold">
+          <span>Line color</span>
+          <span className="flex items-center gap-2 font-mono uppercase">
+            {lineColor}
+            <input
+              type="color"
+              value={lineColor}
+              onChange={(event) => onLineColorChange(event.target.value)}
+              className="h-7 w-9 cursor-pointer rounded border border-foreground bg-transparent p-0.5"
+            />
+          </span>
+        </label>
+
+        <button
+          type="button"
+          onClick={onReset}
+          className="mt-3 w-full cursor-pointer rounded border border-foreground px-2 py-1 text-xs font-bold hover:bg-muted"
+        >
+          Reset
+        </button>
+      </div>
+    </details>
+  );
+}
+
 export function GameApp({
   initialPuzzle,
   persistProgress = true,
@@ -23,6 +112,9 @@ export function GameApp({
   compact = false,
 }: GameAppProps) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [hatchLineWidth, setHatchLineWidth] = useState(DEFAULT_HATCH_LINE_WIDTH);
+  const [hatchGapWidth, setHatchGapWidth] = useState(DEFAULT_HATCH_GAP_WIDTH);
+  const [hatchLineColor, setHatchLineColor] = useState(DEFAULT_HATCH_LINE_COLOR);
 
   useEffect(() => {
     Promise.all([loadDictionary(), initialPuzzle ? Promise.resolve(initialPuzzle) : fetchRandomPuzzle()])
@@ -117,9 +209,34 @@ export function GameApp({
 
   const foundScoringWords = state.foundMadeWords.filter((word) => word.length >= 4);
   const score = scoreWords(foundScoringWords);
+  const hatchStyle = {
+    "--hatch-line-width": `${hatchLineWidth}px`,
+    "--hatch-gap-width": `${hatchGapWidth}px`,
+    "--hatch-line-color": hatchLineColor,
+  } as CSSProperties;
+
+  const resetHatch = () => {
+    setHatchLineWidth(DEFAULT_HATCH_LINE_WIDTH);
+    setHatchGapWidth(DEFAULT_HATCH_GAP_WIDTH);
+    setHatchLineColor(DEFAULT_HATCH_LINE_COLOR);
+  };
 
   return (
-    <div className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}>
+    <div
+      style={hatchStyle}
+      className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}
+    >
+      {showRandom && (
+        <HatchControls
+          lineWidth={hatchLineWidth}
+          gapWidth={hatchGapWidth}
+          lineColor={hatchLineColor}
+          onLineWidthChange={setHatchLineWidth}
+          onGapWidthChange={setHatchGapWidth}
+          onLineColorChange={setHatchLineColor}
+          onReset={resetHatch}
+        />
+      )}
       <div className="w-full flex justify-between items-baseline">
         <h1 className="text-xl font-bold tracking-tight">Split</h1>
         {showRandom && (

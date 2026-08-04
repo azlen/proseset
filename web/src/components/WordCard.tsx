@@ -17,7 +17,8 @@ interface FallingChad {
 
 const CARD_HOLE_RADIUS = 7;
 const CARD_MARKER_RADIUS = 10;
-const CARD_HOLE_SPACING = 18;
+// Tighter than the 14px opening diameter so adjacent punches merge into one hole.
+const CARD_HOLE_SPACING = 11;
 const CARD_HOLES_PER_ROW = 4;
 const CHAD_FALL_DURATION = 1400;
 

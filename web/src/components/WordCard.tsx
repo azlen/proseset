@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 interface CardHole {
@@ -6,12 +6,26 @@ interface CardHole {
   x: number;
   y: number;
   radius: number;
-  label?: ReactNode;
 }
+
+interface FallingChad {
+  id: number;
+  label: number | null;
+}
+
+const USED_CARD_HOLE: CardHole = {
+  id: "used-card",
+  x: 16,
+  y: 16,
+  radius: 10,
+};
+
+const CHAD_FALL_DURATION = 900;
 
 interface WordCardProps {
   word: string;
   selected: boolean;
+  used: boolean;
   selectionIndex: number | null;
   onSelect: () => void;
   onDeselect: () => void;
@@ -116,21 +130,6 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
         )}
       </svg>
 
-      {holes.map((hole) => hole.label !== undefined && (
-        <span
-          key={hole.id}
-          aria-hidden="true"
-          className="word-card-hole-label pointer-events-none absolute z-[2] flex items-center justify-center text-xs font-bold"
-          style={{
-            left: hole.x - hole.radius,
-            top: hole.y - hole.radius,
-            width: hole.radius * 2,
-            height: hole.radius * 2,
-          }}
-        >
-          {hole.label}
-        </span>
-      ))}
     </>
   );
 }
@@ -138,22 +137,61 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
 export function WordCard({
   word,
   selected,
+  used,
   selectionIndex,
   onSelect,
   onDeselect,
 }: WordCardProps) {
   const displayWord = word;
-  const holes: CardHole[] = selected && selectionIndex !== null
-    ? [{ id: "selection", x: 16, y: 16, radius: 10, label: selectionIndex + 1 }]
-    : [];
+  const holes: CardHole[] = used ? [USED_CARD_HOLE] : [];
+  const [fallingChads, setFallingChads] = useState<FallingChad[]>([]);
+  const wasUsedRef = useRef(used);
+  const lastSelectionIndexRef = useRef<number | null>(selectionIndex);
+  const nextChadIdRef = useRef(0);
+  const chadTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  if (selectionIndex !== null) {
+    lastSelectionIndexRef.current = selectionIndex;
+  }
+
+  useEffect(() => {
+    const wasJustPunched = used && !wasUsedRef.current;
+    wasUsedRef.current = used;
+    if (!wasJustPunched) return;
+
+    const id = nextChadIdRef.current++;
+    const chad = {
+      id,
+      label: lastSelectionIndexRef.current === null
+        ? null
+        : lastSelectionIndexRef.current + 1,
+    };
+    setFallingChads((current) => [...current, chad]);
+
+    const timer = setTimeout(() => {
+      setFallingChads((current) => current.filter((candidate) => candidate.id !== id));
+      chadTimersRef.current = chadTimersRef.current.filter((candidate) => candidate !== timer);
+    }, CHAD_FALL_DURATION);
+    chadTimersRef.current.push(timer);
+  }, [used]);
+
+  useEffect(() => () => {
+    for (const timer of chadTimersRef.current) clearTimeout(timer);
+    chadTimersRef.current = [];
+  }, []);
 
   return (
-    <div className={cn("relative h-[80px] min-w-0 rounded-[12px]", selected && "z-10")}>
+    <div
+      className={cn(
+        "relative h-[80px] min-w-0 rounded-[12px]",
+        (selected || fallingChads.length > 0) && "z-10",
+      )}
+    >
       <span
         aria-hidden="true"
         className={cn(
           "word-card-hatch-shadow pointer-events-none absolute inset-0 rounded-[12px] transition-opacity duration-150",
-          selected ? "opacity-100" : "opacity-0",
+          selected || used ? "opacity-100" : "opacity-0",
         )}
       />
       <button
@@ -170,8 +208,34 @@ export function WordCard({
         )}
       >
         <PerforatedCardSurface holes={holes} selected={selected} />
+        {selected && selectionIndex !== null && (
+          <span
+            aria-hidden="true"
+            className="absolute left-[6px] top-[6px] z-[2] flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+          >
+            {selectionIndex + 1}
+          </span>
+        )}
         <span className="relative z-[1]">{displayWord}</span>
       </button>
+
+      {fallingChads.map((chad) => (
+        <span
+          key={chad.id}
+          aria-hidden="true"
+          className="word-card-chad pointer-events-none absolute left-[6px] top-[6px] z-20 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+          style={{
+            "--word-card-chad-drift": chad.label !== null && chad.label % 2 === 0
+              ? "18px"
+              : "-18px",
+            "--word-card-chad-spin": chad.label !== null && chad.label % 2 === 0
+              ? "155deg"
+              : "-145deg",
+          } as CSSProperties}
+        >
+          {chad.label}
+        </span>
+      ))}
     </div>
   );
 }

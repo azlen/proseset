@@ -169,6 +169,7 @@ export function GameApp({
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
+          usedCards={state.usedCards}
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />

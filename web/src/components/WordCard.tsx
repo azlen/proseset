@@ -242,7 +242,7 @@ export function WordCard({
         {selected && selectionIndex !== null && (
           <span
             aria-hidden="true"
-            className="absolute z-[2] flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+            className="absolute z-[2] flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-black"
             style={{
               left: nextHole.x - CARD_MARKER_RADIUS,
               top: nextHole.y - CARD_MARKER_RADIUS,

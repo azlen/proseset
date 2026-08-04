@@ -28,6 +28,74 @@
   );
 }
 
+/* Clip each tile corner with a circular cutout so the border reads like a ticket. */
+.word-card-notch {
+  --word-card-notch-size: 11px;
+  --word-card-notch-border: 3px;
+
+  position: absolute;
+  z-index: 2;
+  width: var(--word-card-notch-size);
+  height: var(--word-card-notch-size);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.word-card-notch::after {
+  content: "";
+  position: absolute;
+  width: calc(var(--word-card-notch-size) * 2);
+  height: calc(var(--word-card-notch-size) * 2);
+  box-sizing: border-box;
+  border: var(--word-card-notch-border) solid var(--foreground);
+  border-radius: 50%;
+  background: var(--background);
+}
+
+.word-card-notch-unbordered .word-card-notch {
+  --word-card-notch-border: 0px;
+}
+
+.word-card-notch-top-left {
+  top: 0;
+  left: 0;
+}
+
+.word-card-notch-top-left::after {
+  top: calc(-1 * var(--word-card-notch-size));
+  left: calc(-1 * var(--word-card-notch-size));
+}
+
+.word-card-notch-top-right {
+  top: 0;
+  right: 0;
+}
+
+.word-card-notch-top-right::after {
+  top: calc(-1 * var(--word-card-notch-size));
+  right: calc(-1 * var(--word-card-notch-size));
+}
+
+.word-card-notch-bottom-right {
+  right: 0;
+  bottom: 0;
+}
+
+.word-card-notch-bottom-right::after {
+  right: calc(-1 * var(--word-card-notch-size));
+  bottom: calc(-1 * var(--word-card-notch-size));
+}
+
+.word-card-notch-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+
+.word-card-notch-bottom-left::after {
+  bottom: calc(-1 * var(--word-card-notch-size));
+  left: calc(-1 * var(--word-card-notch-size));
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-4px); }

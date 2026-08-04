@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useState } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary, type PuzzleData } from "../lib/puzzle";
 import { gameReducer, initialState } from "../lib/game-state";
 import { saveProgress } from "../lib/storage";
@@ -23,6 +23,7 @@ export function GameApp({
   compact = false,
 }: GameAppProps) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [cardY, setCardY] = useState(50);
 
   useEffect(() => {
     Promise.all([loadDictionary(), initialPuzzle ? Promise.resolve(initialPuzzle) : fetchRandomPuzzle()])
@@ -122,16 +123,31 @@ export function GameApp({
     <div
       className={`${compact ? "max-w-md py-4" : "max-w-lg py-6"} w-full mx-auto px-4 h-[100dvh] flex flex-col items-center overflow-hidden box-border`}
     >
-      <div className="w-full flex justify-between items-baseline">
+      <div className="w-full flex justify-between items-center gap-3">
         <h1 className="text-xl font-bold tracking-tight">Split</h1>
-        {showRandom && (
-          <button
-            onClick={handleRandomPuzzle}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            Random
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted-foreground">
+            <span>Card Y: {cardY}</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={cardY}
+              onChange={(event) => setCardY(Number(event.target.value))}
+              aria-label="Card vertical position"
+              className="h-4 w-20 cursor-pointer accent-foreground sm:w-24"
+            />
+          </label>
+          {showRandom && (
+            <button
+              onClick={handleRandomPuzzle}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              Random
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="w-full mt-2">
@@ -172,7 +188,10 @@ export function GameApp({
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />
-        <div className="flex-[0.75] w-full" />
+        <div
+          className="w-full"
+          style={{ flex: `${(100 - cardY) * 0.015} 1 0%` }}
+        />
         <ActionButtons
           selectedCards={state.selectedCards}
           onClear={handleClear}

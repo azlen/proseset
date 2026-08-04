@@ -119,3 +119,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .word-card {
+    isolation: isolate;
+  }
+
+  .word-card::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: #f3f1e8;
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgb(186 181 166 / 72%) 0,
+      rgb(186 181 166 / 72%) 1.5px,
+      transparent 1.5px,
+      transparent 7px
+    );
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(0, 0);
+    transition:
+      opacity 150ms ease-out,
+      transform 150ms ease-out;
+  }
+
+  .word-card[aria-pressed="true"]::after {
+    opacity: 1;
+    transform: translate(4px, 4px);
+  }
+}

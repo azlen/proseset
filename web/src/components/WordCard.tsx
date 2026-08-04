@@ -18,7 +18,7 @@ export function WordCard({
   const displayWord = word;
 
   return (
-    <div className={cn("relative h-[80px] min-w-0 rounded-[12px]", selected && "z-10")}>
+    <div className={cn("relative h-[80px] min-w-0", selected && "z-10")}>
       <span
         aria-hidden="true"
         className={cn(

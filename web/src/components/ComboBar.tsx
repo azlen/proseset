@@ -94,6 +94,7 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   useEffect(() => {
     previousCardsRef.current = selectedCards;
   }, [selectionKey, selectedCards]);
+  const emptySlotCount = Math.max(0, 2 - selectedCards.length);
 
   return (
     <div
@@ -102,61 +103,67 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         shake && "animate-shake",
       )}
     >
-      {renderedCards.length > 0
-        ? (
-            <div
-              className={cn(
-                "selection-chip-resizer",
-                isRemoving && "selection-chip-resizer-removing",
-                removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
-              )}
-              ref={resizerRef}
-              style={{ width: chipWidthRef.current }}
-            >
-              <div
-                className={cn(
-                  "selection-chip-shell",
-                  resizeDirection && `selection-chip-shell-${resizeDirection}`,
+      {renderedCards.length > 0 && (
+        <div
+          className={cn(
+            "selection-chip-resizer",
+            emptySlotCount > 0 && "mx-1",
+            isRemoving && "selection-chip-resizer-removing",
+            removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
+          )}
+          ref={resizerRef}
+          style={{ width: chipWidthRef.current }}
+        >
+          <div
+            className={cn(
+              "selection-chip-shell",
+              resizeDirection && `selection-chip-shell-${resizeDirection}`,
+            )}
+            key={renderedSelectionKey}
+            aria-hidden={selectedCards.length === 0 || undefined}
+          >
+            <div className="selection-chip-content" ref={contentRef}>
+              <SplitChip
+                text={renderedCards.join("")}
+                boundaries={getWordBoundaries(renderedCards)}
+                segments={renderedCards}
+                segmentClassName={(segment) => removedCardSet.has(segment)
+                  ? "selection-chip-word-exiting"
+                  : enteringCards.has(segment)
+                    ? "selection-chip-word-entering"
+                    : undefined}
+                segmentUnitClassName={(segment, index) => cn(
+                  removedCardSet.has(segment) && "selection-chip-unit-exiting",
+                  index === edgeBoundaryExitIndex
+                    && cn(
+                      "selection-chip-edge-boundary-exiting",
+                      removalEdge && `selection-chip-edge-boundary-exiting-${removalEdge}`,
+                    ),
                 )}
-                key={renderedSelectionKey}
-                aria-hidden={selectedCards.length === 0 || undefined}
-              >
-                <div className="selection-chip-content" ref={contentRef}>
-                  <SplitChip
-                    text={renderedCards.join("")}
-                    boundaries={getWordBoundaries(renderedCards)}
-                    segments={renderedCards}
-                    segmentClassName={(segment) => removedCardSet.has(segment)
-                      ? "selection-chip-word-exiting"
-                      : enteringCards.has(segment)
-                        ? "selection-chip-word-entering"
-                        : undefined}
-                    segmentUnitClassName={(segment, index) => cn(
-                      removedCardSet.has(segment) && "selection-chip-unit-exiting",
-                      index === edgeBoundaryExitIndex
-                        && cn(
-                          "selection-chip-edge-boundary-exiting",
-                          removalEdge && `selection-chip-edge-boundary-exiting-${removalEdge}`,
-                        ),
-                    )}
-                    segmentUnitStyle={(segment) => {
-                      const width = segmentWidthsRef.current.get(segment);
-                      if (!removedCardSet.has(segment) || width === undefined) return undefined;
-                      return { "--selection-chip-exit-width": `${width}px` } as CSSProperties;
-                    }}
-                    className="selection-chip-chip"
-                    ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
-                  />
-                </div>
-              </div>
+                segmentUnitStyle={(segment) => {
+                  const width = segmentWidthsRef.current.get(segment);
+                  if (!removedCardSet.has(segment) || width === undefined) return undefined;
+                  return { "--selection-chip-exit-width": `${width}px` } as CSSProperties;
+                }}
+                className="selection-chip-chip"
+                ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
+              />
             </div>
-          )
-        : Array.from({ length: 2 }, (_, i) => (
-            <div
-              key={`empty-${i}`}
-              className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
-            />
-          ))}
+          </div>
+        </div>
+      )}
+
+      {Array.from({
+        length: renderedCards.length > 0 && selectedCards.length === 0
+          ? 0
+          : emptySlotCount,
+      }, (_, i) => (
+        <div
+          key={`empty-${i}`}
+          aria-hidden="true"
+          className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
+        />
+      ))}
 
       {selectedCards.length > 0 && (
         <div className="selection-chip-target-sizer" ref={targetContentRef} aria-hidden="true">

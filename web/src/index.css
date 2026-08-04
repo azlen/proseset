@@ -33,8 +33,6 @@
 /* Shared selection/reveal surface: one chip whose diagonal seams can move. */
 .split-chip {
   --split-chip-padding-block: 0.625rem;
-  --split-chip-padding-inline: 0.875rem;
-  --split-chip-surface: #050505;
 
   display: inline-flex;
   align-items: stretch;
@@ -42,8 +40,8 @@
   max-width: 100%;
   overflow: hidden;
   border-radius: 0.625rem;
-  padding-block: var(--split-chip-padding-block);
-  background: transparent;
+  padding: var(--split-chip-padding-block) 0.875rem;
+  background: #050505;
   color: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -73,57 +71,32 @@
 .split-chip-boundary::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: var(--split-chip-surface);
-  /*
-   * Cut the seam out of the chip instead of painting a light-colored slash.
-   * The transparent stripe therefore reveals whatever is behind the chip.
-   */
-  -webkit-mask-image: linear-gradient(
-    104deg,
-    #000 0 calc(50% - 1.5px),
-    transparent calc(50% - 1.5px) calc(50% + 1.5px),
-    #000 calc(50% + 1.5px)
-  );
-  mask-image: linear-gradient(
-    104deg,
-    #000 0 calc(50% - 1.5px),
-    transparent calc(50% - 1.5px) calc(50% + 1.5px),
-    #000 calc(50% + 1.5px)
-  );
-  pointer-events: none;
+  top: -8%;
+  bottom: -8%;
+  left: 50%;
+  width: 3px;
+  background: var(--background);
+  transform: translateX(-50%) rotate(14deg) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.16s ease;
 }
 
 .split-chip-boundary-visible {
   width: 1.125rem;
 }
 
+.split-chip-boundary-visible::after {
+  transform: translateX(-50%) rotate(14deg) scaleX(1);
+  transition-delay: 0.08s;
+}
+
 .split-chip-letter {
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin-block: calc(-1 * var(--split-chip-padding-block));
-  padding-block: var(--split-chip-padding-block);
-  background: var(--split-chip-surface);
-  transition: color 0.35s ease;
-}
-
-.split-chip-unit:first-child .split-chip-letter {
-  padding-left: var(--split-chip-padding-inline);
-  border-start-start-radius: 0.625rem;
-  border-end-start-radius: 0.625rem;
-}
-
-.split-chip-unit:last-child .split-chip-letter {
-  padding-right: var(--split-chip-padding-inline);
-  border-start-end-radius: 0.625rem;
-  border-end-end-radius: 0.625rem;
-}
-
-.split-chip-letter-text {
-  display: inline-flex;
-  /* Keep capitals optically centered without moving the black chip surface. */
+  /* Keep capitals optically centered within the chip. */
   transform: translateY(0.0625rem);
+  transition: color 0.35s ease;
 }
 
 /* Completion dialog */
@@ -218,6 +191,11 @@
   animation-delay: calc(var(--split-chip-boundary-order, 0) * 45ms);
 }
 
+.combo-reveal-chip-merged .split-chip-boundary-visible::after {
+  animation: split-chip-slash-snap 0.54s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--split-chip-boundary-order, 0) * 45ms);
+}
+
 @keyframes split-chip-snap-closed {
   0% {
     width: 1.125rem;
@@ -239,6 +217,25 @@
   }
 }
 
+@keyframes split-chip-slash-snap {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scaleX(1);
+  }
+  38% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scaleX(1.55);
+  }
+  52% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(14deg) scaleX(1.42);
+  }
+  73%, 100% {
+    opacity: 0;
+    transform: translateX(-50%) rotate(14deg) scaleX(0);
+  }
+}
+
 /* Pop the new seams open one at a time from left to right. */
 .combo-reveal-chip-split .split-chip-boundary {
   transition-duration: 0.32s;
@@ -246,10 +243,17 @@
   transition-delay: calc(var(--split-chip-boundary-order, 0) * 80ms);
 }
 
+.combo-reveal-chip-split .split-chip-boundary::after {
+  transition-duration: 0.1s;
+}
+
+.combo-reveal-chip-split .split-chip-boundary-visible::after {
+  transition-delay: calc(35ms + var(--split-chip-boundary-order, 0) * 80ms);
+}
+
 /* A tiny radial snap at each seam makes the stagger land as a series of pops. */
 .split-chip-pop {
   position: absolute;
-  z-index: 1;
   left: 50%;
   width: 0;
   height: 0;

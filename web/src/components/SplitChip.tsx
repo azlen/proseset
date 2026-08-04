@@ -67,7 +67,7 @@ export function SplitChip({
             </span>
           )}
           <span className={cn("split-chip-letter", letterClassName?.(index))}>
-            <span className="split-chip-letter-text">{character}</span>
+            {character}
           </span>
         </span>
       ))}

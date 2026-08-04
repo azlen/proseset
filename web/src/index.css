@@ -214,6 +214,204 @@
   transition: color 0.35s ease;
 }
 
+.split-chip-segment {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(0.0625rem);
+  transform-origin: center;
+}
+
+/*
+ * The selected words sit in a measured shell so its black surface can grow
+ * and shrink with the contents instead of snapping between intrinsic widths.
+ */
+.selection-chip-resizer {
+  flex: 0 0 auto;
+  max-width: 100%;
+  transform: translateX(0);
+  transition-property: width, transform;
+  transition-duration: 0.42s, 0.16s;
+  transition-timing-function: cubic-bezier(0.22, 0.9, 0.25, 1.08), ease-out;
+  transition-delay: 0s;
+}
+
+.selection-chip-resizer-removing {
+  transition-delay: 0.16s;
+  transition-duration: 0.34s;
+  transition-timing-function: cubic-bezier(0.34, 0.9, 0.5, 1.08);
+}
+
+.selection-chip-resizer-removing-leading,
+.selection-chip-resizer-removing-trailing {
+  transform: translateX(var(--selection-chip-anchor-shift, 0));
+}
+
+.selection-chip-shell {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.625rem;
+}
+
+/* Spring the black surface without scaling the words or separator strokes. */
+.selection-chip-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: #050505;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  transform-origin: center;
+}
+
+.selection-chip-shell-expanding::before {
+  animation: selection-chip-expand-spring 0.42s ease-out both;
+}
+
+.selection-chip-shell-contracting::before {
+  animation: selection-chip-contract-spring 0.42s ease-out both;
+}
+
+.selection-chip-content {
+  position: relative;
+  z-index: 1;
+  width: max-content;
+}
+
+.selection-chip-target-sizer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.selection-chip-chip {
+  max-width: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.selection-chip-word-entering {
+  animation: selection-chip-word-pop 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) 90ms both;
+}
+
+/*
+ * Collapse the removed word's slot while letting its separator remain
+ * full-size. On an interior removal the two separators converge and overlap,
+ * reading as one unchanged slash instead of a slash being squeezed away.
+ */
+.selection-chip-unit-exiting {
+  flex: 0 0 auto;
+  overflow: visible;
+  animation: selection-chip-unit-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
+}
+
+.selection-chip-word-exiting {
+  animation: selection-chip-word-pop-out 0.18s cubic-bezier(0.4, 0, 0.8, 0.2) both;
+}
+
+.selection-chip-edge-boundary-exiting > .split-chip-boundary-visible {
+  overflow: visible;
+  animation: selection-chip-edge-boundary-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
+}
+
+.selection-chip-edge-boundary-exiting > .split-chip-boundary-visible::after {
+  animation: selection-chip-edge-boundary-thin 0.34s ease-out 0.16s both;
+}
+
+/*
+ * Keep an edge seam centered at its original half-gap from the surviving word.
+ * Its layout slot may close, but only the stroke thickness visibly changes.
+ */
+.selection-chip-edge-boundary-exiting-leading > .split-chip-boundary-visible::after {
+  left: calc(100% - 0.5625rem);
+}
+
+.selection-chip-edge-boundary-exiting-trailing > .split-chip-boundary-visible::after {
+  left: 0.5625rem;
+}
+
+@keyframes selection-chip-expand-spring {
+  0% { transform: scaleX(1) scaleY(1); }
+  42% { transform: scaleX(0.985) scaleY(0.97); }
+  70% { transform: scaleX(1.016) scaleY(1.025); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+@keyframes selection-chip-contract-spring {
+  0% { transform: scaleX(1) scaleY(1); }
+  42% { transform: scaleX(1.018) scaleY(1.025); }
+  72% { transform: scaleX(0.992) scaleY(0.98); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+@keyframes selection-chip-word-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0.18rem) scale(0.55);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(0.04rem) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0.0625rem) scale(1);
+  }
+}
+
+@keyframes selection-chip-unit-collapse {
+  from { width: var(--selection-chip-exit-width); }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-edge-boundary-collapse {
+  from { width: 1.125rem; }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-edge-boundary-thin {
+  from { width: 3px; }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-word-pop-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0.0625rem) scale(1);
+  }
+  45% {
+    opacity: 0.85;
+    transform: translateY(0.08rem) scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0.14rem) scale(0.48);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection-chip-resizer {
+    transition-duration: 0.01ms, 0.01ms;
+    transition-delay: 0s;
+  }
+
+  .selection-chip-shell-expanding::before,
+  .selection-chip-shell-contracting::before,
+  .selection-chip-word-entering,
+  .selection-chip-unit-exiting,
+  .selection-chip-edge-boundary-exiting > .split-chip-boundary-visible,
+  .selection-chip-edge-boundary-exiting > .split-chip-boundary-visible::after,
+  .selection-chip-word-exiting {
+    animation: none;
+  }
+}
+
 /* Completion dialog */
 .completion-backdrop {
   animation: completion-backdrop-in 0.24s ease-out both;

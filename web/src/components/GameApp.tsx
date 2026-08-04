@@ -172,7 +172,7 @@ export function GameApp({
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />
-        <div className="flex-1 w-full" />
+        <div className="flex-[0.225] w-full" />
         <ActionButtons
           selectedCards={state.selectedCards}
           onClear={handleClear}

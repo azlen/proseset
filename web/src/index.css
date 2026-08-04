@@ -33,6 +33,7 @@
 /* Shared selection/reveal surface: one chip whose diagonal seams can move. */
 .split-chip {
   --split-chip-padding-block: 0.625rem;
+  --split-chip-cutout-color: var(--background);
 
   display: inline-flex;
   align-items: stretch;
@@ -75,7 +76,8 @@
   bottom: -8%;
   left: 50%;
   width: 3px;
-  background: #fff;
+  /* Match the surface behind the chip so the seam reads as a cutout. */
+  background: var(--split-chip-cutout-color);
   transform: translateX(-50%) rotate(14deg) scaleX(0);
   transform-origin: center;
   transition: transform 0.16s ease;

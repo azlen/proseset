@@ -112,6 +112,96 @@
   transition: color 0.35s ease;
 }
 
+.split-chip-segment {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(0.0625rem);
+  transform-origin: center;
+}
+
+/*
+ * The selected words sit in a measured shell so its black surface can grow
+ * and shrink with the contents instead of snapping between intrinsic widths.
+ */
+.selection-chip-resizer {
+  flex: 0 0 auto;
+  max-width: 100%;
+  transition: width 0.42s cubic-bezier(0.22, 0.9, 0.25, 1.08);
+}
+
+.selection-chip-shell {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  background: #050505;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  transform-origin: center;
+}
+
+.selection-chip-shell-expanding {
+  animation: selection-chip-expand-spring 0.42s ease-out both;
+}
+
+.selection-chip-shell-contracting {
+  animation: selection-chip-contract-spring 0.42s ease-out both;
+}
+
+.selection-chip-content {
+  width: max-content;
+}
+
+.selection-chip-chip {
+  max-width: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.selection-chip-word-entering {
+  animation: selection-chip-word-pop 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) 90ms both;
+}
+
+@keyframes selection-chip-expand-spring {
+  0% { transform: scaleX(1) scaleY(1); }
+  42% { transform: scaleX(0.985) scaleY(0.97); }
+  70% { transform: scaleX(1.016) scaleY(1.025); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+@keyframes selection-chip-contract-spring {
+  0% { transform: scaleX(1) scaleY(1); }
+  42% { transform: scaleX(1.018) scaleY(1.025); }
+  72% { transform: scaleX(0.992) scaleY(0.98); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+@keyframes selection-chip-word-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0.18rem) scale(0.55);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(0.04rem) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0.0625rem) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection-chip-resizer {
+    transition-duration: 0.01ms;
+  }
+
+  .selection-chip-shell-expanding,
+  .selection-chip-shell-contracting,
+  .selection-chip-word-entering {
+    animation: none;
+  }
+}
+
 /* Completion dialog */
 .completion-backdrop {
   animation: completion-backdrop-in 0.24s ease-out both;

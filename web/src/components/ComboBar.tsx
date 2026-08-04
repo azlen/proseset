@@ -1,3 +1,4 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getWordBoundaries, SplitChip } from "./SplitChip";
 
@@ -6,7 +7,67 @@ interface CardSlotsProps {
   shake: boolean;
 }
 
+const CHIP_RESIZE_DURATION = 420;
+
 export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const resizerRef = useRef<HTMLDivElement>(null);
+  const previousCardsRef = useRef(selectedCards);
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const chipWidthRef = useRef<number>();
+  const completedExitKeyRef = useRef<string>();
+  const [, rerenderAfterExit] = useState(0);
+  const previousCards = previousCardsRef.current;
+  const isClearing = selectedCards.length === 0 && previousCards.length > 0;
+  const renderedCards = isClearing ? previousCards : selectedCards;
+  const selectionKey = selectedCards.join("\u0000");
+  const renderedSelectionKey = renderedCards.join("\u0000");
+  const exitComplete = selectedCards.length === 0
+    && renderedSelectionKey === completedExitKeyRef.current;
+  const enteringCards = new Set(
+    selectedCards.filter((card) => !previousCards.includes(card)),
+  );
+  const resizeDirection = selectedCards.length > previousCards.length
+    ? "expanding"
+    : selectedCards.length < previousCards.length
+      ? "contracting"
+      : undefined;
+
+  useLayoutEffect(() => {
+    clearTimeout(exitTimerRef.current);
+
+    if (selectedCards.length === 0) {
+      if (previousCards.length > 0) {
+        chipWidthRef.current = 0;
+        if (resizerRef.current) resizerRef.current.style.width = "0px";
+        const exitDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? 0
+          : CHIP_RESIZE_DURATION;
+        exitTimerRef.current = setTimeout(() => {
+          completedExitKeyRef.current = renderedSelectionKey;
+          rerenderAfterExit((version) => version + 1);
+        }, exitDelay);
+      } else {
+        chipWidthRef.current = undefined;
+      }
+
+      return () => clearTimeout(exitTimerRef.current);
+    }
+
+    completedExitKeyRef.current = undefined;
+    const nextWidth = contentRef.current?.getBoundingClientRect().width;
+    if (nextWidth !== undefined) {
+      chipWidthRef.current = nextWidth;
+      if (resizerRef.current) resizerRef.current.style.width = `${nextWidth}px`;
+    }
+
+    return () => clearTimeout(exitTimerRef.current);
+  }, [selectionKey, selectedCards.length, previousCards.length]);
+
+  useEffect(() => {
+    previousCardsRef.current = selectedCards;
+  }, [selectionKey, selectedCards]);
+
   return (
     <div
       className={cn(
@@ -14,13 +75,35 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         shake && "animate-shake",
       )}
     >
-      {selectedCards.length > 0
+      {renderedCards.length > 0 && (!exitComplete || selectedCards.length > 0)
         ? (
-            <SplitChip
-              text={selectedCards.join("")}
-              boundaries={getWordBoundaries(selectedCards)}
-              ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
-            />
+            <div
+              className="selection-chip-resizer"
+              ref={resizerRef}
+              style={{ width: chipWidthRef.current }}
+            >
+              <div
+                className={cn(
+                  "selection-chip-shell",
+                  resizeDirection && `selection-chip-shell-${resizeDirection}`,
+                )}
+                key={renderedSelectionKey}
+                aria-hidden={selectedCards.length === 0 || undefined}
+              >
+                <div className="selection-chip-content" ref={contentRef}>
+                  <SplitChip
+                    text={renderedCards.join("")}
+                    boundaries={getWordBoundaries(renderedCards)}
+                    segments={renderedCards}
+                    segmentClassName={(segment) => enteringCards.has(segment)
+                      ? "selection-chip-word-entering"
+                      : undefined}
+                    className="selection-chip-chip"
+                    ariaLabel={`Selected words: ${renderedCards.join(", ")}`}
+                  />
+                </div>
+              </div>
+            </div>
           )
         : Array.from({ length: 2 }, (_, i) => (
             <div

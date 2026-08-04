@@ -17,15 +17,18 @@ interface GameAppProps {
 }
 
 const DEFAULT_HATCH_LINE_WIDTH = 1.5;
-const DEFAULT_HATCH_GAP_WIDTH = 5.5;
+const DEFAULT_HATCH_GAP_WIDTH = 1.5;
+const DEFAULT_HATCH_ANGLE = 45;
 const DEFAULT_HATCH_LINE_COLOR = "#000000";
 
 interface HatchControlsProps {
   lineWidth: number;
   gapWidth: number;
+  angle: number;
   lineColor: string;
   onLineWidthChange: (value: number) => void;
   onGapWidthChange: (value: number) => void;
+  onAngleChange: (value: number) => void;
   onLineColorChange: (value: string) => void;
   onReset: () => void;
 }
@@ -33,9 +36,11 @@ interface HatchControlsProps {
 function HatchControls({
   lineWidth,
   gapWidth,
+  angle,
   lineColor,
   onLineWidthChange,
   onGapWidthChange,
+  onAngleChange,
   onLineColorChange,
   onReset,
 }: HatchControlsProps) {
@@ -80,6 +85,22 @@ function HatchControls({
           />
         </label>
 
+        <label className="mt-2 block text-xs font-semibold">
+          <span className="flex justify-between gap-3">
+            <span>Rotation</span>
+            <output className="font-mono tabular-nums">{Math.round(angle)}°</output>
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="360"
+            step="any"
+            value={angle}
+            onChange={(event) => onAngleChange(Number(event.target.value))}
+            className="mt-1 w-full cursor-pointer accent-black"
+          />
+        </label>
+
         <label className="mt-2 flex items-center justify-between gap-3 text-xs font-semibold">
           <span>Line color</span>
           <span className="flex items-center gap-2 font-mono uppercase">
@@ -114,6 +135,7 @@ export function GameApp({
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const [hatchLineWidth, setHatchLineWidth] = useState(DEFAULT_HATCH_LINE_WIDTH);
   const [hatchGapWidth, setHatchGapWidth] = useState(DEFAULT_HATCH_GAP_WIDTH);
+  const [hatchAngle, setHatchAngle] = useState(DEFAULT_HATCH_ANGLE);
   const [hatchLineColor, setHatchLineColor] = useState(DEFAULT_HATCH_LINE_COLOR);
 
   useEffect(() => {
@@ -212,12 +234,14 @@ export function GameApp({
   const hatchStyle = {
     "--hatch-line-width": `${hatchLineWidth}px`,
     "--hatch-gap-width": `${hatchGapWidth}px`,
+    "--hatch-angle": `${hatchAngle}deg`,
     "--hatch-line-color": hatchLineColor,
   } as CSSProperties;
 
   const resetHatch = () => {
     setHatchLineWidth(DEFAULT_HATCH_LINE_WIDTH);
     setHatchGapWidth(DEFAULT_HATCH_GAP_WIDTH);
+    setHatchAngle(DEFAULT_HATCH_ANGLE);
     setHatchLineColor(DEFAULT_HATCH_LINE_COLOR);
   };
 
@@ -230,9 +254,11 @@ export function GameApp({
         <HatchControls
           lineWidth={hatchLineWidth}
           gapWidth={hatchGapWidth}
+          angle={hatchAngle}
           lineColor={hatchLineColor}
           onLineWidthChange={setHatchLineWidth}
           onGapWidthChange={setHatchGapWidth}
+          onAngleChange={setHatchAngle}
           onLineColorChange={setHatchLineColor}
           onReset={resetHatch}
         />

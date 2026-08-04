@@ -4,6 +4,9 @@ interface WordCardProps {
   word: string;
   selected: boolean;
   selectionIndex: number | null;
+  height: number;
+  borderWidth: number;
+  borderRadius: number;
   onSelect: () => void;
   onDeselect: () => void;
 }
@@ -12,6 +15,9 @@ export function WordCard({
   word,
   selected,
   selectionIndex,
+  height,
+  borderWidth,
+  borderRadius,
   onSelect,
   onDeselect,
 }: WordCardProps) {
@@ -20,8 +26,9 @@ export function WordCard({
   return (
     <button
       onClick={selected ? onDeselect : onSelect}
+      style={{ height, borderWidth, borderRadius }}
       className={cn(
-        "relative min-w-0 rounded-lg border-[3px] border-solid border-foreground py-5 text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
+        "relative flex min-w-0 items-center justify-center border-solid border-foreground text-center text-base font-semibold uppercase tracking-wide text-card-foreground transition-colors duration-150 cursor-pointer",
         selected
           ? "bg-[#ddd1b2]"
           : "bg-card hover:bg-[#e9dfc2]",

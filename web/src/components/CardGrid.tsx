@@ -3,6 +3,9 @@ import { WordCard } from "./WordCard";
 interface CardGridProps {
   cards: string[];
   selectedCards: string[];
+  cardHeight: number;
+  cardBorderWidth: number;
+  cardBorderRadius: number;
   onSelectCard: (card: string) => void;
   onDeselectCard: (card: string) => void;
 }
@@ -10,6 +13,9 @@ interface CardGridProps {
 export function CardGrid({
   cards,
   selectedCards,
+  cardHeight,
+  cardBorderWidth,
+  cardBorderRadius,
   onSelectCard,
   onDeselectCard,
 }: CardGridProps) {
@@ -23,6 +29,9 @@ export function CardGrid({
             word={card}
             selected={selIdx !== -1}
             selectionIndex={selIdx !== -1 ? selIdx : null}
+            height={cardHeight}
+            borderWidth={cardBorderWidth}
+            borderRadius={cardBorderRadius}
             onSelect={() => onSelectCard(card)}
             onDeselect={() => onDeselectCard(card)}
           />

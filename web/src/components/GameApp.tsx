@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useState } from "react";
 import { fetchRandomPuzzle, validateCombo, loadDictionary, type PuzzleData } from "../lib/puzzle";
 import { gameReducer, initialState } from "../lib/game-state";
 import { saveProgress } from "../lib/storage";
@@ -16,6 +16,35 @@ interface GameAppProps {
   compact?: boolean;
 }
 
+interface TuningSliderProps {
+  id: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}
+
+function TuningSlider({ id, label, value, min, max, onChange }: TuningSliderProps) {
+  return (
+    <label htmlFor={id} className="min-w-0 text-xs font-medium">
+      <span className="mb-1 flex items-center justify-between gap-1">
+        <span>{label}</span>
+        <output htmlFor={id} className="tabular-nums text-muted-foreground">{value}px</output>
+      </span>
+      <input
+        id={id}
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(event) => onChange(Number(event.currentTarget.value))}
+        className="block h-4 w-full cursor-pointer accent-primary"
+      />
+    </label>
+  );
+}
+
 export function GameApp({
   initialPuzzle,
   persistProgress = true,
@@ -23,6 +52,9 @@ export function GameApp({
   compact = false,
 }: GameAppProps) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  const [cardHeight, setCardHeight] = useState(70);
+  const [cardBorderWidth, setCardBorderWidth] = useState(3);
+  const [cardBorderRadius, setCardBorderRadius] = useState(10);
 
   useEffect(() => {
     Promise.all([loadDictionary(), initialPuzzle ? Promise.resolve(initialPuzzle) : fetchRandomPuzzle()])
@@ -142,6 +174,17 @@ export function GameApp({
         />
       </div>
 
+      <section aria-label="Temporary card tuning controls" className="mt-2 w-full rounded-lg border bg-popover px-3 py-2">
+        <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+          Card tuning · temporary
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <TuningSlider id="card-height" label="Height" value={cardHeight} min={48} max={100} onChange={setCardHeight} />
+          <TuningSlider id="card-border" label="Border" value={cardBorderWidth} min={1} max={8} onChange={setCardBorderWidth} />
+          <TuningSlider id="card-radius" label="Radius" value={cardBorderRadius} min={0} max={24} onChange={setCardBorderRadius} />
+        </div>
+      </section>
+
       <div className="flex-1 flex flex-col items-center w-full">
         <div className="flex-1 flex items-center w-full">
           <div className="w-full">
@@ -167,6 +210,9 @@ export function GameApp({
         <CardGrid
           cards={state.puzzle.cards}
           selectedCards={state.selectedCards}
+          cardHeight={cardHeight}
+          cardBorderWidth={cardBorderWidth}
+          cardBorderRadius={cardBorderRadius}
           onSelectCard={handleSelectCard}
           onDeselectCard={handleDeselectCard}
         />

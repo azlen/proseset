@@ -127,7 +127,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           y="1.5"
           width="calc(100% - 3px)"
           height="77"
-          rx="10.5"
+          rx="14.5"
           className={cn("word-card-face", selected && "word-card-face-selected")}
           mask={holes.length > 0 ? `url(#${faceMaskId})` : undefined}
         />
@@ -226,7 +226,7 @@ export function WordCard({
   return (
     <div
       className={cn(
-        "relative h-[80px] min-w-0 rounded-[12px]",
+        "relative h-[80px] min-w-0 rounded-[16px]",
         punchBursts.length > 0 && "z-10",
       )}
     >
@@ -236,7 +236,7 @@ export function WordCard({
         aria-label={selected && selectionIndex !== null
           ? `${word}, selection ${selectionIndex + 1}`
           : word}
-        className="group relative z-[1] flex h-[80px] w-full min-w-0 cursor-pointer items-center justify-center rounded-[12px] text-center text-base font-semibold uppercase tracking-wide text-card-foreground"
+        className="group relative z-[1] flex h-[80px] w-full min-w-0 cursor-pointer items-center justify-center rounded-[16px] text-center text-base font-semibold uppercase tracking-wide text-card-foreground"
       >
         <PerforatedCardSurface holes={holes} selected={selected} />
         {selected && selectionIndex !== null && (

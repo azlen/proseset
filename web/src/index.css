@@ -30,8 +30,8 @@
 
 /*
  * A used card's face is an SVG compound shape so its holes are genuinely
- * transparent. Keeping the hatch on the layer below means it remains visible
- * through every perforation, even after the card settles back into the grid.
+ * transparent. A resting card reveals the page through its holes; the hatch
+ * beneath is visible only while the card is selected and lifted.
  */
 .word-card-face {
   fill: var(--card);
@@ -56,30 +56,36 @@
 
 /* The numbered disk detaches only when a valid combination marks the card used. */
 .word-card-chad {
-  --word-card-chad-drift: -18px;
-  --word-card-chad-spin: -145deg;
+  --word-card-chad-drift: -34px;
+  --word-card-chad-spin: -680deg;
 
   box-shadow: 0 2px 3px rgb(0 0 0 / 35%);
+  backface-visibility: visible;
   transform-origin: center;
-  will-change: transform, opacity;
-  animation: word-card-chad-fall 900ms cubic-bezier(0.22, 0.68, 0.3, 1) forwards;
+  will-change: transform;
+  animation: word-card-chad-fall 1400ms linear forwards;
 }
 
 @keyframes word-card-chad-fall {
   0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0) scale(1);
+    transform: perspective(140px) translate3d(0, 0, 0) rotate(0) rotateX(0) scale(1);
+    animation-timing-function: cubic-bezier(0.15, 0.8, 0.25, 1);
   }
-  18% {
-    opacity: 1;
-    transform: translate3d(0, -9px, 0) rotate(-18deg) scale(1.08);
+  13% {
+    transform: perspective(140px) translate3d(0, -16px, 18px) rotate(-22deg) rotateX(32deg) scale(1.12);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.8, 0.4);
+  }
+  28% {
+    transform: perspective(140px) translate3d(0, -5px, 8px) rotate(-48deg) rotateX(118deg) scale(1.03);
+    animation-timing-function: cubic-bezier(0.55, 0.05, 0.85, 0.35);
   }
   100% {
-    opacity: 0;
     transform:
-      translate3d(var(--word-card-chad-drift), 116px, 0)
+      perspective(140px)
+      translate3d(var(--word-card-chad-drift), 110dvh, 0)
       rotate(var(--word-card-chad-spin))
-      scale(0.82);
+      rotateX(720deg)
+      scale(0.94);
   }
 }
 

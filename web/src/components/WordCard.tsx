@@ -20,7 +20,7 @@ const USED_CARD_HOLE: CardHole = {
   radius: 10,
 };
 
-const CHAD_FALL_DURATION = 900;
+const CHAD_FALL_DURATION = 1400;
 
 interface WordCardProps {
   word: string;
@@ -191,7 +191,7 @@ export function WordCard({
         aria-hidden="true"
         className={cn(
           "word-card-hatch-shadow pointer-events-none absolute inset-0 rounded-[12px] transition-opacity duration-150",
-          selected || used ? "opacity-100" : "opacity-0",
+          selected ? "opacity-100" : "opacity-0",
         )}
       />
       <button
@@ -226,11 +226,11 @@ export function WordCard({
           className="word-card-chad pointer-events-none absolute left-[6px] top-[6px] z-20 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
           style={{
             "--word-card-chad-drift": chad.label !== null && chad.label % 2 === 0
-              ? "18px"
-              : "-18px",
+              ? "36px"
+              : "-34px",
             "--word-card-chad-spin": chad.label !== null && chad.label % 2 === 0
-              ? "155deg"
-              : "-145deg",
+              ? "720deg"
+              : "-680deg",
           } as CSSProperties}
         >
           {chad.label}

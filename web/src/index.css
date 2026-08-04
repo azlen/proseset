@@ -28,6 +28,40 @@
   );
 }
 
+/*
+ * The face is an SVG compound shape so its holes are genuinely transparent.
+ * Keeping the hatch on the layer below means the lifted-card shadow remains
+ * visible through every perforation.
+ */
+.word-card-face {
+  fill: var(--card);
+  stroke: var(--foreground);
+  stroke-width: 3px;
+  transition: fill 150ms ease-out;
+}
+
+.group:hover .word-card-face {
+  fill: #e9dfc2;
+}
+
+.word-card-face-selected,
+.group:hover .word-card-face-selected {
+  fill: #ddd1b2;
+}
+
+/* This is the union edge, not one ring per circle, so holes may overlap. */
+.word-card-hole-edge {
+  fill: var(--foreground);
+}
+
+.word-card-hole-label {
+  color: var(--background);
+  line-height: 1;
+  paint-order: stroke fill;
+  -webkit-text-stroke: 2px var(--foreground);
+  text-shadow: 0 1px 1px rgb(0 0 0 / 45%);
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-4px); }

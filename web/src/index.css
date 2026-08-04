@@ -222,6 +222,18 @@
   animation: selection-chip-edge-boundary-thin 0.34s ease-out 0.16s both;
 }
 
+/*
+ * Keep an edge seam centered at its original half-gap from the surviving word.
+ * Its layout slot may close, but only the stroke thickness visibly changes.
+ */
+.selection-chip-edge-boundary-exiting-leading > .split-chip-boundary-visible::after {
+  left: calc(100% - 0.5625rem);
+}
+
+.selection-chip-edge-boundary-exiting-trailing > .split-chip-boundary-visible::after {
+  left: 0.5625rem;
+}
+
 @keyframes selection-chip-expand-spring {
   0% { transform: scaleX(1) scaleY(1); }
   42% { transform: scaleX(0.985) scaleY(0.97); }

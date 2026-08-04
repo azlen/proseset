@@ -134,7 +134,10 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
                     segmentUnitClassName={(segment, index) => cn(
                       removedCardSet.has(segment) && "selection-chip-unit-exiting",
                       index === edgeBoundaryExitIndex
-                        && "selection-chip-edge-boundary-exiting",
+                        && cn(
+                          "selection-chip-edge-boundary-exiting",
+                          removalEdge && `selection-chip-edge-boundary-exiting-${removalEdge}`,
+                        ),
                     )}
                     segmentUnitStyle={(segment) => {
                       const width = segmentWidthsRef.current.get(segment);

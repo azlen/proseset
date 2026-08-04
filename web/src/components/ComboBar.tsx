@@ -9,11 +9,15 @@ interface CardSlotsProps {
 }
 
 const CHIP_RESIZE_DURATION = 500;
+const EMPTY_SLOT_WIDTH = 64;
+const EMPTY_SLOT_GAP = 8;
+const SLOT_FILL_DURATION = 520;
 
 export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const targetContentRef = useRef<HTMLDivElement>(null);
   const resizerRef = useRef<HTMLDivElement>(null);
+  const resizeAnimationRef = useRef<Animation>();
   const previousCardsRef = useRef(selectedCards);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const chipWidthRef = useRef<number>();
@@ -46,6 +50,13 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const enteringCards = new Set(
     selectedCards.filter((card) => !previousCards.includes(card)),
   );
+  const fillingSlotIndex = !isRemoving
+    && selectedCards.length === previousCards.length + 1
+    && previousCards.length < 2
+    ? previousCards.length
+    : undefined;
+  const isFirstSlotFill = fillingSlotIndex === 0;
+  const isSecondSlotFill = fillingSlotIndex === 1;
   const resizeDirection = selectedCards.length > previousCards.length
     ? "expanding"
     : selectedCards.length < previousCards.length
@@ -67,6 +78,9 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
       : targetContentRef.current?.getBoundingClientRect().width;
     if (nextWidth !== undefined) {
       const currentWidth = resizerRef.current?.getBoundingClientRect().width;
+      const previousWidth = currentWidth ?? EMPTY_SLOT_WIDTH;
+      resizeAnimationRef.current?.cancel();
+      resizeAnimationRef.current = undefined;
       if (currentWidth !== undefined && removalEdge) {
         const direction = removalEdge === "leading" ? 1 : -1;
         const anchorShift = Math.max(0, currentWidth - nextWidth) * direction / 2;
@@ -76,7 +90,47 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         );
       }
       chipWidthRef.current = nextWidth;
-      if (resizerRef.current) resizerRef.current.style.width = `${nextWidth}px`;
+      if (resizerRef.current) {
+        resizerRef.current.style.width = `${nextWidth}px`;
+        resizerRef.current.style.setProperty(
+          "--selection-chip-previous-width",
+          `${previousWidth}px`,
+        );
+        resizerRef.current.style.setProperty(
+          "--selection-chip-target-width",
+          `${nextWidth}px`,
+        );
+
+        if (
+          fillingSlotIndex !== undefined
+          && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+          // For slot one, the new chip occupies the exact footprint of the
+          // placeholder it replaces. For slot two, temporarily include the
+          // remaining placeholder in the resizer so the whole row keeps its
+          // position while that placeholder is absorbed into the chip.
+          const startWidth = isFirstSlotFill
+            ? EMPTY_SLOT_WIDTH
+            : previousWidth + EMPTY_SLOT_WIDTH + EMPTY_SLOT_GAP;
+          const animation = resizerRef.current.animate(
+            [
+              { width: `${startWidth}px` },
+              { width: `${nextWidth}px` },
+            ],
+            {
+              duration: SLOT_FILL_DURATION,
+              easing: "cubic-bezier(0.22, 0.9, 0.25, 1)",
+              fill: "both",
+            },
+          );
+          resizeAnimationRef.current = animation;
+          void animation.finished.then(() => {
+            if (resizeAnimationRef.current !== animation) return;
+            animation.cancel();
+            resizeAnimationRef.current = undefined;
+          }).catch(() => undefined);
+        }
+      }
     }
 
     if (isRemoving) {
@@ -89,7 +143,15 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
     }
 
     return () => clearTimeout(exitTimerRef.current);
-  }, [isRemoving, removalEdge, renderedSelectionKey, selectionKey, selectedCards.length]);
+  }, [
+    fillingSlotIndex,
+    isFirstSlotFill,
+    isRemoving,
+    removalEdge,
+    renderedSelectionKey,
+    selectionKey,
+    selectedCards.length,
+  ]);
 
   useEffect(() => {
     previousCardsRef.current = selectedCards;
@@ -107,7 +169,7 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         <div
           className={cn(
             "selection-chip-resizer",
-            emptySlotCount > 0 && "mx-1",
+            "mx-1",
             isRemoving && "selection-chip-resizer-removing",
             removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
           )}
@@ -118,10 +180,15 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
             className={cn(
               "selection-chip-shell",
               resizeDirection && `selection-chip-shell-${resizeDirection}`,
+              isFirstSlotFill && "selection-chip-shell-first-fill",
+              isSecondSlotFill && "selection-chip-shell-second-fill",
             )}
             key={renderedSelectionKey}
             aria-hidden={selectedCards.length === 0 || undefined}
           >
+            {isSecondSlotFill && (
+              <span className="selection-chip-absorbed-slot" aria-hidden="true" />
+            )}
             <div className="selection-chip-content" ref={contentRef}>
               <SplitChip
                 text={renderedCards.join("")}

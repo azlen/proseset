@@ -251,6 +251,7 @@
   position: relative;
   isolation: isolate;
   width: 100%;
+  height: 2.5rem;
   overflow: hidden;
   border-radius: 0.625rem;
 }
@@ -267,6 +268,45 @@
   transform-origin: center;
 }
 
+/*
+ * The first two selections start from the geometry of the dashed targets.
+ * On the first selection the shell itself changes from paper and dashes into
+ * the chip. On the second, the remaining target slides into the first chip,
+ * changes size, fills, and hands its surface off to the combined shell.
+ */
+.selection-chip-shell.selection-chip-shell-first-fill::before {
+  animation: selection-chip-first-slot-fill 0.52s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.selection-chip-shell.selection-chip-shell-second-fill::before {
+  animation: selection-chip-second-slot-surface 0.52s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.selection-chip-absorbed-slot {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: calc(var(--selection-chip-previous-width) + 0.5rem);
+  width: 4rem;
+  height: 2.5rem;
+  box-sizing: border-box;
+  border: 2px dashed rgb(34 34 34 / 40%);
+  border-radius: 0.625rem;
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  animation: selection-chip-absorb-slot 0.52s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Let the seam arrive as the two formerly separate surfaces meet. */
+.selection-chip-shell-second-fill .split-chip-boundary-visible {
+  animation: selection-chip-fill-boundary 0.28s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+.selection-chip-shell-second-fill .split-chip-boundary-visible::after {
+  animation: selection-chip-fill-slash 0.24s ease-out 0.2s both;
+}
+
 .selection-chip-shell-expanding::before {
   animation: selection-chip-expand-spring 0.42s ease-out both;
 }
@@ -277,7 +317,7 @@
 
 .selection-chip-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: max-content;
 }
 
@@ -343,6 +383,100 @@
   100% { transform: scaleX(1) scaleY(1); }
 }
 
+@keyframes selection-chip-first-slot-fill {
+  0% {
+    border-width: 2px;
+    border-style: dashed;
+    border-color: rgb(34 34 34 / 40%);
+    background-color: transparent;
+    box-shadow: none;
+    transform: scale(1);
+  }
+  44% {
+    border-color: #050505;
+    background: #050505;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+    transform: scale(0.98, 0.94);
+  }
+  72% {
+    border-color: #050505;
+    background: #050505;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    transform: scale(1.01, 1.025);
+  }
+  100% {
+    border: 0 dashed #050505;
+    background: #050505;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    transform: scale(1);
+  }
+}
+
+@keyframes selection-chip-second-slot-surface {
+  0%, 28% {
+    clip-path: inset(
+      0 calc(100% - var(--selection-chip-previous-width)) 0 0
+      round 0.625rem
+    );
+  }
+  100% {
+    clip-path: inset(0 round 0.625rem);
+  }
+}
+
+@keyframes selection-chip-absorb-slot {
+  0% {
+    left: calc(var(--selection-chip-previous-width) + 0.5rem);
+    width: 4rem;
+    border-width: 2px;
+    border-style: dashed;
+    border-color: rgb(34 34 34 / 40%);
+    border-radius: 0.625rem;
+    background-color: transparent;
+    opacity: 1;
+  }
+  44% {
+    left: var(--selection-chip-previous-width);
+    width: calc(
+      var(--selection-chip-target-width) - var(--selection-chip-previous-width)
+    );
+    border-color: #050505;
+    border-radius: 0 0.625rem 0.625rem 0;
+    background: #050505;
+    opacity: 1;
+  }
+  82% {
+    left: var(--selection-chip-previous-width);
+    width: calc(
+      var(--selection-chip-target-width) - var(--selection-chip-previous-width)
+    );
+    border-width: 0;
+    border-radius: 0 0.625rem 0.625rem 0;
+    background: #050505;
+    opacity: 1;
+  }
+  100% {
+    left: var(--selection-chip-previous-width);
+    width: calc(
+      var(--selection-chip-target-width) - var(--selection-chip-previous-width)
+    );
+    border-width: 0;
+    border-radius: 0 0.625rem 0.625rem 0;
+    background: #050505;
+    opacity: 0;
+  }
+}
+
+@keyframes selection-chip-fill-boundary {
+  from { width: 0; }
+  to { width: 1.125rem; }
+}
+
+@keyframes selection-chip-fill-slash {
+  from { transform: translateX(-50%) rotate(14deg) scaleX(0); }
+  to { transform: translateX(-50%) rotate(14deg) scaleX(1); }
+}
+
 @keyframes selection-chip-contract-spring {
   0% { transform: scaleX(1) scaleY(1); }
   42% { transform: scaleX(1.018) scaleY(1.025); }
@@ -403,6 +537,11 @@
 
   .selection-chip-shell-expanding::before,
   .selection-chip-shell-contracting::before,
+  .selection-chip-shell-first-fill::before,
+  .selection-chip-shell-second-fill::before,
+  .selection-chip-absorbed-slot,
+  .selection-chip-shell-second-fill .split-chip-boundary-visible,
+  .selection-chip-shell-second-fill .split-chip-boundary-visible::after,
   .selection-chip-word-entering,
   .selection-chip-unit-exiting,
   .selection-chip-edge-boundary-exiting > .split-chip-boundary-visible,

@@ -23,16 +23,18 @@ const PUNCH_INITIAL_DELAY = 90;
 const PUNCH_STAGGER = 140;
 const PUNCH_BURST_DURATION = 520;
 const PUNCH_PARTICLES = 8;
-const TICKET_PERFORATION_X = "calc(100% - 17px)";
-const TICKET_EDGE_X = "calc(100% - 1.5px)";
+const CARD_LEFT_EDGE_X = 1.5;
+const CARD_RIGHT_EDGE_X = "calc(100% - 1.5px)";
+const CARD_TOP_EDGE_Y = 1.5;
+const CARD_BOTTOM_EDGE_Y = 78.5;
+const TICKET_CORNER_RADIUS = 8.5;
 
 const TICKET_EDGE_CUTS = [
-  { y: 15, radius: 1.4 },
-  { y: 25, radius: 1.8 },
-  { y: 36, radius: 1.3 },
-  { y: 47, radius: 1.7 },
-  { y: 58, radius: 1.4 },
-  { y: 68, radius: 1.9 },
+  { y: 17, leftRadius: 1.4, rightRadius: 1.8 },
+  { y: 28, leftRadius: 1.9, rightRadius: 1.3 },
+  { y: 40, leftRadius: 1.3, rightRadius: 1.7 },
+  { y: 52, leftRadius: 1.7, rightRadius: 1.4 },
+  { y: 63, leftRadius: 1.5, rightRadius: 1.9 },
 ];
 
 function getCardHole(index: number): CardHole {
@@ -58,27 +60,27 @@ interface PerforatedCardSurfaceProps {
   selected: boolean;
 }
 
-/** Curved bites at either end of the tear guide. */
-function TicketNotches() {
+/** Circular scoops replace all four conventional rounded corners. */
+function TicketCornerCutouts() {
   return (
     <>
-      <circle cx={TICKET_PERFORATION_X} cy="1.5" r="5.5" />
-      <circle cx={TICKET_PERFORATION_X} cy="78.5" r="5.5" />
+      <circle cx={CARD_LEFT_EDGE_X} cy={CARD_TOP_EDGE_Y} r={TICKET_CORNER_RADIUS} />
+      <circle cx={CARD_RIGHT_EDGE_X} cy={CARD_TOP_EDGE_Y} r={TICKET_CORNER_RADIUS} />
+      <circle cx={CARD_LEFT_EDGE_X} cy={CARD_BOTTOM_EDGE_Y} r={TICKET_CORNER_RADIUS} />
+      <circle cx={CARD_RIGHT_EDGE_X} cy={CARD_BOTTOM_EDGE_Y} r={TICKET_CORNER_RADIUS} />
     </>
   );
 }
 
-/** Small uneven bites leave the ticket stub with a fibrous torn edge. */
+/** Small uneven bites leave both ticket edges looking torn from a strip. */
 function TicketEdgeCuts() {
   return (
     <>
       {TICKET_EDGE_CUTS.map((cut) => (
-        <circle
-          key={cut.y}
-          cx={TICKET_EDGE_X}
-          cy={cut.y}
-          r={cut.radius}
-        />
+        <g key={cut.y}>
+          <circle cx={CARD_LEFT_EDGE_X} cy={cut.y} r={cut.leftRadius} />
+          <circle cx={CARD_RIGHT_EDGE_X} cy={cut.y} r={cut.rightRadius} />
+        </g>
       ))}
     </>
   );
@@ -87,14 +89,14 @@ function TicketEdgeCuts() {
 /**
  * Paint the card as a compound shape instead of placing opaque badges on it.
  *
- * The first mask removes the union of every hole from the face and its outer
- * border. The second mask paints only the outside edge of that same union, so
- * overlapping holes continue to read as one clean, punched-out shape.
+ * The first mask removes the ticket cuts and every punch hole from the face.
+ * The second paints the outlined cutouts as a union, so overlapping punch
+ * holes continue to read as one clean, punched-out shape.
  */
 function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) {
   const reactId = useId().replace(/:/g, "");
   const faceMaskId = `card-face-mask-${reactId}`;
-  const holeEdgeMaskId = `card-hole-edge-mask-${reactId}`;
+  const cutEdgeMaskId = `card-cut-edge-mask-${reactId}`;
 
   return (
     <>
@@ -114,7 +116,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           >
             <rect x="-10" y="-10" width="600" height="100" fill="white" />
             <g fill="black">
-              <TicketNotches />
+              <TicketCornerCutouts />
               <TicketEdgeCuts />
               {holes.map((hole) => (
                 <circle
@@ -129,7 +131,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           </mask>
 
           <mask
-            id={holeEdgeMaskId}
+            id={cutEdgeMaskId}
             x="-10"
             y="-10"
             width="600"
@@ -139,7 +141,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           >
             <rect x="-10" y="-10" width="600" height="100" fill="black" />
             <g fill="white" stroke="white" strokeWidth="6">
-              <TicketNotches />
+              <TicketCornerCutouts />
               {holes.map((hole) => (
                 <circle
                   key={hole.id}
@@ -150,7 +152,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
               ))}
             </g>
             <g fill="black">
-              <TicketNotches />
+              <TicketCornerCutouts />
               {holes.map((hole) => (
                 <circle
                   key={hole.id}
@@ -168,7 +170,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           y="1.5"
           width="calc(100% - 3px)"
           height="77"
-          rx="10.5"
+          rx="1.5"
           className={cn("word-card-face", selected && "word-card-face-selected")}
           mask={`url(#${faceMaskId})`}
         />
@@ -176,14 +178,7 @@ function PerforatedCardSurface({ holes, selected }: PerforatedCardSurfaceProps) 
           width="100%"
           height="100%"
           className="word-card-hole-edge"
-          mask={`url(#${holeEdgeMaskId})`}
-        />
-        <line
-          x1={TICKET_PERFORATION_X}
-          x2={TICKET_PERFORATION_X}
-          y1="11"
-          y2="69"
-          className="word-card-ticket-seam"
+          mask={`url(#${cutEdgeMaskId})`}
         />
       </svg>
 
@@ -309,7 +304,7 @@ export function WordCard({
             {selectionIndex + 1}
           </span>
         )}
-        <span className="word-card-label relative z-[1]">{displayWord}</span>
+        <span className="relative z-[1]">{displayWord}</span>
       </button>
 
       {punchBursts.map((burst) => (

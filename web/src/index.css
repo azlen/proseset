@@ -22,10 +22,9 @@
 .word-card-hatch-shadow {
   background-color: #f3f1e8;
   background-image: repeating-linear-gradient(
-    var(--hatch-angle, 45deg),
-    var(--hatch-line-color, #000) 0 var(--hatch-line-width, 1.5px),
-    transparent var(--hatch-line-width, 1.5px)
-      calc(var(--hatch-line-width, 1.5px) + var(--hatch-gap-width, 1.5px))
+    45deg,
+    #000 0 1.5px,
+    transparent 1.5px 3px
   );
 }
 

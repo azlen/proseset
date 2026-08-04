@@ -37,7 +37,7 @@ export function WordCard({
         )}
       >
         {selected && selectionIndex !== null && (
-          <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+          <span className="absolute top-1 left-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {selectionIndex + 1}
           </span>
         )}

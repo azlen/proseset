@@ -7,6 +7,8 @@ interface CardSlotsProps {
 }
 
 export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
+  const emptySlotCount = Math.max(0, 2 - selectedCards.length);
+
   return (
     <div
       className={cn(
@@ -14,20 +16,21 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         shake && "animate-shake",
       )}
     >
-      {selectedCards.length > 0
-        ? (
-            <SplitChip
-              text={selectedCards.join("")}
-              boundaries={getWordBoundaries(selectedCards)}
-              ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
-            />
-          )
-        : Array.from({ length: 2 }, (_, i) => (
-            <div
-              key={`empty-${i}`}
-              className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
-            />
-          ))}
+      {selectedCards.length > 0 && (
+        <SplitChip
+          text={selectedCards.join("")}
+          boundaries={getWordBoundaries(selectedCards)}
+          ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
+          className={emptySlotCount > 0 ? "mx-1" : undefined}
+        />
+      )}
+      {Array.from({ length: emptySlotCount }, (_, i) => (
+        <div
+          key={`empty-${i}`}
+          aria-hidden="true"
+          className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
+        />
+      ))}
     </div>
   );
 }

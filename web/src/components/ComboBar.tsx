@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { getWordBoundaries, SplitChip } from "./SplitChip";
 
@@ -7,23 +8,40 @@ interface CardSlotsProps {
   shake: boolean;
 }
 
-const CHIP_RESIZE_DURATION = 420;
+const CHIP_RESIZE_DURATION = 500;
 
 export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const targetContentRef = useRef<HTMLDivElement>(null);
   const resizerRef = useRef<HTMLDivElement>(null);
   const previousCardsRef = useRef(selectedCards);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const chipWidthRef = useRef<number>();
-  const completedExitKeyRef = useRef<string>();
+  const segmentWidthsRef = useRef(new Map<string, number>());
   const [, rerenderAfterExit] = useState(0);
   const previousCards = previousCardsRef.current;
-  const isClearing = selectedCards.length === 0 && previousCards.length > 0;
-  const renderedCards = isClearing ? previousCards : selectedCards;
+  const removedCards = previousCards.filter((card) => !selectedCards.includes(card));
+  const removedCardSet = new Set(removedCards);
+  const isRemoving = removedCards.length > 0;
+  const removedIndex = removedCards.length === 1
+    ? previousCards.indexOf(removedCards[0]!)
+    : -1;
+  const removalEdge = selectedCards.length > 0 && removedIndex === 0
+    ? "leading"
+    : selectedCards.length > 0 && removedIndex === previousCards.length - 1
+      ? "trailing"
+      : undefined;
+  // Keep every old segment mounted until its precise slot has collapsed.
+  const renderedCards = isRemoving ? previousCards : selectedCards;
   const selectionKey = selectedCards.join("\u0000");
   const renderedSelectionKey = renderedCards.join("\u0000");
-  const exitComplete = selectedCards.length === 0
-    && renderedSelectionKey === completedExitKeyRef.current;
+  // Separators live on the segment to their right. When the first word exits,
+  // collapse the next word's leading separator without collapsing that word.
+  const leadingBoundaryExitCard = removedCardSet.has(previousCards[0] ?? "")
+    && previousCards[1] !== undefined
+    && !removedCardSet.has(previousCards[1])
+      ? previousCards[1]
+      : undefined;
   const enteringCards = new Set(
     selectedCards.filter((card) => !previousCards.includes(card)),
   );
@@ -36,33 +54,41 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
   useLayoutEffect(() => {
     clearTimeout(exitTimerRef.current);
 
-    if (selectedCards.length === 0) {
-      if (previousCards.length > 0) {
-        chipWidthRef.current = 0;
-        if (resizerRef.current) resizerRef.current.style.width = "0px";
-        const exitDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? 0
-          : CHIP_RESIZE_DURATION;
-        exitTimerRef.current = setTimeout(() => {
-          completedExitKeyRef.current = renderedSelectionKey;
-          rerenderAfterExit((version) => version + 1);
-        }, exitDelay);
-      } else {
-        chipWidthRef.current = undefined;
-      }
+    const renderedUnits = contentRef.current?.querySelectorAll<HTMLElement>(".split-chip-unit");
+    renderedUnits?.forEach((unit, index) => {
+      const card = renderedCards[index];
+      // offsetWidth intentionally ignores the word's scale/pop transform.
+      if (card) segmentWidthsRef.current.set(card, unit.offsetWidth);
+    });
 
-      return () => clearTimeout(exitTimerRef.current);
-    }
-
-    completedExitKeyRef.current = undefined;
-    const nextWidth = contentRef.current?.getBoundingClientRect().width;
+    const nextWidth = selectedCards.length === 0
+      ? 0
+      : targetContentRef.current?.getBoundingClientRect().width;
     if (nextWidth !== undefined) {
+      const currentWidth = resizerRef.current?.getBoundingClientRect().width;
+      if (currentWidth !== undefined && removalEdge) {
+        const direction = removalEdge === "leading" ? 1 : -1;
+        const anchorShift = Math.max(0, currentWidth - nextWidth) * direction / 2;
+        resizerRef.current?.style.setProperty(
+          "--selection-chip-anchor-shift",
+          `${anchorShift}px`,
+        );
+      }
       chipWidthRef.current = nextWidth;
       if (resizerRef.current) resizerRef.current.style.width = `${nextWidth}px`;
     }
 
+    if (isRemoving) {
+      const exitDelay = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? 0
+        : CHIP_RESIZE_DURATION;
+      exitTimerRef.current = setTimeout(() => {
+        rerenderAfterExit((version) => version + 1);
+      }, exitDelay);
+    }
+
     return () => clearTimeout(exitTimerRef.current);
-  }, [selectionKey, selectedCards.length, previousCards.length]);
+  }, [isRemoving, removalEdge, renderedSelectionKey, selectionKey, selectedCards.length]);
 
   useEffect(() => {
     previousCardsRef.current = selectedCards;
@@ -75,10 +101,14 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
         shake && "animate-shake",
       )}
     >
-      {renderedCards.length > 0 && (!exitComplete || selectedCards.length > 0)
+      {renderedCards.length > 0
         ? (
             <div
-              className="selection-chip-resizer"
+              className={cn(
+                "selection-chip-resizer",
+                isRemoving && "selection-chip-resizer-removing",
+                removalEdge && `selection-chip-resizer-removing-${removalEdge}`,
+              )}
               ref={resizerRef}
               style={{ width: chipWidthRef.current }}
             >
@@ -95,11 +125,23 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
                     text={renderedCards.join("")}
                     boundaries={getWordBoundaries(renderedCards)}
                     segments={renderedCards}
-                    segmentClassName={(segment) => enteringCards.has(segment)
-                      ? "selection-chip-word-entering"
-                      : undefined}
+                    segmentClassName={(segment) => removedCardSet.has(segment)
+                      ? "selection-chip-word-exiting"
+                      : enteringCards.has(segment)
+                        ? "selection-chip-word-entering"
+                        : undefined}
+                    segmentUnitClassName={(segment) => cn(
+                      removedCardSet.has(segment) && "selection-chip-unit-exiting",
+                      segment === leadingBoundaryExitCard
+                        && "selection-chip-leading-boundary-exiting",
+                    )}
+                    segmentUnitStyle={(segment) => {
+                      const width = segmentWidthsRef.current.get(segment);
+                      if (!removedCardSet.has(segment) || width === undefined) return undefined;
+                      return { "--selection-chip-exit-width": `${width}px` } as CSSProperties;
+                    }}
                     className="selection-chip-chip"
-                    ariaLabel={`Selected words: ${renderedCards.join(", ")}`}
+                    ariaLabel={`Selected words: ${selectedCards.join(", ")}`}
                   />
                 </div>
               </div>
@@ -111,6 +153,18 @@ export function CardSlots({ selectedCards, shake }: CardSlotsProps) {
               className="mx-1 px-6 py-2 rounded-lg border-2 border-dashed border-border/40 min-h-10 min-w-16"
             />
           ))}
+
+      {selectedCards.length > 0 && (
+        <div className="selection-chip-target-sizer" ref={targetContentRef} aria-hidden="true">
+          <SplitChip
+            text={selectedCards.join("")}
+            boundaries={getWordBoundaries(selectedCards)}
+            segments={selectedCards}
+            className="selection-chip-chip"
+            ariaLabel=""
+          />
+        </div>
+      )}
     </div>
   );
 }

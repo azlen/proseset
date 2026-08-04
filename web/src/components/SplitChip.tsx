@@ -9,6 +9,8 @@ interface SplitChipProps {
   letterClassName?: (index: number) => string | undefined;
   segments?: readonly string[];
   segmentClassName?: (segment: string, index: number) => string | undefined;
+  segmentUnitClassName?: (segment: string, index: number) => string | undefined;
+  segmentUnitStyle?: (segment: string, index: number) => CSSProperties | undefined;
 }
 
 /** Return the character positions where each word in a split ends. */
@@ -36,6 +38,8 @@ export function SplitChip({
   letterClassName,
   segments,
   segmentClassName,
+  segmentUnitClassName,
+  segmentUnitStyle,
 }: SplitChipProps) {
   const boundaryOrder = new Map(
     [...boundaries]
@@ -52,7 +56,12 @@ export function SplitChip({
               .reduce((position, word) => position + word.length, 0);
 
             return (
-              <span className="split-chip-unit" key={segment} aria-hidden="true">
+              <span
+                className={cn("split-chip-unit", segmentUnitClassName?.(segment, index))}
+                key={segment}
+                style={segmentUnitStyle?.(segment, index)}
+                aria-hidden="true"
+              >
                 {index > 0 && (
                   <SplitChipBoundary
                     order={boundaryOrder.get(boundaryPosition) ?? index - 1}

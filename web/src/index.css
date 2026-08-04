@@ -127,7 +127,22 @@
 .selection-chip-resizer {
   flex: 0 0 auto;
   max-width: 100%;
-  transition: width 0.42s cubic-bezier(0.22, 0.9, 0.25, 1.08);
+  transform: translateX(0);
+  transition-property: width, transform;
+  transition-duration: 0.42s, 0.16s;
+  transition-timing-function: cubic-bezier(0.22, 0.9, 0.25, 1.08), ease-out;
+  transition-delay: 0s;
+}
+
+.selection-chip-resizer-removing {
+  transition-delay: 0.16s;
+  transition-duration: 0.34s;
+  transition-timing-function: cubic-bezier(0.34, 0.9, 0.5, 1.08);
+}
+
+.selection-chip-resizer-removing-leading,
+.selection-chip-resizer-removing-trailing {
+  transform: translateX(var(--selection-chip-anchor-shift, 0));
 }
 
 .selection-chip-shell {
@@ -151,6 +166,15 @@
   width: max-content;
 }
 
+.selection-chip-target-sizer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .selection-chip-chip {
   max-width: none;
   background: transparent;
@@ -159,6 +183,22 @@
 
 .selection-chip-word-entering {
   animation: selection-chip-word-pop 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) 90ms both;
+}
+
+/* Collapse the removed word's original flex slot so later words slide into it. */
+.selection-chip-unit-exiting {
+  flex: 0 0 auto;
+  overflow: hidden;
+  animation: selection-chip-unit-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
+}
+
+.selection-chip-word-exiting {
+  animation: selection-chip-word-pop-out 0.18s cubic-bezier(0.4, 0, 0.8, 0.2) both;
+}
+
+.selection-chip-leading-boundary-exiting > .split-chip-boundary-visible {
+  overflow: hidden;
+  animation: selection-chip-leading-boundary-collapse 0.34s cubic-bezier(0.34, 0.9, 0.5, 1.08) 0.16s both;
 }
 
 @keyframes selection-chip-expand-spring {
@@ -190,14 +230,43 @@
   }
 }
 
+@keyframes selection-chip-unit-collapse {
+  from { width: var(--selection-chip-exit-width); }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-leading-boundary-collapse {
+  from { width: 1.125rem; }
+  to { width: 0; }
+}
+
+@keyframes selection-chip-word-pop-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0.0625rem) scale(1);
+  }
+  45% {
+    opacity: 0.85;
+    transform: translateY(0.08rem) scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0.14rem) scale(0.48);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .selection-chip-resizer {
-    transition-duration: 0.01ms;
+    transition-duration: 0.01ms, 0.01ms;
+    transition-delay: 0s;
   }
 
   .selection-chip-shell-expanding,
   .selection-chip-shell-contracting,
-  .selection-chip-word-entering {
+  .selection-chip-word-entering,
+  .selection-chip-unit-exiting,
+  .selection-chip-leading-boundary-exiting > .split-chip-boundary-visible,
+  .selection-chip-word-exiting {
     animation: none;
   }
 }
